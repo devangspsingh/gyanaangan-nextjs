@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 // No specific API call for initial data here, client will fetch.
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.dspsc.live';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.gyanaangan.in';
 const SITE_NAME = 'Gyan Aangan';
 
 export async function generateMetadata() {

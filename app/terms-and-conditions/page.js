@@ -1,7 +1,7 @@
 export default function TermsAndConditionsPage() {
   // In a real app, you might fetch this content from a CMS or have it statically defined
   const lastUpdated = "October 26, 2023"; // Example date, keep dynamic if possible
-  const siteUrl = "https://gyanaangan.dspsc.live"; // Example URL
+  const siteUrl = "https://app.gyanaangan.in"; // Example URL
   const contactEmail = "dspscpy@gmail.com"; // Example email
 
   return (
