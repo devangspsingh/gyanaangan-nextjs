@@ -133,16 +133,7 @@ export default function CourseDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {course.streams.map((stream) => (
                 <Link key={stream.slug} href={`/${courseSlug}/${stream.slug}`} className="group block bg-stone-800 border border-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:border-primary/50">
-                  {stream.og_image_url ? (
-                    <div className="w-full h-40 bg-gray-700 overflow-hidden">
-                      <img src={stream.og_image_url} alt={stream.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                    </div>
-                  ) : (
-                    <div className="w-full h-40 bg-gradient-to-br from-stone-700 to-stone-600 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">No Image</span>
-                    </div>
-                  )}
-                  <div className="p-5">
+                    <div className="p-5">
                     <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-primary transition-colors duration-300 truncate" title={stream.name}>
                       {stream.name}
                     </h3>
