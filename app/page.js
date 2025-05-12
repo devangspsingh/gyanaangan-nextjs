@@ -1,103 +1,110 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { ArrowRightIcon } from '@heroicons/react/20/solid';
+import { getLatestNotification } from '../services/apiService'; // Keep for notification
+import { Suspense } from 'react';
 
-export default function Home() {
+// Import Card Skeletons (these are used by the client list components as fallbacks)
+import CourseCardSkeleton from '../components/CourseCardSkeleton';
+import SubjectCardSkeleton from '../components/SubjectCardSkeleton';
+import ResourceCardSkeleton from '../components/ResourceCardSkeleton';
+
+// Import new Client List Components
+import CoursesListClient from '../components/home/CoursesListClient';
+import SubjectsListClient from '../components/home/SubjectsListClient';
+import ResourcesListClient from '../components/home/ResourcesListClient';
+
+// Import HeroSearchForm (Client Component) and SectionWrapper (Server Component)
+import HeroSearchForm from '../components/HeroSearchForm';
+import SectionWrapper from '../components/SectionWrapper';
+
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
+// Skeleton for individual sections, used as Suspense fallback
+const SectionContentSkeleton = ({ count = 3, CardSkeletonComponent }) => (
+  <div className={`grid grid-cols-1 ${CardSkeletonComponent === CourseCardSkeleton ? 'sm:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6`}>
+    {[...Array(count)].map((_, index) => <CardSkeletonComponent key={index} />)}
+  </div>
+);
+
+
+export default async function HomePage() {
+  const notificationResponse = await getLatestNotification();
+  const notification = notificationResponse.error ? null : notificationResponse.data;
+  if (notificationResponse.error && notificationResponse.data !== null) {
+    console.error("Failed to load notification.");
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="container mx-auto py-4 text-gray-100 px-4">
+      <ScrollArea className="w-full">
+        {/* Hero Section - Renders immediately */}
+        <section
+          className="min-h-[70vh] md:min-h-[90vh] relative flex flex-col justify-center items-center text-center py-16 px-4"
+        >
+          {notification && notification.title && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 backdrop-blur-sm text-white rounded-lg shadow-lg z-20">
+              <h3 className="font-bold">{notification.title}</h3>
+              {notification.url && (
+                <Link href={notification.url} className="text-primary-light hover:underline text-sm font-medium mt-2 inline-block">
+                  Learn more <ArrowRightIcon className="w-4 h-4 inline" />
+                </Link>
+              )}
+            </div>
+          )}
+          <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[100px] md:w-[300px] md:h-[150px] bg-primary/50 rounded-full blur-3xl opacity-40 animate-pulse"></div>
+          </div>
+          <div className="z-10 relative">
+            <h1 className="text-primary mb-4 text-5xl font-heading-main font-bold tracking-tight leading-none md:text-5xl lg:text-6xl">
+              Gyan Aangan
+            </h1>
+            <p className="mb-8 text-lg font-body-desc font-medium lg:text-xl sm:px-16 lg:px-48 text-secondary">
+              Browse a variety of courses, subjects, and resources to enhance your knowledge.
+            </p>
+            <HeroSearchForm /> {/* Client Component for search form - Renders immediately */}
+          </div>
+        </section>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        {/* Courses Section - Wrapper renders immediately, content streams with Suspense */}
+        <SectionWrapper 
+            id="courses" 
+            title="Available Courses for Students" 
+            description="Explore a variety of courses to enhance your knowledge and skills. Our offerings include Bachelor of Technology (B.Tech) with specializations in Computer Science, Information Technology, and a common first-year stream for all disciplines, as well as Bachelor of Science (B.Sc) programs covering fundamental scientific concepts." 
+            linkHref="/courses" 
+            linkText="Explore All Available Courses"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <Suspense fallback={<SectionContentSkeleton count={4} CardSkeletonComponent={CourseCardSkeleton} />}>
+            <CoursesListClient />
+          </Suspense>
+        </SectionWrapper>
+
+        {/* Subjects Section - Wrapper renders immediately, content streams with Suspense */}
+        <SectionWrapper 
+            id="subjects" 
+            title="Available Subjects for Students" 
+            description="Discover a wide range of subjects to boost your knowledge and skills. Our offerings include detailed notes, lab manuals, previous year questions, and curated resources, all designed to enhance your learning experience." 
+            linkHref="/subjects" 
+            linkText="Explore All Available Subjects"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <Suspense fallback={<SectionContentSkeleton count={6} CardSkeletonComponent={SubjectCardSkeleton} />}>
+            <SubjectsListClient />
+          </Suspense>
+        </SectionWrapper>
+
+        {/* Resources Section - Wrapper renders immediately, content streams with Suspense */}
+        <SectionWrapper 
+            id="resources" 
+            title="Available Resources for Students" 
+            description="Explore a variety of resources to enhance your knowledge and skills. Our offerings include lab manuals, previous year questions (PYQ), PDFs, and notes, updated regularly to support your learning journey." 
+            linkHref="/resources" 
+            linkText="Explore All Available Resources"
         >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <Suspense fallback={<SectionContentSkeleton count={6} CardSkeletonComponent={ResourceCardSkeleton} />}>
+            <ResourcesListClient />
+          </Suspense>
+        </SectionWrapper>
+        <ScrollBar orientation="vertical" />
+      </ScrollArea>
+    </main>
   );
 }

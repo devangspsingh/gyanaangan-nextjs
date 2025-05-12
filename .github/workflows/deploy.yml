@@ -1,0 +1,76 @@
+name: Deploy Next.js App (Frontend)
+
+on:
+  push:
+    branches:
+      - main # Or your default/production branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (for workflow context)
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }} # Private key to access your server
+
+      - name: Deploy to Server
+        run: |
+          # Add server to known_hosts to avoid prompt
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          
+          # SSH into the server and run deployment commands
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            # Navigate to the application directory
+            cd ${{ secrets.SERVER_APP_PATH }}
+            
+            echo "Current directory: $(pwd)"
+            echo "Pulling latest changes from Git..."
+            git checkout main # Ensure we are on the correct branch
+            git pull origin main
+            
+            echo "Creating/Updating .env.production file..."
+            echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
+            
+            echo "Setting up Node.js environment (if using nvm)..."
+            # If you use nvm on the server, uncomment and adjust the following lines:
+            # export NVM_DIR="$HOME/.nvm"
+            # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+            # nvm use 20 # Or your desired Node.js version for the project
+
+            echo "Installing production dependencies..."
+            npm install --omit=dev # Or yarn install --production if you use Yarn
+            
+            echo "Building Next.js application..."
+            npm run build
+            
+            echo "Restarting application with PM2..."
+            # Extract PORT from .env.production to use with PM2, or use a default
+            APP_PORT=$(grep '^PORT=' .env.production | cut -d '=' -f2)
+            if [ -z "$APP_PORT" ]; then
+              APP_PORT=3000 # Default port if not found in .env.production
+            fi
+            
+            # Start or restart the application using PM2
+            # The 'npm run start' command will pick up the PORT from .env.production
+            if pm2 list | grep -q 'gyanaangan-app'; then
+              pm2 restart gyanaangan-app
+            else
+              # Ensure your package.json's "start" script is `next start -p $PORT` or similar
+              # PM2 will pass the port if you configure it in the ecosystem file or start command
+              # For simplicity, we assume `next start` respects the PORT env var from .env.production
+              # or you can explicitly pass it:
+              # pm2 start npm --name "gyanaangan-app" -- run start -- -p $APP_PORT
+              # If `npm run start` already handles the port from .env.production, this is simpler:
+              pm2 start npm --name "gyanaangan-app" -- run start
+            fi
+            
+            pm2 save # Save current PM2 process list to resurrect on reboot
+            echo "Deployment complete. Application should be running on app.gyanaangan.in (proxied to port $APP_PORT)"
+          EOF
+

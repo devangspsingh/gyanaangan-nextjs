@@ -1,26 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@700&family=Inter:wght@400;500;600;700&family=Roboto:wght@500;700;800&display=swap');
 @import "tailwindcss";
+/* Tailwind v4 specific import */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-barlow: 'Barlow', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+
+  /* Default background/foreground for light/dark themes */
+  --background-light: #ffffff;
+  --foreground-light: #171717;
+  --background-dark: #010717;
+  /* Your existing dark background */
+  --foreground-dark: #ededed;
+  /* Your existing dark foreground */
+
+  /* Apply dark theme by default based on your existing setup */
+  --background: var(--background-dark);
+  --foreground: var(--foreground-dark);
 }
 
+/* This @theme inline block is for Tailwind v4 to pick up CSS variables for its utilities */
+/* We are defining semantic font variables that Tailwind will use */
 @theme inline {
+  --font-sans: var(--font-inter);
+  /* Default sans-serif font */
+  --font-heading-main: var(--font-barlow);
+  --font-heading-section: var(--font-roboto);
+  --font-body-desc: var(--font-inter);
+  /* Explicitly for body descriptions if needed, otherwise covered by --font-sans */
+
+  /* Re-define background and foreground for Tailwind utilities */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Your custom color palettes */
+  --color-primary: #D2F6FC;
+  --color-primary-light: #38bdf8;
+  --color-primary-dark: #010717;
+  /* This seems very dark, ensure it's intended for primary-dark */
+  --color-primary-text: #D2F6FC;
+  --color-secondary: #97B1C6;
+
+  --color-customBlue-900: #1A2B42;
+  --color-customSlate-200: #E2E8F0;
+  --color-customSlate-400: #A0AEC0;
+  --color-customSlate-600: #4A5568;
+  --color-customSlate-700: #2D3748;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter);
+  /* Set Inter as the default body font */
 }
+
+@theme {
+  /* Existing primary, stone, gray, yellow colors can also be defined here if you want to manage them via CSS variables */
+  /* Example for existing primary color */
+  --color-primary: #D2F6FC;
+  --color-primary-light: #38bdf8;
+  --color-primary-dark: #010717;
+  --color-primary-text: #D2F6FC;
+  --color-secondary: #97B1C6;
+
+  /* New custom color palettes */
+  --color-customBlue-900: #1A2B42;
+  /* Was 'card-dark-blue' */
+  /* --gradient-primary: linear-gradient(to right, #3D7BAA, #234B6C, #17334C, #10273D, #0A1B2D); */
+  --color-customSlate-200: #E2E8F0;
+  /* Was 'tag-bg-light' */
+  --color-customSlate-400: #A0AEC0;
+  /* Was 'card-header-blue' */
+  --color-customSlate-600: #4A5568;
+  /* Was 'tag-text-dark' */
+  --color-customSlate-700: #2D3748;
+  /* Was 'card-body-blue' */
+
+  /* You can add more variants if needed, e.g., by finding intermediate shades or using a color palette generator */
+  /* --color-customBlue-800: ...; */
+  /* --color-customSlate-50: ...; */
+}
+
+.card-gradient {
+  @apply bg-gradient-to-tl hover:from-[#3D7BAA] from-[#3D7BAA]/50 from-10% via-[#234B6C] via-20% via-[#17334C] via-40% via-[#10273D] via-60% to-[#0A1B2D] to-100%;
+
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    /* Use Tailwind utilities derived from CSS variables */
+    /* The font-family is already set directly on body above */
+  }
+
+  /* You can define base styles for headings here if desired */
+  /* h1, h2, h3, h4, h5, h6 { @apply font-sans; } */
+  /* Default to Inter */
+}
+
+
+/* Print styles from base.html */
+@media print {
+  .container-app {
+    /* Assuming your main app container has this class or similar */
+    display: none !important;
+  }
+
+  .printable-message {
+    display: block !important;
+    text-align: center;
+    font-size: 24px;
+    color: red;
+    /* Or a less jarring color */
+  }
+}
+
+/* Add other global styles or font imports here if needed */
+/* Example for Inter font if not handled by next/font */
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap'); */
