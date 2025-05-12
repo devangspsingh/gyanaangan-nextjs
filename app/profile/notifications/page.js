@@ -8,7 +8,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@/components/ui/breadcrumb";
 // No specific API call for initial data here, client will fetch.
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.dspsc.live';

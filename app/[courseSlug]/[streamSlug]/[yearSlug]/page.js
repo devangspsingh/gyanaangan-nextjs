@@ -14,7 +14,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb"; // Import shadcn Breadcrumb components
+} from "@/components/ui/breadcrumb"; // Import shadcn Breadcrumb components
 
 const LoadingState = () => (
   <div className="space-y-8">

@@ -23,7 +23,7 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import LoginDialog from '@/components/Auth/LoginDialog';

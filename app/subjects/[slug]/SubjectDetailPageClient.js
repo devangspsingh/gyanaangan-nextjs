@@ -18,7 +18,7 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@/components/ui/breadcrumb";
 import { FunnelIcon } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 

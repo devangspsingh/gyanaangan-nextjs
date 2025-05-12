@@ -18,7 +18,7 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@/components/ui/breadcrumb";
 import { useAuth } from '@/context/AuthContext'; // For save/download auth checks
 import LoginDialog from '@/components/Auth/LoginDialog';
 import { GoogleLogin } from '@react-oauth/google';
