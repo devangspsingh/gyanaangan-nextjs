@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 // import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getResourceBySlug, downloadResourceFile, toggleSaveResource } from '@/services/apiService'; // Added getResourceBySlug, toggleSaveResource
+import { getResourceBySlug, toggleSaveResource } from '@/services/apiService'; // Added getResourceBySlug, toggleSaveResource
 import toast from 'react-hot-toast';
 import { BookmarkIcon as BookmarkOutlineIcon, ShareIcon, ArrowDownIcon as DownloadIconHero, ArrowLeftIcon } from 'lucide-react';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
@@ -44,7 +44,7 @@ export default function NestedResourceDetailPageClient({
 }) {
     const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = params;
     // const clientRouter = useRouter();
-    const { isAuthenticated, user, login: setAuthState } = useAuth();
+    const { isAuthenticated, login: setAuthState } = useAuth();
 
     const [resource, setResource] = useState(null); // Main resource fetched client-side
     const [parentData, setParentData] = useState(serverFetchedParentData);
@@ -52,8 +52,6 @@ export default function NestedResourceDetailPageClient({
 
     const [loadingResource, setLoadingResource] = useState(true); // For client-side resource fetch
     const [error, setError] = useState(null);
-
-    const [isDownloading, setIsDownloading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [currentIsSaved, setCurrentIsSaved] = useState(false);
@@ -116,20 +114,7 @@ export default function NestedResourceDetailPageClient({
         setIsSaving(false);
     };
 
-    const handleDownload = async () => {
-        if (!resource || !resource.privacy?.includes('download')) {
-            toast.error('This resource is not available for download.');
-            return;
-        }
-        if (!isAuthenticated) { setIsLoginModalOpen(true); return; }
-        setIsDownloading(true);
-        const fileExtension = resource.file ? resource.file.substring(resource.file.lastIndexOf('.')) : '.dat';
-        const result = await downloadResourceFile(resource.download_url, resource.name, fileExtension);
-        if (result.success) { toast.success("Download started!"); }
-        else { toast.error(result.message || "Download failed."); }
-        setIsDownloading(false);
-    };
-    
+
     const handleShare = async () => {
         if (navigator.share && resource) {
             try {
@@ -166,7 +151,7 @@ export default function NestedResourceDetailPageClient({
         stream: { name: streamSlug, slug: streamSlug },
         year: { name: yearSlug, slug: yearSlug },
     };
-    
+
     const breadcrumbSubjectName = resource?.subject_name || displayParentData.subjects?.find(s => s.slug === subjectSlug)?.name || subjectSlug;
 
 
@@ -206,7 +191,7 @@ export default function NestedResourceDetailPageClient({
             </main>
         );
     }
-    
+
     // Combined loading state for initial parent data and client-side resource fetch
     if (!parentData && loadingResource) { // Still waiting for server props OR client resource
         return (
@@ -221,161 +206,162 @@ export default function NestedResourceDetailPageClient({
 
     return (
         <>
-        {isLoginModalOpen && (
-            <LoginDialog
-                isOpen={isLoginModalOpen}
-                onOpenChange={setIsLoginModalOpen}
-                title="Login Required"
-                description="Please login to perform this action."
-            >
-                <div className="flex flex-col items-center space-y-4 p-4">
-                    <GoogleLogin onSuccess={handleGoogleLoginSuccessForModal} onError={() => toast.error('Google login failed.')} theme="filled_blue" shape="pill" />
-                </div>
-            </LoginDialog>
-        )}
-        <main className="container mx-auto py-8 px-4 text-gray-100">
-            <Breadcrumb className="mb-6 text-sm">
-                <BreadcrumbList>
-                    <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>
-                    {displayParentData?.course && (
-                        <>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}`}>{displayParentData.course?.name || courseSlug}</Link></BreadcrumbLink></BreadcrumbItem>
-                        </>
-                    )}
-                    {displayParentData?.stream && (
-                        <>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}`}>{displayParentData.stream?.name || streamSlug}</Link></BreadcrumbLink></BreadcrumbItem>
-                        </>
-                    )}
-                    {displayParentData?.year && (
-                        <>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}/${yearSlug}`}>{displayParentData.year?.name || yearSlug}</Link></BreadcrumbLink></BreadcrumbItem>
-                        </>
-                    )}
-                    {subjectSlug && ( // Ensure subjectSlug exists before trying to link
-                        <>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}`}>{breadcrumbSubjectName}</Link></BreadcrumbLink></BreadcrumbItem>
-                        </>
-                    )}
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem><BreadcrumbPage className="truncate max-w-[150px] sm:max-w-none" title={resource?.name || resourceSlug}>{resource?.name || resourceSlug}</BreadcrumbPage></BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            {isLoginModalOpen && (
+                <LoginDialog
+                    isOpen={isLoginModalOpen}
+                    onOpenChange={setIsLoginModalOpen}
+                    title="Login Required"
+                    description="Please login to perform this action."
+                >
+                    <div className="flex flex-col items-center space-y-4 p-4">
+                        <GoogleLogin onSuccess={handleGoogleLoginSuccessForModal} onError={() => toast.error('Google login failed.')} theme="filled_blue" shape="pill" />
+                    </div>
+                </LoginDialog>
+            )}
+            <main className="container mx-auto py-8 px-4 text-gray-100">
+                <Breadcrumb className="mb-6 text-sm">
+                    <BreadcrumbList>
+                        <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>
+                        {displayParentData?.course && (
+                            <>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}`}>{displayParentData.course?.name || courseSlug}</Link></BreadcrumbLink></BreadcrumbItem>
+                            </>
+                        )}
+                        {displayParentData?.stream && (
+                            <>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}`}>{displayParentData.stream?.name || streamSlug}</Link></BreadcrumbLink></BreadcrumbItem>
+                            </>
+                        )}
+                        {displayParentData?.year && (
+                            <>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}/${yearSlug}`}>{displayParentData.year?.name || yearSlug}</Link></BreadcrumbLink></BreadcrumbItem>
+                            </>
+                        )}
+                        {subjectSlug && ( // Ensure subjectSlug exists before trying to link
+                            <>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}`}>{breadcrumbSubjectName}</Link></BreadcrumbLink></BreadcrumbItem>
+                            </>
+                        )}
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem><BreadcrumbPage className="truncate max-w-[150px] sm:max-w-none" title={resource?.name || resourceSlug}>{resource?.name || resourceSlug}</BreadcrumbPage></BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
 
-            {loadingResource ? (
-                <ClientResourceLoadingSkeleton />
-            ) : !resource ? (
-                 <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 text-gray-400 bg-stone-800/30 p-6 rounded-lg">
-                    <InformationCircleIcon className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-                    <h2 className="text-xl font-semibold mb-2">Resource Not Found</h2>
-                    <p>The specific resource details could not be loaded.</p>
-                    <Button onClick={() => clientRouter.back()} className="mt-6" variant="outline">
-                        <ArrowLeftIcon className="h-5 w-5 mr-2" /> Go Back
-                    </Button>
-                </div>
-            ) : (
-                <>
-                    <header className="mb-8">
-                        <h1 className="text-2xl md:text-3xl font-heading-section font-extrabold text-white mb-3">{resource.name}</h1>
-                    </header>
+                {loadingResource ? (
+                    <ClientResourceLoadingSkeleton />
+                ) : !resource ? (
+                    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 text-gray-400 bg-stone-800/30 p-6 rounded-lg">
+                        <InformationCircleIcon className="w-16 h-16 mx-auto mb-4 text-blue-500" />
+                        <h2 className="text-xl font-semibold mb-2">Resource Not Found</h2>
+                        <p>The specific resource details could not be loaded.</p>
+                        <Button onClick={() => clientRouter.back()} className="mt-6" variant="outline">
+                            <ArrowLeftIcon className="h-5 w-5 mr-2" /> Go Back
+                        </Button>
+                    </div>
+                ) : (
+                    <>
+                        <header className="mb-8">
+                            <h1 className="text-2xl md:text-3xl font-heading-section font-extrabold text-white mb-3">{resource.name}</h1>
+                        </header>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        <div className="lg:col-span-8 xl:col-span-9">
-                            <Viewer resource={resource} />
-                            {resource.description && (
-                                <section className="mt-8 rounded-lg shadow">
-                                    <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
-                                    <p className="text-gray-300 font-body-desc leading-relaxed whitespace-pre-wrap">{resource.description}</p>
-                                    <div className="font-body-desc py-2 text-gray-400 flex flex-wrap gap-2 mt-3">
-                                        <Badge variant="outline" className={"text-md"}>Type: {resource.resource_type_display || resource.resource_type}</Badge>
-                                        {resource.subject_name && <Badge className="text-md" variant="outline">Subject: {resource.subject_name}</Badge>}
-                                        {resource.educational_year?.name && <Badge className="text-md" variant="outline">Year: {resource.educational_year.name}</Badge>}
-                                        {resource.updated_at && <Badge className="text-md" variant="outline">Last Updated: {resource.updated_at}</Badge>}
-                                    </div>
-                                </section>
-                            )}
-                        </div>
-                        <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
-                            <div className="rounded-lg shadow">
-                                <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
-                                <div className="space-y-3">
-                                    <Button
-                                        onClick={handleSaveToggle}
-                                        disabled={isSaving}
-                                        variant="outline"
-                                        className="w-full justify-start text-gray-200 hover:bg-stone-700 border-stone-600"
-                                    >
-                                        {currentIsSaved ? <BookmarkSolidIcon className="w-5 h-5 mr-2 text-primary" /> : <BookmarkOutlineIcon className="w-5 h-5 mr-2" />}
-                                        {isSaving ? 'Saving...' : (currentIsSaved ? 'Unsave Resource' : 'Save Resource')}
-                                    </Button>
-                                    {resource.privacy?.includes('download') && resource.download_url && (
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="lg:col-span-8 xl:col-span-9">
+                                <Viewer resource={resource} />
+                                {resource.description && (
+                                    <section className="mt-8 rounded-lg shadow">
+                                        <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
+                                        <p className="text-gray-300 font-body-desc leading-relaxed whitespace-pre-wrap">{resource.description}</p>
+                                        <div className="font-body-desc py-2 text-gray-400 flex flex-wrap gap-2 mt-3">
+                                            <Badge variant="outline" className={"text-md"}>Type: {resource.resource_type_display || resource.resource_type}</Badge>
+                                            {resource.subject_name && <Badge className="text-md" variant="outline">Subject: {resource.subject_name}</Badge>}
+                                            {resource.educational_year?.name && <Badge className="text-md" variant="outline">Year: {resource.educational_year.name}</Badge>}
+                                            {resource.updated_at && <Badge className="text-md" variant="outline">Last Updated: {resource.updated_at}</Badge>}
+                                        </div>
+                                    </section>
+                                )}
+                            </div>
+                            <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
+                                <div className="rounded-lg shadow">
+                                    <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
+                                    <div className="space-y-3">
                                         <Button
-                                            onClick={handleDownload}
-                                            disabled={isDownloading}
+                                            onClick={handleSaveToggle}
+                                            disabled={isSaving}
                                             variant="outline"
                                             className="w-full justify-start text-gray-200 hover:bg-stone-700 border-stone-600"
                                         >
-                                            <DownloadIconHero className="w-5 h-5 mr-2" />
-                                            {isDownloading ? 'Downloading...' : 'Download'}
+                                            {currentIsSaved ? <BookmarkSolidIcon className="w-5 h-5 mr-2 text-primary" /> : <BookmarkOutlineIcon className="w-5 h-5 mr-2" />}
+                                            {isSaving ? 'Saving...' : (currentIsSaved ? 'Unsave Resource' : 'Save Resource')}
                                         </Button>
-                                    )}
-                                    <Button
-                                        onClick={handleShare}
-                                        variant="outline"
-                                        className="w-full justify-start text-gray-200 hover:bg-stone-700 border-stone-600"
-                                    >
-                                        <ShareIcon className="w-5 h-5 mr-2" />
-                                        Share
-                                    </Button>
-                                </div>
-                            </div>
-                             {resource.tags && resource.tags.length > 0 && (
-                                <div className="p-6 bg-stone-800 rounded-lg shadow">
-                                    <h3 className="text-lg font-semibold text-white mb-4">Tags</h3>
-                                    <div className="flex flex-wrap gap-2">
-                                    {resource.tags.map((tag) => (
-                                        <Badge key={tag} variant="secondary" className="bg-stone-700 text-gray-300 hover:bg-stone-600">
-                                        {tag}
-                                        </Badge>
-                                    ))}
+                                        {resource.privacy?.includes('download') && resource.download_url && (
+                                            <Button variant="outline" className="w-full text-gray-200 hover:bg-stone-700 border-stone-600">
+                                                <Link
+                                                    href={resource.download_url}
+                                                    target='_blank'
+                                                    className="flex w-full justify-start items-center text-gray-200 hover:bg-stone-700 border-stone-600"
+                                                >
+                                                    <DownloadIconHero className="w-5 h-5 mr-2" />
+                                                    Download
+                                                </Link>
+                                            </Button>
+                                        )}
+                                        <Button
+                                            onClick={handleShare}
+                                            variant="outline"
+                                            className="w-full justify-start text-gray-200 hover:bg-stone-700 border-stone-600"
+                                        >
+                                            <ShareIcon className="w-5 h-5 mr-2" />
+                                            Share
+                                        </Button>
                                     </div>
                                 </div>
-                            )}
-                        </aside>
-                    </div>
+                                {resource.tags && resource.tags.length > 0 && (
+                                    <div className="p-6 bg-stone-800 rounded-lg shadow">
+                                        <h3 className="text-lg font-semibold text-white mb-4">Tags</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {resource.tags.map((tag) => (
+                                                <Badge key={tag} variant="secondary" className="bg-stone-700 text-gray-300 hover:bg-stone-600">
+                                                    {tag}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </aside>
+                        </div>
 
 
-                    {relatedResources.length > 0 && (
-                        <section className="mt-12 pt-8 border-t border-stone-700">
-                            <h2 className="text-2xl font-semibold text-white mb-6">
-                                {resource.subject_name ? `More from ${resource.subject_name}` : (subjectSlug ? `More from ${subjectSlug.replace(/-/g, ' ')}` : "Related Resources")}
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {relatedResources.map(relatedRes => (
-                                    <ResourceCard
-                                        key={relatedRes.slug}
-                                        resource={relatedRes}
-                                        customHref={(courseSlug && streamSlug && yearSlug && subjectSlug) ? `/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}/${relatedRes.slug}` : `/resources/${relatedRes.slug}`}
-                                    />
-                                ))}
-                            </div>
-                        </section>
-                    )}
-                    {serverFetchedRelatedResources && serverFetchedRelatedResources.length === 0 && subjectSlug && (
-                        <section className="mt-12 pt-8 border-t border-stone-700">
-                            <h2 className="text-2xl font-semibold text-white mb-6">
-                                {resource.subject_name ? `More from ${resource.subject_name}` : (subjectSlug ? `More from ${subjectSlug.replace(/-/g, ' ')}` : "Related Resources")}
-                            </h2>
-                            <p className="text-gray-400">No other resources found for this subject.</p>
-                        </section>
-                    )}
-                </>
-            )}
-        </main>
+                        {relatedResources.length > 0 && (
+                            <section className="mt-12 pt-8 border-t border-stone-700">
+                                <h2 className="text-2xl font-semibold text-white mb-6">
+                                    {resource.subject_name ? `More from ${resource.subject_name}` : (subjectSlug ? `More from ${subjectSlug.replace(/-/g, ' ')}` : "Related Resources")}
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {relatedResources.map(relatedRes => (
+                                        <ResourceCard
+                                            key={relatedRes.slug}
+                                            resource={relatedRes}
+                                            customHref={(courseSlug && streamSlug && yearSlug && subjectSlug) ? `/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}/${relatedRes.slug}` : `/resources/${relatedRes.slug}`}
+                                        />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                        {serverFetchedRelatedResources && serverFetchedRelatedResources.length === 0 && subjectSlug && (
+                            <section className="mt-12 pt-8 border-t border-stone-700">
+                                <h2 className="text-2xl font-semibold text-white mb-6">
+                                    {resource.subject_name ? `More from ${resource.subject_name}` : (subjectSlug ? `More from ${subjectSlug.replace(/-/g, ' ')}` : "Related Resources")}
+                                </h2>
+                                <p className="text-gray-400">No other resources found for this subject.</p>
+                            </section>
+                        )}
+                    </>
+                )}
+            </main>
         </>
     );
 }

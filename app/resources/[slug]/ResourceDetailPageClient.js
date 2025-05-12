@@ -317,14 +317,15 @@ export default function ResourceDetailPageClient({ slug }) {
                                     {isSaving ? 'Saving...' : (currentIsSaved ? 'Unsave Resource' : 'Save Resource')}
                                 </Button>
                                 {resource.privacy?.includes('download') && resource.download_url && (
-                                    <Button
-                                        onClick={handleDownload}
-                                        disabled={isDownloading}
-                                        variant="outline"
-                                        className="w-full justify-start text-gray-200 hover:bg-stone-700 border-stone-600"
-                                    >
-                                        <DownloadIconHero className="w-5 h-5 mr-2" />
-                                        {isDownloading ? 'Downloading...' : 'Download'}
+                                    <Button variant="outline" className="w-full text-gray-200 hover:bg-stone-700 border-stone-600">
+                                        <Link
+                                            href={resource.download_url}
+                                            target='_blank'
+                                            className="flex w-full justify-start items-center text-gray-200 hover:bg-stone-700 border-stone-600"
+                                        >
+                                            <DownloadIconHero className="w-5 h-5 mr-2" />
+                                            Download
+                                        </Link>
                                     </Button>
                                 )}
                                 <Button

@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 
 import { BookmarkIcon as BookmarkSolidIcon, ClockIcon, BookOpenIcon, BeakerIcon, PlayCircleIcon, PhotoIcon, DocumentTextIcon } from '@heroicons/react/24/solid'; // Added more icons
 import toast from 'react-hot-toast';
-import { downloadResourceFile, toggleSaveResource } from '../services/apiService';
+import { toggleSaveResource } from '../services/apiService';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 import {
-    ArrowDownTrayIcon,
+    // ArrowDownTrayIcon,
     BookmarkIcon as BookmarkOutlineIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
@@ -56,16 +56,14 @@ const ResourceTypeIcon = ({ type }) => {
 
 
 export default function ResourceCard({ resource, variant = 'default', customHref }) { // Added customHref
-    const { isAuthenticated, login: setAuthState, user } = useAuth(); // Renamed login to setAuthState
+    const { isAuthenticated, login: setAuthState } = useAuth(); // Renamed login to setAuthState
     const router = useRouter(); // Initialize router
     const [isSaved, setIsSaved] = useState(resource.is_saved);
     const [isSaving, setIsSaving] = useState(false);
-    const [isDownloading, setIsDownloading] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State for drawer
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State for login modal
 
     const canDownload = resource.privacy && resource.privacy.includes('download');
-    const fileExtension = resource.file ? resource.file.substring(resource.file.lastIndexOf('.')) : '.dat';
 
     const effectiveHref = customHref || `/resources/${resource.slug}`;
 
@@ -87,27 +85,6 @@ export default function ResourceCard({ resource, variant = 'default', customHref
         setIsSaving(false);
     };
 
-    const handleDownload = async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!canDownload) {
-            toast.error('This resource is not available for download.');
-            return;
-        }
-        if (!isAuthenticated) {
-            setIsLoginModalOpen(true); // Open login dialog
-            return;
-        }
-        setIsDownloading(true);
-        // Use resource.download_url which is the full URL from the serializer
-        const result = await downloadResourceFile(resource.download_url, resource.name, fileExtension);
-        if (result.success) {
-            toast.success('Download started!');
-        } else {
-            toast.error(result.message || 'Download failed.');
-        }
-        setIsDownloading(false);
-    };
 
     const handleGoogleLoginSuccessForModal = async (credentialResponse) => {
         try {
@@ -183,17 +160,18 @@ export default function ResourceCard({ resource, variant = 'default', customHref
                             </div>
                             <div>
 
-                                {canDownload && (
-                                    <button
-                                        onClick={handleDownload}
-                                        disabled={!canDownload || isDownloading}
+                                {/* {canDownload && (
+                                    <Link
+                                        href={resource.download_url}
+                                        target='_blank'
+                                        disabled={!canDownload}
                                         className="p-1.5 text-white/80 hover:text-primary transition rounded-full hover:bg-white/10"
                                         aria-label="Download resource"
                                         title="Download"
                                     >
                                         <ArrowDownTrayIcon className="size-6" />
-                                    </button>
-                                )}
+                                    </Link>
+                                )} */}
                                 <button
                                     onClick={handleSaveToggle}
                                     disabled={isSaving}
