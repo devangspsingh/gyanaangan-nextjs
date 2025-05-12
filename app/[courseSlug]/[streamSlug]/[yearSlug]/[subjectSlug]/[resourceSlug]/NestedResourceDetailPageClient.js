@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getResourceBySlug, downloadResourceFile, toggleSaveResource } from '@/services/apiService'; // Added getResourceBySlug, toggleSaveResource
 import toast from 'react-hot-toast';
-import { ArrowLeftIcon, BookmarkIcon as BookmarkOutlineIcon, ShareIcon, ArrowDownIcon as DownloadIconHero } from 'lucide-react'; // Using lucide for ArrowLeftIcon
+import { BookmarkIcon as BookmarkOutlineIcon, ShareIcon, ArrowDownIcon as DownloadIconHero, ArrowLeftIcon } from 'lucide-react';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import Viewer from '@/components/Viewer';
@@ -43,7 +43,7 @@ export default function NestedResourceDetailPageClient({
     serverFetchedRelatedResources
 }) {
     const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = params;
-    const clientRouter = useRouter();
+    // const clientRouter = useRouter();
     const { isAuthenticated, user, login: setAuthState } = useAuth();
 
     const [resource, setResource] = useState(null); // Main resource fetched client-side

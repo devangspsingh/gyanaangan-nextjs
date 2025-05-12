@@ -1,5 +1,3 @@
-import Header from '../../components/Header'; // Adjust path as necessary
-
 export default function TermsAndConditionsPage() {
   // In a real app, you might fetch this content from a CMS or have it statically defined
   const lastUpdated = "October 26, 2023"; // Example date, keep dynamic if possible
@@ -14,7 +12,7 @@ export default function TermsAndConditionsPage() {
           <h1 className="text-3xl font-bold text-white mb-6">Terms and Conditions</h1>
           <p className="text-sm text-gray-500 mb-6">Last updated: {lastUpdated}</p>
 
-          <p>Welcome to Gyan Aangan! These terms and conditions outline the rules and regulations for the use of Gyan Aangan's Website, located at <a href={siteUrl}>{siteUrl}</a>.</p>
+          <p>Welcome to Gyan Aangan! These terms and conditions outline the rules and regulations for the use of Gyan Aangan&apos;s Website, located at <a href={siteUrl}>{siteUrl}</a>.</p>
 
           <h2 className="text-2xl font-semibold text-white mt-6 mb-3">1. Acceptance of Terms</h2>
           <p>By accessing this website, we assume you accept these terms and conditions. Do not continue to use Gyan Aangan if you do not agree to all of the terms and conditions stated on this page.</p>

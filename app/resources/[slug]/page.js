@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { getResourceBySlug, getResources } from '@/services/apiService';
+import { getResourceBySlug } from '@/services/apiService';
 import ResourceDetailPageClient from './ResourceDetailPageClient'; 
 // Head component from next/head is not used in Server Components for metadata.
 // Metadata is handled by the generateMetadata export.

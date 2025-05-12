@@ -1,5 +1,3 @@
-import Header from '../../components/Header'; // Adjust path as necessary
-
 export default function PrivacyPolicyPage() {
   const lastUpdated = "October 26, 2023"; // Example date, keep dynamic if possible
   const siteUrl = "https://gyanaangan.in"; // Example URL
@@ -37,7 +35,7 @@ export default function PrivacyPolicyPage() {
           <p>We use Google Analytics as a third-party service to monitor and analyze the use of our service. Your interaction with Google Analytics is governed by their own terms and conditions.</p>
 
           <h2 className="text-2xl font-semibold text-white mt-6 mb-3">5. Links to Other Sites</h2>
-          <p>Our service may contain links to other sites that are not operated by us. If you click on a third-party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.</p>
+          <p>Our service may contain links to other sites that are not operated by us. If you click on a third-party link, you will be directed to that third party&apos;s site. We strongly advise you to review the Privacy Policy of every site you visit.</p>
 
           <h2 className="text-2xl font-semibold text-white mt-6 mb-3">6. Changes to This Privacy Policy</h2>
           <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>

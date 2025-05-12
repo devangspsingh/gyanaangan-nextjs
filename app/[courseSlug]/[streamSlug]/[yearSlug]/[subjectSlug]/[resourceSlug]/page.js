@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { getResourceBySlug, getSpecialPageData, getResources } from '@/services/apiService';
+import { getResourceBySlug } from '@/services/apiService';
 import NestedResourceDetailPageClient from './NestedResourceDetailPageClient';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.dspsc.live';
@@ -66,22 +66,12 @@ async function NestedResourceDataFetcherSERVER({ params }) {
   // Fetch parent data (course, stream, year details) for breadcrumbs etc.
   const parentDataResponse = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
   
-  let relatedResourcesData = [];
-  if (subjectSlug) {
-    const relatedResponse = await getResources(1, 7, { subject_slug: subjectSlug });
-    if (!relatedResponse.error && relatedResponse.data?.results) {
-      relatedResourcesData = relatedResponse.data.results.filter(r => r.slug !== resourceSlug).slice(0,6);
-    }
-  }
-  
   // The main 'resource' object is NOT fetched here.
   // NestedResourceDetailPageClient will fetch it using resourceSlug from params.
   return (
     <NestedResourceDetailPageClient 
       params={{ courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug }} // Pass all params, including resourceSlug
       serverFetchedParentData={parentDataResponse.data || null} 
-      serverFetchedRelatedResources={relatedResourcesData}
-      // initialResource is removed
     />
   );
 }

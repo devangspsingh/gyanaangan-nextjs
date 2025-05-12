@@ -144,18 +144,7 @@ export default function NotificationsListClient() {
     }
   };
 
-  const lastNotificationElementRef = useCallback(node => {
-    if (loadingMore || !hasNextPage) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        loadMoreNotifications();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loadingMore, hasNextPage]);
-
-  const loadMoreNotifications = async (pageToLoad = currentPage + 1) => {
+  const loadMoreNotifications = useCallback(async (pageToLoad = currentPage + 1) => {
     if (loadingMore) return;
     setLoadingMore(true);
     setError(null);
@@ -174,12 +163,23 @@ export default function NotificationsListClient() {
     } finally {
       setLoadingMore(false);
     }
-  };
+  }, [currentPage, loadingMore]); // Added currentPage and loadingMore as they are used, though loadMoreNotifications itself is the primary concern for the other hooks.
+
+  const lastNotificationElementRef = useCallback(node => {
+    if (loadingMore || !hasNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        loadMoreNotifications();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadingMore, hasNextPage, loadMoreNotifications]);
 
   useEffect(() => {
     loadMoreNotifications(1); // Initial load for the page
     refreshNotifications(); // Also trigger context refresh if needed, or rely on its own timing
-  }, [refreshNotifications]); // refreshNotifications is stable from context
+  }, [refreshNotifications, loadMoreNotifications]); // refreshNotifications is stable from context
 
   if (notifications.length === 0 && loadingMore) { // Initial loading state
     return (
@@ -222,7 +222,7 @@ export default function NotificationsListClient() {
           ))
         )}
         {!loadingMore && !hasNextPage && notifications.length > 0 && (
-          <p className="text-center text-gray-500 py-4">You've seen all notifications.</p>
+          <p className="text-center text-gray-500 py-4">You&apos;ve seen all notifications.</p>
         )}
         {error && notifications.length > 0 && <p className="text-center text-red-500 py-4">{error}</p>}
       </div>

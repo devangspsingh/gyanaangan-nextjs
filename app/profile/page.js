@@ -50,7 +50,7 @@ export default function ProfilePage() {
   return (
     <>
       <Head>
-        <title>{user.name || user.username}'s Profile - Gyan Aangan</title>
+        <title>{user.name || user.username}&apos;s Profile - Gyan Aangan</title>
         <meta name="description" content={`Manage your profile and preferences on Gyan Aangan.`} />
       </Head>
       <main className="container mx-auto px-4 text-gray-100 py-8"> {/* Added py-8 for consistency */}
@@ -63,7 +63,7 @@ export default function ProfilePage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{user.name || user.username}'s Profile</BreadcrumbPage>
+              <BreadcrumbPage>{user.name || user.username}&apos;s Profile</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

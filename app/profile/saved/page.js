@@ -81,7 +81,7 @@ export default function SavedResourcesPage() {
       <header className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-white mb-2">Your Saved Resources</h1>
         <p className="text-lg text-gray-400">
-          Access all the learning materials you've bookmarked for later.
+          Access all the learning materials you&apos;ve bookmarked for later.
         </p>
       </header>
       <Suspense fallback={<PageSkeleton />}>

@@ -144,6 +144,7 @@ export default function LoginDialog({
         <LoginDialogContentInner
           title={title}
           description={description}
+          // eslint-disable-next-line react/no-children-prop
           children={children}
           showBenefits={showBenefits}
           onExplicitClose={() => currentOnOpenChange(false)}

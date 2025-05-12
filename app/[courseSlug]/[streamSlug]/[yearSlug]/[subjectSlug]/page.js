@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { getSubjectBySlug, getResources, getSpecialPageData } from '../../../../../services/apiService'; // Adjust path
 import ResourceCard from '../../../../../components/ResourceCard';
 import ResourceCardSkeleton from '../../../../../components/ResourceCardSkeleton';
-import { ArrowLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'; // ChevronRightIcon removed
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import Head from 'next/head';
 import toast from 'react-hot-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // ShadCN UI Tabs

@@ -10,7 +10,6 @@ import SubjectCard from '../../components/SubjectCard'; // Assuming this compone
 import { searchSite } from '../../services/apiService';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import ResourceCard from '@/components/ResourceCard';
 
@@ -117,7 +116,7 @@ function SearchResults() {
       </div>
 
       {loading && (
-        <div className="text-center py-10 text-xl text-gray-300">Searching for "{query}"...</div>
+        <div className="text-center py-10 text-xl text-gray-300">Searching for &quot;{query}&quot;...</div>
       )}
 
       {!loading && error && (
@@ -129,7 +128,7 @@ function SearchResults() {
 
       {!loading && !error && query && (
         <>
-          <h1 className="text-3xl font-heading-section font-bold mb-2 text-white">Search Results for "{query}"</h1>
+          <h1 className="text-3xl font-heading-section font-bold mb-2 text-white">Search Results for &quot;{query}&quot;</h1>
           <p className="text-gray-400 mb-8">{totalResults} result(s) found.</p>
 
           {totalResults === 0 && (

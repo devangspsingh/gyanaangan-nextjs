@@ -26,18 +26,7 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
 
   const observer = useRef();
 
-  const lastResourceElementRef = useCallback(node => {
-    if (loadingMore || !hasNextPage) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        loadMoreResources();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loadingMore, hasNextPage]);
-
-  const loadMoreResources = async (paramsToUse = filterParams, pageToLoad = currentPage + 1, isNewSearch = false) => {
+  const loadMoreResources = useCallback(async (paramsToUse = filterParams, pageToLoad = currentPage + 1, isNewSearch = false) => {
     if (loadingMore || !isAuthenticated) return;
     setLoadingMore(true);
     setError(null);
@@ -56,7 +45,18 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
     } finally {
       setLoadingMore(false);
     }
-  };
+  }, [currentPage, filterParams, isAuthenticated, loadingMore]); // Added dependencies
+
+  const lastResourceElementRef = useCallback(node => {
+    if (loadingMore || !hasNextPage) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        loadMoreResources();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadingMore, hasNextPage, loadMoreResources]);
   
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -64,7 +64,7 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
     } else if (!authLoading && isAuthenticated && resources.length === 0) { // Initial load if authenticated and no initial resources
       loadMoreResources(filterParams, 1, true);
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [authLoading, isAuthenticated, router, resources.length, loadMoreResources, filterParams]);
 
 
   const handleSearchSubmit = (e) => {
@@ -120,7 +120,7 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
       </form>
 
       {resources.length === 0 && !loadingMore && !error && (
-        <p className="text-center text-gray-400 text-lg py-10">You haven't saved any resources yet, or no resources match your search.</p>
+        <p className="text-center text-gray-400 text-lg py-10">You haven&apos;t saved any resources yet, or no resources match your search.</p>
       )}
       {error && <p className="text-center text-red-500 py-10">{error}</p>}
 
@@ -128,7 +128,7 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
         {resources.map((resource, index) => {
           const card = <ResourceCard key={resource.slug || resource.id} resource={resource} />;
           if (resources.length === index + 1) {
-            return <div ref={lastResourceElementRef}>{card}</div>;
+            return <div ref={lastResourceElementRef} key={index}>{card}</div>;
           }
           return card;
         })}
@@ -139,7 +139,7 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
         )}
       </div>
       {!loadingMore && !hasNextPage && resources.length > 0 && (
-        <p className="text-center text-gray-500 py-4">You've reached the end of your saved resources.</p>
+        <p className="text-center text-gray-500 py-4">You&apos;ve reached the end of your saved resources.</p>
       )}
     </div>
   );

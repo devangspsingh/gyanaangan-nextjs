@@ -23,17 +23,17 @@ export default function RootLayout({ children }) {
         <Providers>
           <DynamicBackground /> {/* Use the client component for dynamic background */}
           <Header />
-          {/* <ScrollArea className="rounded-md h-screen"> */}
+
           <div className="container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">
 
             {children}
           </div>
-          {/* </ScrollArea> */}
+
           <div className="printable-message hidden">
-            <p>🚫 Oops! This page doesn't like printers. 😊<br />Please enjoy it online!</p>
+            <p>🚫 Oops! This page does not like printers. 😊<br />Please enjoy it online!</p>
           </div>
-          <Footer /> {/* This is your existing navigation footer */}
-          <FooterNavigation /> {/* This is the new informational footer */}
+          <Footer /> 
+          <FooterNavigation />
         </Providers>
       </body>
     </html>

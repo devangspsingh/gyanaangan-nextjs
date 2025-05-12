@@ -7,7 +7,7 @@ import api from '../../lib/axiosInstance'; // Adjust path
 import { useEffect, Suspense } from 'react'; // Added Suspense
 import toast from 'react-hot-toast';
 import LoginDialog from '../../components/Auth/LoginDialog'; // Import the LoginDialog
-
+import Link from 'next/link';
 function LoginPageContent() {
   const { login, isAuthenticated, loading: authLoading } = useAuth();
   // const router = useRouter(); // Not strictly needed if only using nextRedirect

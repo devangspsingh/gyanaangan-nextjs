@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { getSubjectBySlug } from '@/services/apiService'; // getResources removed from here
 import SubjectDetailPageClient from './SubjectDetailPageClient';
 import ResourceCardSkeleton from '@/components/ResourceCardSkeleton'; // Used by client as fallback
+import ResourceCard from '../../../components/ResourceCard';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.dspsc.live';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;

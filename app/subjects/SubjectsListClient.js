@@ -20,18 +20,7 @@ export default function SubjectsListClient({ initialSubjects, initialHasNextPage
 
   const observer = useRef();
 
-  const lastSubjectElementRef = useCallback(node => {
-    if (loadingMore) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage && !loadingMore) {
-        loadMoreSubjects();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loadingMore, hasNextPage]);
-
-  const loadMoreSubjects = async (paramsToUse = filterParams, pageToLoad = currentPage + 1) => {
+  const loadMoreSubjects = useCallback(async (paramsToUse = filterParams, pageToLoad = currentPage + 1) => {
     if (loadingMore) return;
     setLoadingMore(true);
     setError(null);
@@ -49,8 +38,19 @@ export default function SubjectsListClient({ initialSubjects, initialHasNextPage
     } finally {
       setLoadingMore(false);
     }
-  };
-  
+  }, [currentPage, filterParams, loadingMore]); // Added dependencies
+
+  const lastSubjectElementRef = useCallback(node => {
+    if (loadingMore) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage && !loadingMore) {
+        loadMoreSubjects();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadingMore, hasNextPage, loadMoreSubjects]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const newFilterParams = { ...filterParams, search: searchTerm.trim() };
@@ -67,7 +67,7 @@ export default function SubjectsListClient({ initialSubjects, initialHasNextPage
     if (initialSubjects.length === 0 && (filterParams.search)) {
          loadMoreSubjects(filterParams, 1);
     }
-  }, []); // Run once on mount if needed
+  }, [initialSubjects.length, filterParams, loadMoreSubjects]); // Run once on mount if needed
 
   return (
     <div className="space-y-8">
@@ -117,7 +117,7 @@ export default function SubjectsListClient({ initialSubjects, initialHasNextPage
         )}
       </div>
       {!loadingMore && !hasNextPage && subjects.length > 0 && (
-        <p className="text-center text-gray-500 py-4">You've reached the end.</p>
+        <p className="text-center text-gray-500 py-4">You&apos;ve reached the end.</p>
       )}
     </div>
   );

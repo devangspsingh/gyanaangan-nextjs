@@ -41,18 +41,7 @@ export default function ResourcesListClient({ initialResources, initialHasNextPa
 
   const observer = useRef();
 
-  const lastResourceElementRef = useCallback(node => {
-    if (loadingMore) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasNextPage && !loadingMore) {
-        loadMoreResources();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loadingMore, hasNextPage]);
-
-  const loadMoreResources = async (paramsToUse = filterParams, pageToLoad = currentPage + 1) => {
+  const loadMoreResources = useCallback(async (paramsToUse = filterParams, pageToLoad = currentPage + 1) => {
     if (loadingMore) return;
     setLoadingMore(true);
     setError(null);
@@ -75,7 +64,18 @@ export default function ResourcesListClient({ initialResources, initialHasNextPa
     } finally {
       setLoadingMore(false);
     }
-  };
+  }, [currentPage, filterParams, loadingMore]); // Added dependencies
+
+  const lastResourceElementRef = useCallback(node => {
+    if (loadingMore) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage && !loadingMore) {
+        loadMoreResources();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loadingMore, hasNextPage, loadMoreResources]);
 
   const applyFiltersAndSearch = (newSearchTerm, newType) => {
     const newFilterParams = {
@@ -108,7 +108,7 @@ export default function ResourcesListClient({ initialResources, initialHasNextPa
     if (initialResources.length === 0 && (filterParams.search || (filterParams.resource_type && filterParams.resource_type !== 'all'))) {
          loadMoreResources(filterParams, 1);
     }
-  }, []);
+  }, [initialResources.length, filterParams, loadMoreResources]);
 
   return (
     <div className="space-y-8">
@@ -176,7 +176,7 @@ export default function ResourcesListClient({ initialResources, initialHasNextPa
         )}
       </div>
       {!loadingMore && !hasNextPage && resources.length > 0 && (
-        <p className="text-center text-gray-500 py-4">You've reached the end.</p>
+        <p className="text-center text-gray-500 py-4">You&apos;ve reached the end.</p>
       )}
     </div>
   );
