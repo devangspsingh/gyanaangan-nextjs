@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { getResourceBySlug } from '@/services/apiService';
+import { getResourceBySlug, getSpecialPageData } from '@/services/apiService';
 import NestedResourceDetailPageClient from './NestedResourceDetailPageClient';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.gyanaangan.in';
@@ -66,7 +66,6 @@ async function NestedResourceDataFetcherSERVER({ params }) {
   // Fetch parent data (course, stream, year details) for breadcrumbs etc.
   const parentDataResponse = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
   
-  // The main 'resource' object is NOT fetched here.
   // NestedResourceDetailPageClient will fetch it using resourceSlug from params.
   return (
     <NestedResourceDetailPageClient 

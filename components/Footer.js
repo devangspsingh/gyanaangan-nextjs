@@ -150,9 +150,9 @@ const Footer = () => {
       }
       // For actions or auth-required links when not authenticated (will be handled by onClick)
       return (
-        <button type="button" {...commonProps} key={listItemKey}>
+        <button type="button" {...commonProps} key={listItemKey+1}>
           {iconElement}
-          {isDesktop && <span className="mt-1 text-xs">{item.label}</span>} {/* Removed key="label" */}
+          {isDesktop && <span className="mt-1 text-xs">{item.label}</span>}
         </button>
       );
     });

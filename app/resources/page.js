@@ -17,7 +17,7 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 const PAGE_SIZE = 9; // Consistent with client
 
-export async function generateMetadata({ searchParams }) {
+export async function generateMetadata() {
   const pageTitle = `All Resources - ${SITE_NAME}`;
   const pageDescription = `Browse all available learning resources on ${SITE_NAME}, including notes, PYQs, videos, and more.`;
   const canonicalUrl = `${SITE_URL}/resources`;
@@ -63,6 +63,7 @@ const PageSkeleton = () => (
 );
 
 async function ResourcesPageDataFetcher({ searchParams }) {
+  const {q,type} = await searchParams
   const initialPage = 1;
   const filterParams = {
     search: searchParams?.q || '',

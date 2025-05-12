@@ -46,7 +46,7 @@ const getImportanceStyles = (importance) => {
 
 const NotificationCard = ({ notification, onNotificationClick, isRead }) => {
   const styles = getImportanceStyles(notification.importance);
-  const hasContent = notification.message && notification.message.trim() !== "";
+  const hasContent = notification?.content && notification?.content?.trim() !== "";
   const hasUrl = notification.url && notification.url.trim() !== "";
 
   return (
@@ -72,7 +72,7 @@ const NotificationCard = ({ notification, onNotificationClick, isRead }) => {
           </div>
 
           {hasContent ? (
-            <p className="text-gray-300 mt-1 text-sm leading-relaxed line-clamp-2">{notification.message}</p>
+            <p className="text-gray-300 mt-1 text-sm leading-relaxed line-clamp-2">{notification.content}</p>
           ) : hasUrl ? (
             <p className="text-gray-400 mt-1 text-sm italic">This notification contains a link for more details.</p>
           ) : (
@@ -124,64 +124,98 @@ export default function NotificationsListClient() {
     refreshNotifications 
   } = useNotification();
   
-  const [notifications, setNotifications] = useState([]); // Paginated notifications for this page
-  const [currentPage, setCurrentPage] = useState(1);
+  const [notifications, setNotifications] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0); // Start at 0, page 1 will be the first loaded
   const [hasNextPage, setHasNextPage] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false); // Renamed from loading to loadingMore for clarity
   const [error, setError] = useState(null);
 
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  // readNotificationIds state is now primarily driven by contextReadNotificationIds for display
-
+  
   const observer = useRef();
 
   const handleNotificationClick = (notification) => {
     setSelectedNotification(notification);
     setIsDrawerOpen(true);
     if (!contextReadNotificationIds.has(notification.id)) {
-      markNotificationAsRead(notification.id); // Mark as read via context
+      markNotificationAsRead(notification.id);
     }
   };
 
-  const loadMoreNotifications = useCallback(async (pageToLoad = currentPage + 1) => {
-    if (loadingMore) return;
+  // Renamed to loadMoreNotifications, specifically for IntersectionObserver pagination
+  const loadMoreNotifications = useCallback(async () => {
+    // Guard against multiple calls or when no more pages
+    if (loadingMore || !hasNextPage) return;
+
     setLoadingMore(true);
     setError(null);
+    const nextPageToLoad = currentPage + 1;
+
     try {
-      const response = await getNotifications(pageToLoad, PAGE_SIZE);
+      const response = await getNotifications(nextPageToLoad, PAGE_SIZE);
       if (response.error) {
         throw new Error(response.data?.detail || 'Failed to load notifications.');
       }
-      setNotifications(prevNotifications => pageToLoad === 1 ? response.data.results : [...prevNotifications, ...response.data.results]);
-      setCurrentPage(pageToLoad);
+      setNotifications(prevNotifications => [...prevNotifications, ...response.data.results]);
+      setCurrentPage(nextPageToLoad);
       setHasNextPage(!!response.data.next);
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
-      console.error("Error loading notifications:", err);
+      console.error("Error loading more notifications:", err);
     } finally {
       setLoadingMore(false);
     }
-  }, [currentPage, loadingMore]); // Added currentPage and loadingMore as they are used, though loadMoreNotifications itself is the primary concern for the other hooks.
+  }, [currentPage, hasNextPage, loadingMore]); // Dependencies for loading subsequent pages
+
+  // useEffect for initial load (page 1)
+  useEffect(() => {
+    const fetchInitialNotifications = async () => {
+      // Ensure this doesn't run if already loading or if initial page (e.g. page 1) has been loaded
+      if (loadingMore || currentPage !== 0) return; 
+
+      setLoadingMore(true);
+      setError(null);
+      try {
+        const response = await getNotifications(1, PAGE_SIZE); // Fetch page 1
+        if (response.error) {
+          throw new Error(response.data?.detail || 'Failed to load initial notifications.');
+        }
+        setNotifications(response.data.results);
+        setCurrentPage(1); // Set current page to 1
+        setHasNextPage(!!response.data.next);
+      } catch (err) {
+        setError(err.message);
+        toast.error(err.message);
+        console.error("Error loading initial notifications:", err);
+      } finally {
+        setLoadingMore(false);
+      }
+    };
+
+    fetchInitialNotifications();
+    if (refreshNotifications) { // Conditionally call if refreshNotifications is defined
+        refreshNotifications(); 
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshNotifications]); // Runs once on mount or if refreshNotifications changes.
+                              // currentPage is intentionally not a dep here to prevent re-fetch on its change by this effect.
+
 
   const lastNotificationElementRef = useCallback(node => {
     if (loadingMore || !hasNextPage) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
+      if (entries[0].isIntersecting && hasNextPage) { // Added hasNextPage check here too for safety
         loadMoreNotifications();
       }
     });
     if (node) observer.current.observe(node);
   }, [loadingMore, hasNextPage, loadMoreNotifications]);
 
-  useEffect(() => {
-    loadMoreNotifications(1); // Initial load for the page
-    refreshNotifications(); // Also trigger context refresh if needed, or rely on its own timing
-  }, [refreshNotifications, loadMoreNotifications]); // refreshNotifications is stable from context
-
-  if (notifications.length === 0 && loadingMore) { // Initial loading state
+  // Initial loading state (before any notifications are fetched, or if currentPage is 0)
+  if (currentPage === 0 && loadingMore) { 
     return (
         <div className="space-y-4 max-w-2xl mx-auto">
             {Array.from({ length: 5 }).map((_, index) => (
@@ -216,7 +250,7 @@ export default function NotificationsListClient() {
           }
           return card;
         })}
-        {loadingMore && (
+        {loadingMore && currentPage > 0 && ( // Show loading skeletons only when paginating
           Array.from({ length: 3 }).map((_, index) => (
             <NotificationSkeleton key={`loading_skel_${index}`} />
           ))
@@ -233,9 +267,9 @@ export default function NotificationsListClient() {
             <div className="mx-auto w-full max-w-md p-4">
               <DrawerHeader className="text-left">
                 <DrawerTitle className="text-2xl font-semibold text-white">{selectedNotification.title}</DrawerTitle>
-                {selectedNotification.message && selectedNotification.message.trim() !== "" && (
+                {selectedNotification.content && selectedNotification.content.trim() !== "" && (
                   <DrawerDescription className="text-gray-400 mt-2 whitespace-pre-wrap leading-relaxed">
-                    {selectedNotification.message}
+                    {selectedNotification.content}
                   </DrawerDescription>
                 )}
               </DrawerHeader>

@@ -12,13 +12,13 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const PAGE_SIZE = 9;
 
-export default function SavedResourcesListClient({ initialResources, initialHasNextPage, initialTotalPages }) {
+export default function SavedResourcesListClient({ initialResources, initialHasNextPage }) {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
 
   const [resources, setResources] = useState(initialResources || []);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
+  const [currentPage, setCurrentPage] = useState(0); // Start at 0, page 1 will be the first loaded
+  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage !== undefined ? initialHasNextPage : true); // Default to true if not provided
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,7 +26,8 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
 
   const observer = useRef();
 
-  const loadMoreResources = useCallback(async (paramsToUse = filterParams, pageToLoad = currentPage + 1, isNewSearch = false) => {
+  // Renamed to fetchSavedResources, handles both initial and subsequent loads based on pageToLoad
+  const fetchSavedResources = useCallback(async (paramsToUse = filterParams, pageToLoad = 1, isNewSearch = false) => {
     if (loadingMore || !isAuthenticated) return;
     setLoadingMore(true);
     setError(null);
@@ -41,49 +42,54 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
-      console.error("Error loading saved resources:", err);
+      // console.error("Error loading saved resources:", err); // Keep for debugging if needed
     } finally {
       setLoadingMore(false);
     }
-  }, [currentPage, filterParams, isAuthenticated, loadingMore]); // Added dependencies
+  }, [isAuthenticated, loadingMore,filterParams]); // Removed currentPage and filterParams to simplify, they are passed as arguments
 
   const lastResourceElementRef = useCallback(node => {
     if (loadingMore || !hasNextPage) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        loadMoreResources();
+      if (entries[0].isIntersecting && hasNextPage) { // Ensure hasNextPage is true
+        fetchSavedResources(filterParams, currentPage + 1, false);
       }
     });
     if (node) observer.current.observe(node);
-  }, [loadingMore, hasNextPage, loadMoreResources]);
+  }, [loadingMore, hasNextPage, fetchSavedResources, filterParams, currentPage]);
   
+  // useEffect for initial load and auth changes
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.replace('/login?next=/profile/saved');
-    } else if (!authLoading && isAuthenticated && resources.length === 0) { // Initial load if authenticated and no initial resources
-      loadMoreResources(filterParams, 1, true);
+    } else if (!authLoading && isAuthenticated && currentPage === 0) { 
+      // Only fetch if authenticated and it's the very first load (currentPage is 0)
+      fetchSavedResources(filterParams, 1, true);
     }
-  }, [authLoading, isAuthenticated, router, resources.length, loadMoreResources, filterParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, isAuthenticated, router, fetchSavedResources]);
+  // filterParams is intentionally omitted from deps here for initial load, 
+  // search will trigger its own fetch. currentPage === 0 handles the "initial" part.
 
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const newFilterParams = { search: searchTerm.trim() };
-    if (!newFilterParams.search) delete newFilterParams.search; // Remove if empty
-
+    const newSearchTerm = searchTerm.trim();
+    const newFilterParams = newSearchTerm ? { search: newSearchTerm } : {};
+    
     setFilterParams(newFilterParams);
-    setResources([]); // Clear existing resources
-    setCurrentPage(0); // Reset page, loadMoreResources will load page 1
-    setHasNextPage(true); // Assume there might be results
-    loadMoreResources(newFilterParams, 1, true); // Load first page with new search
+    // setResources([]); // Cleared by fetchSavedResources with isNewSearch=true
+    // setCurrentPage(0); // Reset by fetchSavedResources logic for new search
+    // setHasNextPage(true); // Assumed by fetchSavedResources
+    fetchSavedResources(newFilterParams, 1, true); // Load first page with new search
   };
 
 
-  if (authLoading) {
+  if (authLoading || (isAuthenticated && currentPage === 0 && loadingMore)) { // Show loading if auth is pending OR initial fetch is happening
     return (
       <div className="text-center py-10 text-gray-300">
-        Checking authentication...
+        {authLoading ? "Checking authentication..." : "Loading saved resources..."}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {Array.from({ length: 3 }).map((_, index) => <ResourceCardSkeleton key={`auth_skel_${index}`} />)}
         </div>
@@ -91,7 +97,7 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
     );
   }
   
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !authLoading) { // Ensure auth is not loading before redirect message
      return <div className="text-center py-10 text-gray-300">Redirecting to login...</div>;
   }
 
@@ -119,7 +125,7 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
         </div>
       </form>
 
-      {resources.length === 0 && !loadingMore && !error && (
+      {resources.length === 0 && !loadingMore && !error && isAuthenticated && ( // Added isAuthenticated check
         <p className="text-center text-gray-400 text-lg py-10">You haven&apos;t saved any resources yet, or no resources match your search.</p>
       )}
       {error && <p className="text-center text-red-500 py-10">{error}</p>}
@@ -128,11 +134,11 @@ export default function SavedResourcesListClient({ initialResources, initialHasN
         {resources.map((resource, index) => {
           const card = <ResourceCard key={resource.slug || resource.id} resource={resource} />;
           if (resources.length === index + 1) {
-            return <div ref={lastResourceElementRef} key={index}>{card}</div>;
+            return <div ref={lastResourceElementRef} key={`wrapper-${resource.id || index}`}>{card}</div>; // Ensure key is unique
           }
           return card;
         })}
-        {loadingMore && (
+        {loadingMore && currentPage > 0 && ( // Show skeletons only when paginating, not initial load
           Array.from({ length: PAGE_SIZE }).map((_, index) => (
             <ResourceCardSkeleton key={`loading_skel_${index}`} />
           ))

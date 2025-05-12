@@ -29,8 +29,8 @@ export default function CourseCard({ course, svgIndex }) { // Added svgIndex pro
 
   // Determine SVG path, cycling through 1-5.svg or falling back
   const defaultSvg = '/svg/course/in_the_zone.svg'; // Fallback SVG
-  const svgPath = svgIndex !== undefined 
-    ? `/svg/course/${(svgIndex % 4) + 1}.svg` 
+  const svgPath = course.slug.length !== undefined 
+    ? `/svg/course/${(course.slug.length % 4) + 1}.svg` 
     : defaultSvg;
 
   return (
@@ -39,7 +39,7 @@ export default function CourseCard({ course, svgIndex }) { // Added svgIndex pro
 
       <div className="relative group card-gradient border border-gray-700 rounded-lg shadow-lg hover:shadow-primary/30 transition-all duration-300 flex flex-col h-full overflow-hidden">
         {/* Background SVG and decorative element */}
-        <div className="absolute top-0 right-0 h-full w-2/5 md:w-1/3 pointer-events-none z-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+        <div className="absolute top-0 right-0 h-full w-2/5 md:w-1/3 pointer-events-none z-0 opacity-40 group-hover:opacity-45 transition-opacity duration-300">
           {/* Decorative half-circle shape */}
           <div
             className="absolute -right-1/4 top-1/2 transform -translate-y-1/2 w-3/4 h-3/4 bg-primary/10 rounded-full blur-md"
@@ -81,7 +81,7 @@ export default function CourseCard({ course, svgIndex }) { // Added svgIndex pro
                     {course.streams.slice(0, 3).map((stream) => ( // Show max 3 streams for space
                       <Link key={stream.slug} href={`/${course.slug}/${stream.slug}`} className="hover:opacity-80 transition-opacity">
                         <span
-                          className="px-2.5 py-1 bg-secondary text-primary-dark text-xs rounded-full font-medium block"
+                          className="px-2.5 py-1 bg-secondary text-primary-dark text-sm rounded-full font-medium block"
                           title={stream.name}
                         >
                           {stream.name}

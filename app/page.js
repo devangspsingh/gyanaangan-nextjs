@@ -1,6 +1,3 @@
-import Link from 'next/link';
-import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { getLatestNotification } from '../services/apiService'; // Keep for notification
 import { Suspense } from 'react';
 
 // Import Card Skeletons (these are used by the client list components as fallbacks)
@@ -28,20 +25,20 @@ const SectionContentSkeleton = ({ count = 3, CardSkeletonComponent }) => (
 
 
 export default async function HomePage() {
-  const notificationResponse = await getLatestNotification();
-  const notification = notificationResponse.error ? null : notificationResponse.data;
-  if (notificationResponse.error && notificationResponse.data !== null) {
-    console.error("Failed to load notification.");
-  }
+  // const notificationResponse = await getLatestNotification();
+  // const notification = notificationResponse.error ? null : notificationResponse.data;
+  // if (notificationResponse.error && notificationResponse.data !== null) {
+  //   console.error("Failed to load notification.");
+  // }
 
   return (
-    <main className="container mx-auto py-4 text-gray-100 px-4">
+    <main className="container mx-auto py-4 text-gray-100">
       <ScrollArea className="w-full">
         {/* Hero Section - Renders immediately */}
         <section
           className="min-h-[70vh] md:min-h-[90vh] relative flex flex-col justify-center items-center text-center py-16 px-4"
         >
-          {notification && notification.title && (
+          {/* {notification && notification.title && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 backdrop-blur-sm text-white rounded-lg shadow-lg z-20">
               <h3 className="font-bold">{notification.title}</h3>
               {notification.url && (
@@ -50,7 +47,7 @@ export default async function HomePage() {
                 </Link>
               )}
             </div>
-          )}
+          )} */}
           <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
             <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[100px] md:w-[300px] md:h-[150px] bg-primary/50 rounded-full blur-3xl opacity-40 animate-pulse"></div>
           </div>
@@ -66,19 +63,19 @@ export default async function HomePage() {
         </section>
 
         {/* Courses Section - Wrapper renders immediately, content streams with Suspense */}
-        <SectionWrapper 
-            id="courses" 
-            title="Available Courses for Students" 
-            description="Explore a variety of courses to enhance your knowledge and skills. Our offerings include Bachelor of Technology (B.Tech) with specializations in Computer Science, Information Technology, and a common first-year stream for all disciplines, as well as Bachelor of Science (B.Sc) programs covering fundamental scientific concepts." 
-            linkHref="/courses" 
-            linkText="Explore All Available Courses"
-        >
-          <Suspense fallback={<SectionContentSkeleton count={4} CardSkeletonComponent={CourseCardSkeleton} />}>
-            <CoursesListClient />
-          </Suspense>
-        </SectionWrapper>
+          <SectionWrapper 
+              id="courses" 
+              title="Available Courses for Students" 
+              description="Explore our current course offerings, including Bachelor of Science (B.Sc) in Computer Science and Bachelor of Technology (B.Tech) with specializations in Computer Science, Information Technology, and a common first-year stream. We are continuously expanding our programs to cover more areas of study." 
+              linkHref="/courses" 
+              linkText="Explore All Available Courses"
+          >
+            <Suspense fallback={<SectionContentSkeleton count={4} CardSkeletonComponent={CourseCardSkeleton} />}>
+              <CoursesListClient />
+            </Suspense>
+          </SectionWrapper>
 
-        {/* Subjects Section - Wrapper renders immediately, content streams with Suspense */}
+          {/* Subjects Section - Wrapper renders immediately, content streams with Suspense */}
         <SectionWrapper 
             id="subjects" 
             title="Available Subjects for Students" 
