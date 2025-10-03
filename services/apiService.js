@@ -140,6 +140,36 @@ export const getNotifications = async (page = 1, pageSize = 10) => {
   return handleApiResponse(api.get(getFullUrl('/notifications/'), { params: { page, page_size: pageSize } }));
 };
 
+// Blog-related API functions
+export const getBlogPosts = async (page = 1, pageSize = 9, params = {}) => {
+  return handleApiResponse(api.get(getFullUrl('/blog/posts/'), { 
+    params: { page, page_size: pageSize, ...params } 
+  }));
+};
+
+export const getBlogPostBySlug = async (slug) => {
+  if (typeof window === 'undefined') {
+    // Server-side fetch
+    try {
+      const response = await axios.get(`${API_BASE_URL}/blog/posts/${slug}/`);
+      return { data: response.data, error: false };
+    } catch (error) {
+      console.error(`Server-side error fetching blog post ${slug}:`, error);
+      return { data: null, error: true };
+    }
+  }
+  // Client-side fetch
+  return handleApiResponse(api.get(getFullUrl(`/blog/posts/${slug}/`)));
+};
+
+export const getBlogCategories = async () => {
+  return handleApiResponse(api.get(getFullUrl('/blog/categories/')));
+};
+
+export const getFeaturedPosts = async () => {
+  return handleApiResponse(api.get(getFullUrl('/blog/posts/featured/')));
+};
+
 const correctMalformedUrl = (url) => {
   if (url && url.startsWith('://')) {
     // If URL starts with :// (e.g., ://localhost:8000/...), prepend current window protocol

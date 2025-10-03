@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { LockKeyholeIcon, SparklesIcon, SaveIcon, PaletteIcon, TrendingUpIcon } from 'lucide-react';
+import Link from 'next/link';
 
 // Extracted content to be reusable for both page and modal views
 const LoginDialogContentInner = ({ title, description, children, showBenefits, onExplicitClose, isPage }) => {
   return (
-    <div className={`bg-stone-800 text-gray-100 ${isPage ? 'w-full max-w-[480px] mx-auto rounded-lg shadow-xl border border-stone-700' : ''}`}>
+    <div className={`rounded-3xl card-gradient text-gray-100 ${isPage ? 'w-full max-w-[480px] mx-auto rounded-lg shadow-xl border border-stone-700' : ''}`}>
       <div className="p-6">
         {isPage ? (
           // Custom header for page view (no Dialog context)
@@ -38,13 +39,26 @@ const LoginDialogContentInner = ({ title, description, children, showBenefits, o
             </DialogTitle>
             {description && (
               <DialogDescription className="pt-2 text-gray-400">
+
                 {description}
               </DialogDescription>
             )}
           </DialogHeader>
         )}
-        
-        <div className="py-6">
+
+
+        <div className="my-4 flex flex-col flex-shrink-0 items-center content-center justify-center">
+          <img
+            className="h-20 w-auto"
+            src="/images/logo white.png"
+            alt="Gyan Aangan Logo"
+          />
+          <div className="my-4 self-center font-mono text-2xl font-semibold whitespace-nowrap text-white">
+            GyanAangan
+          </div>
+        </div>
+
+        <div className="py-4">
           {children} {/* Login mechanism (e.g., GoogleLogin button) goes here */}
         </div>
 
@@ -55,7 +69,7 @@ const LoginDialogContentInner = ({ title, description, children, showBenefits, o
         )}
       </div>
 
-      {showBenefits && (
+      {/* {showBenefits && (
         <div className={`p-6 border-t border-stone-700 ${isPage ? 'bg-stone-850/50 rounded-b-lg' : 'bg-stone-850/50'}`}>
           <p className="text-sm font-medium text-gray-200 mb-3 text-center">Why Log In?</p>
           <ul className="space-y-2 text-xs text-gray-400 max-w-xs mx-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
@@ -73,7 +87,7 @@ const LoginDialogContentInner = ({ title, description, children, showBenefits, o
             </li>
           </ul>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
@@ -95,7 +109,7 @@ export default function LoginDialog({
   const [internalOpen, setInternalOpen] = useState(isPage || controlledIsOpen === undefined ? true : controlledIsOpen);
 
   const currentOpen = typeof controlledIsOpen !== 'undefined' ? controlledIsOpen : internalOpen;
-  
+
   const currentOnOpenChange = (openStatus) => {
     if (onOpenChange) {
       onOpenChange(openStatus);
@@ -112,13 +126,13 @@ export default function LoginDialog({
       }
     }
   };
-  
+
   useEffect(() => {
     if (isPage && controlledIsOpen === undefined) {
       setInternalOpen(true);
     }
     if (!isPage && typeof controlledIsOpen !== 'undefined') {
-        setInternalOpen(controlledIsOpen);
+      setInternalOpen(controlledIsOpen);
     }
   }, [isPage, controlledIsOpen]);
 
