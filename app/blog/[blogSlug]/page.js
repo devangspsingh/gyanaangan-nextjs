@@ -6,6 +6,7 @@ import { formatDate } from '@/components/blog/utils';
 import BlogSidebar from '@/components/blog/BlogSidebar';
 import ShareButtons from '@/components/blog/ShareButtons';
 import { Metadata } from 'next';
+import { getGradientForSlug } from '@/components/blog/gradients';
 
 // Generate static metadata for SEO
 export async function generateMetadata({ params }) {
@@ -59,17 +60,29 @@ export default async function BlogPostPage({ params }) {
         <article className="lg:col-span-8 xl:col-span-9">
           {/* Header */}
           <header className="mb-8">
-            {post.featured_image && (
-              <div className="relative aspect-video mb-6 rounded-lg overflow-hidden">
+            <div className="relative aspect-video mb-6 rounded-lg overflow-hidden">
+              {post.featured_image ? (
                 <img
                   src={post.featured_image}
                   alt={post.title}
-                //   fill
-                  className="object-cover"
+                  className="object-cover w-full h-full"
                   priority
                 />
-              </div>
-            )}
+              ) : (
+                <div 
+                  className="w-full h-full flex items-center justify-center relative"
+                  style={{ background: getGradientForSlug(post.slug) }}
+                >
+                  {/* Decorative overlay */}
+                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.5),transparent)]"></div>
+                  
+                  {/* Title watermark */}
+                  <div className="relative z-10 text-white/30 font-bold text-5xl text-center px-12 line-clamp-4">
+                    {post.title}
+                  </div>
+                </div>
+              )}
+            </div>
             <h1 className="text-4xl font-bold text-white mb-4">{post.title}</h1>
             <div className="flex flex-wrap gap-4 text-gray-400 text-sm">
               {post.author_name && (

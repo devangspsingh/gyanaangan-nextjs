@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { formatDate } from './utils';
 import { Badge } from "@/components/ui/badge";
+import { getGradientForSlug } from './gradients';
 
 export default function BlogPostCard({ post }) {
   return (
@@ -19,8 +20,17 @@ export default function BlogPostCard({ post }) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full bg-stone-700 flex items-center justify-center">
-              <span className="text-stone-500">No Image</span>
+            <div 
+              className="w-full h-full flex items-center justify-center relative overflow-hidden"
+              style={{ background: getGradientForSlug(post.slug) }}
+            >
+              {/* Optional: Add a subtle pattern overlay */}
+              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.5),transparent)]"></div>
+              
+              {/* Optional: Add the title as a watermark */}
+              <div className="relative z-10 text-white/20 font-bold text-4xl text-center px-8 line-clamp-3">
+                {post.title}
+              </div>
             </div>
           )}
           {post.category && (

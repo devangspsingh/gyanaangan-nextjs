@@ -11,6 +11,7 @@ import {
     ClockIcon
 } from '@heroicons/react/24/outline';
 import { formatDate } from './utils';
+import { getGradientForSlug } from './gradients';
 
 export default function BlogSidebar({ categories = [], featuredPosts = [], currentPost = null }) {
     const searchParams = useSearchParams();
@@ -68,16 +69,20 @@ export default function BlogSidebar({ categories = [], featuredPosts = [], curre
                                     className="group block"
                                 >
                                     <article className="flex gap-4">
-                                        {post.featured_image && (
-                                            <div className="relative w-20 h-20 flex-shrink-0">
+                                        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden">
+                                            {post.featured_image ? (
                                                 <img
                                                     src={post.featured_image}
                                                     alt={post.title}
-                                                    // fill
-                                                    className="object-cover rounded-md"
+                                                    className="object-cover w-full h-full"
                                                 />
-                                            </div>
-                                        )}
+                                            ) : (
+                                                <div 
+                                                    className="w-full h-full"
+                                                    style={{ background: getGradientForSlug(post.slug) }}
+                                                />
+                                            )}
+                                        </div>
                                         <div className="flex-grow min-w-0">
                                             <h4 className="text-gray-200 group-hover:text-primary line-clamp-2 text-sm font-medium mb-1">
                                                 {post.title}
