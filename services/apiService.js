@@ -2,7 +2,7 @@ import { cache } from 'react';
 import api from '../lib/axiosInstance';
 import axios from 'axios'; // Import axios directly for server-side calls
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://gyanaangan.in/api';
 
 // Helper to construct full URL
 const getFullUrl = (path) => `${API_BASE_URL}${path}`;
@@ -141,7 +141,7 @@ export const getNotifications = async (page = 1, pageSize = 10) => {
 };
 
 // Blog-related API functions
-export const getBlogPosts = async (page = 1, pageSize = 9, params = {}) => {
+export const getBlogPosts = async (page = 1, pageSize = 100, params = {}) => {
   return handleApiResponse(api.get(getFullUrl('/blog/posts/'), { 
     params: { page, page_size: pageSize, ...params } 
   }));
