@@ -37,10 +37,10 @@ export default function AboutPage() {
             At Gyan Aangan, our mission is to make quality education accessible, engaging, and effective for everyone. We believe that learning is a lifelong journey, and we are dedicated to providing the resources and support needed to empower individuals to achieve their full potential.
           </p>
           <p>
-            We started with a simple idea: to create a digital 'aangan' (courtyard) where knowledge is shared freely, curiosity is encouraged, and collaboration flourishes. Whether you're a student, a professional looking to upskill, or simply a curious mind, you'll find a welcoming space here.
+            We started with a simple idea: to create a digital &lsquo;aangan&rsquo; (courtyard) where knowledge is shared freely, curiosity is encouraged, and collaboration flourishes. Whether you&apos;re a student, a professional looking to upskill, or simply a curious mind, you&apos;ll find a welcoming space here.
           </p>
           <blockquote>
-            <p>"An investment in knowledge pays the best interest." – Benjamin Franklin</p>
+            <p>&ldquo;An investment in knowledge pays the best interest.&rdquo; – Benjamin Franklin</p>
           </blockquote>
           {/* <h2>What We Offer 📚</h2>
           <ul>
