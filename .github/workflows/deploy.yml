@@ -24,53 +24,23 @@ jobs:
             
             echo "Current directory: $(pwd)"
             
-            # Stash any local changes to avoid merge conflicts
-            echo "Stashing any local changes..."
-            git stash
-            
             # Pull latest changes from Git
             echo "Pulling latest changes from Git..."
-            git fetch origin
-            git checkout main
             git pull origin main
-            
-            # Show git status for debugging
-            git status
-            
-            # Create/Update .env.production file
-            echo "Creating/Updating .env.production file..."
-            cat > .env.production << 'EOL'
-            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
-            EOL
             
             # Install dependencies
             echo "Installing dependencies..."
-            npm ci --production=false
+            npm install
             
-            # Build the Next.js application
+            # Build the Next.js application (will use existing .env file)
             echo "Building Next.js application..."
             npm run build
-            
-            # Update PM2 in-memory process
-            echo "Updating PM2..."
-            pm2 update
             
             # Restart application with PM2
             echo "Restarting application with PM2..."
             pm2 restart gyanaangan-app --update-env || pm2 start npm --name "gyanaangan-app" -- start
+            
+            # Save PM2 process list
             pm2 save
             
-            echo "Deployment complete. Application running on ${{ secrets.SSH_HOST }}"
-              # PM2 will pass the port if you configure it in the ecosystem file or start command
-              # For simplicity, we assume `next start` respects the PORT env var from .env.production
-              # or you can explicitly pass it:
-              # pm2 start npm --name "gyanaangan-app" -- run start -- -p $APP_PORT
-              # If `npm run start` already handles the port from .env.production, this is simpler:
-              pm2 start npm --name "gyanaangan-app" -- run start
-            fi
-            
-            pm2 save # Save current PM2 process list to resurrect on reboot
-            echo "Deployment complete. Application should be running on app.gyanaangan.in (proxied to port $APP_PORT)"
-            EOF
-
+            echo "Deployment complete!"
