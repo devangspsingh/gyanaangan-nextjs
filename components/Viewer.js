@@ -82,6 +82,7 @@ export default function Viewer({ resource }) {
           ></iframe>
         </div>
         {/* <IPWatermark /> */}
+        
       </section>
     );
   }

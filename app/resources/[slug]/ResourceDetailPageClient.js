@@ -30,7 +30,8 @@ import LoginDialog from '@/components/Auth/LoginDialog';
 import { GoogleLogin } from '@react-oauth/google';
 import api_client from '@/lib/axiosInstance'; // Renamed to avoid conflict
 import { useRouter } from 'next/navigation'; // useRouter for back button
-import { GoogleAdUnit } from '@mesmotronic/next-adsense';
+// import { ResponsiveAdUnit } from 'nextjs-google-adsense';
+// import AdUnit from '@/components/blog/AdUnit';
 
 // Skeleton for the main content area when resource is loading client-side
 const ClientResourceLoadingSkeleton = () => (
@@ -306,16 +307,7 @@ export default function ResourceDetailPageClient({ slug }) {
                     </div>
 
 
-                    <GoogleAdUnit>
-                        <ins
-                            className="adsbygoogle"
-                            style={{ display: "block" }}
-                            data-ad-client="ca-pub-3792754105959046"
-                            data-ad-slot="1937256059"
-                            data-ad-format="auto"
-                            data-full-width-responsive="true"
-                        ></ins>
-                    </GoogleAdUnit>
+                {/* <AdUnit/> */}
 
 
                     <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
