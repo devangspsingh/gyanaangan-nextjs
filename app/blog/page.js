@@ -3,6 +3,7 @@ import BlogPostCard from '@/components/blog/BlogPostCard';
 // import BlogSidebar from '@/components/blog/BlogSidebar';
 import BlogInfiniteScroll from '@/components/blog/BlogInfiniteScroll';
 import { Suspense } from 'react';
+import BlogSidebar from '@/components/blog/BlogSidebar';
 
 export const metadata = {
   title: 'Blog - GyanAangan',
@@ -33,7 +34,7 @@ export default async function BlogPage() {
           {featuredPosts.length > 0 && (
             <section className="mb-12">
               <h2 className="text-2xl font-semibold text-white mb-6">Featured Posts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
                 {featuredPosts.map(post => (
                   <BlogPostCard
                     key={post.slug}
@@ -58,12 +59,12 @@ export default async function BlogPage() {
         </div>
 
         {/* Sidebar */}
-        {false &&
+        {true &&
           <aside className="lg:col-span-4 xl:col-span-3">
-            {/* <BlogSidebar 
+            <BlogSidebar 
             categories={categories}
             featuredPosts={featuredPosts.slice(0, 3)}
-          /> */}
+          />
           </aside>}
       </div>
     </main>
@@ -83,3 +84,6 @@ function BlogPostsSkeleton() {
     </div>
   );
 }
+
+
+export const dynamic = 'force-dynamic';

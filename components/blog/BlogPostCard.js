@@ -7,7 +7,7 @@ import { getGradientForSlug } from './gradients';
 export default function BlogPostCard({ post }) {
   return (
     // The card is now a flex container, arranged vertically
-    <article className="bg-[#1C1C24] rounded-lg overflow-hidden flex flex-col transition-transform duration-300 hover:-translate-y-1 group">
+    <article className="bg-slate-950/80 rounded-lg overflow-hidden flex flex-col transition-transform duration-300 group">
       <Link href={`/blog/${post.slug}`} className="flex flex-col h-full">
         {/* 1. Image Container (Stays the same) */}
         <div className="relative aspect-video overflow-hidden">
@@ -16,7 +16,7 @@ export default function BlogPostCard({ post }) {
               src={post.featured_image}
               alt={post.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
@@ -34,25 +34,25 @@ export default function BlogPostCard({ post }) {
             </div>
           )}
           {post.category && (
-            <Badge className="absolute top-4 left-4 bg-primary/80 hover:bg-primary z-10">
+            <Badge className="absolute top-4 left-4 bg-slate-700/40 hover:bg-gray-700/50 z-10">
               {post.category.name}
             </Badge>
           )}
         </div>
 
         {/* 2. Content Wrapper (This will grow to fill space) */}
-        <div className="p-5 flex flex-col flex-grow">
-          <h2 className='text-xl font-bold text-white mb-3 line-clamp-2'>
+        <div className="p-3 flex flex-col flex-grow">
+          <h2 className='font-bold text-white mb-1 line-clamp-2'>
             {post.title}
           </h2>
           
-          <p className="text-gray-300 mb-4 line-clamp-3">
+          {/* <p className="text-gray-300 text-sm line-clamp-3">
             {post.excerpt}
-          </p>
+          </p> */}
 
           {/* 3. Meta Footer (Pushed to the bottom) */}
           {/* "mt-auto" is the magic class that pushes this block down */}
-          <div className="flex items-center text-sm text-gray-400 mt-auto pt-4 border-t border-gray-700/50">
+          <div className="flex items-center text-xs text-gray-400 pt-2">
             <time dateTime={post.publish_date}>
               {formatDate(post.publish_date)}
             </time>

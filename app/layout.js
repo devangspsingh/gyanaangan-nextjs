@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer'; // Import the Footer component
 import FooterNavigation from '@/components/FooterNavigation'; // Import the new FooterNavigation component
 import DynamicBackground from './dynamicBackgroud';
-
+import { GoogleAdSense } from "@mesmotronic/next-adsense";
 export const metadata = {
   title: 'Gyan Aangan | Explore courses, resources, and subjects....',
   description: 'Explore a variety of courses and resources to enhance your knowledge at Gyan Aangan.',
@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
         <Providers>
           <DynamicBackground /> {/* Use the client component for dynamic background */}
           <Header />
-
+          <GoogleAdSense client="ca-pub-3792754105959046" />
           <div className="container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">
 
             {children}
@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
           <div className="printable-message hidden">
             <p>🚫 Oops! This page does not like printers. 😊<br />Please enjoy it online!</p>
           </div>
-          <Footer /> 
+          <Footer />
           <FooterNavigation />
         </Providers>
       </body>

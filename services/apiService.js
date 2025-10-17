@@ -2,7 +2,7 @@ import { cache } from 'react';
 import api from '../lib/axiosInstance';
 import axios from 'axios'; // Import axios directly for server-side calls
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://gyanaangan.in/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gyanaangan.in/api';
 
 // Helper to construct full URL
 const getFullUrl = (path) => `${API_BASE_URL}${path}`;

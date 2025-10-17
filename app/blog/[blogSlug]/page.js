@@ -60,7 +60,7 @@ export default async function BlogPostPage({ params }) {
         <article className="lg:col-span-8 xl:col-span-9">
           {/* Header */}
           <header className="mb-8">
-            <div className="relative aspect-video mb-6 rounded-lg overflow-hidden">
+            <div className="relative mb-6 rounded-lg overflow-hidden">
               {post.featured_image ? (
                 <img
                   src={post.featured_image}
@@ -83,7 +83,7 @@ export default async function BlogPostPage({ params }) {
                 </div>
               )}
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4">{post.title}</h1>
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-4">{post.title}</h1>
             <div className="flex flex-wrap gap-4 text-gray-400 text-sm">
               {post.author_name && (
                 <span>By {post.author_name}</span>
@@ -104,7 +104,7 @@ export default async function BlogPostPage({ params }) {
 
           {/* Content */}
           <article 
-            className="prose prose-invert prose-lg max-w-none"
+            className="prose prose-invert lg:prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
