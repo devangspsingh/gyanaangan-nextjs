@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 // import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getResourceBySlug, toggleSaveResource } from '@/services/apiService'; // Added getResourceBySlug, toggleSaveResource
+import { getResourceBySlug, getResources, toggleSaveResource } from '@/services/apiService'; // Added getResourceBySlug, toggleSaveResource
 import toast from 'react-hot-toast';
 import { BookmarkIcon as BookmarkOutlineIcon, ShareIcon, ArrowDownIcon as DownloadIconHero, ArrowLeftIcon } from 'lucide-react';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
