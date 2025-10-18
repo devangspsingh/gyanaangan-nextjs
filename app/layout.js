@@ -12,7 +12,6 @@ export const metadata = {
 
 // After (in files like layout.js)
 // import AdSenseComponent from '@/components/blog/AdSenseComponent';
-import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
@@ -29,7 +28,7 @@ export default function RootLayout({ children }) {
         /> */}
         <script
       async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}`}
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3792754105959046`}
       crossOrigin="anonymous"
     ></script>
       </head>
