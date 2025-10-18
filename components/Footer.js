@@ -129,7 +129,7 @@ const Footer = () => {
         onClick: handleClick,
       };
 
-      const listItemKey = item.href || item.label;
+      const listItemKey = item.label;
 
       const iconElement = (
         <div className="relative">

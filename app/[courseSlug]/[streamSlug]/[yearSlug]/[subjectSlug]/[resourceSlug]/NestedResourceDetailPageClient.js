@@ -78,6 +78,13 @@ export default function NestedResourceDetailPageClient({
                     } else {
                         setResource(resourceResponse.data);
                         setCurrentIsSaved(resourceResponse.data.is_saved);
+                        if (resourceResponse.data.subject_slug) {
+                            const relatedResponse = await getResources(1, 7, { subject_slug: resourceResponse.data.subject_slug });
+                            console.log("relatedResponse", relatedResponse)
+                            if (!relatedResponse.error && relatedResponse.data?.results) {
+                                setRelatedResources(relatedResponse.data.results.filter(r => r.slug !== slug).slice(0, 6));
+                            }
+                        }
                     }
                 } catch (e) {
                     console.error("Error fetching resource details client-side:", e);
@@ -288,7 +295,7 @@ export default function NestedResourceDetailPageClient({
                             </div>
 
 
-                    {/* <ResponsiveAdUnit
+                            {/* <ResponsiveAdUnit
                             // className="adsbygoogle"
                             // style={{ display: "block" }}
                             publisherId="ca-pub-3792754105959046"

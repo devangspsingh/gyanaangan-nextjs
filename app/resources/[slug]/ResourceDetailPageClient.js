@@ -63,6 +63,7 @@ export default function ResourceDetailPageClient({ slug }) {
                 setError(null);
                 try {
                     const resourceResponse = await getResourceBySlug(slug);
+                    console.log(resourceResponse)
                     if (resourceResponse.error || !resourceResponse.data) {
                         setError(resourceResponse.data?.detail || 'Failed to load resource.');
                         setResource(null);
@@ -72,6 +73,7 @@ export default function ResourceDetailPageClient({ slug }) {
 
                         if (resourceResponse.data.subject_slug) {
                             const relatedResponse = await getResources(1, 7, { subject_slug: resourceResponse.data.subject_slug });
+                            console.log("relatedResponse",relatedResponse)
                             if (!relatedResponse.error && relatedResponse.data?.results) {
                                 setRelatedResources(relatedResponse.data.results.filter(r => r.slug !== slug).slice(0, 6));
                             }

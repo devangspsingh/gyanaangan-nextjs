@@ -9,7 +9,7 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`; // Ensure th
 const SITE_NAME = 'Gyan Aangan';
 
 export async function generateMetadata({ params }) {
-  const { slug } = params; // Removed await
+  const { slug } =  params; // Removed await
   const resourceResponse = await getResourceBySlug(slug);
 
   if (!resourceResponse.error && resourceResponse.data) {
@@ -61,7 +61,8 @@ const ResourceDetailSkeleton = () => (
   </div>
 );
 
-async function ResourceDataFetcher({ slug }) {
+async function ResourceDataFetcher(props) {
+  const {slug} = await props
   // Main resource is no longer fetched here.
   // It will be fetched client-side in ResourceDetailPageClient.
 
