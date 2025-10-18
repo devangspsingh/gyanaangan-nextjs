@@ -82,7 +82,7 @@ export default function NestedResourceDetailPageClient({
                             const relatedResponse = await getResources(1, 7, { subject_slug: resourceResponse.data.subject_slug });
                             console.log("relatedResponse", relatedResponse)
                             if (!relatedResponse.error && relatedResponse.data?.results) {
-                                setRelatedResources(relatedResponse.data.results.filter(r => r.slug !== slug).slice(0, 6));
+                                setRelatedResources(relatedResponse.data.results.filter(r => r.slug !== resourceSlug).slice(0, 6));
                             }
                         }
                     }
