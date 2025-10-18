@@ -53,7 +53,7 @@ export default function SubjectCard({ subject, url }) {
                                     {subject.common_name || ''} {subject.abbreviation && `(${subject.abbreviation})`}
                                 </p>
                             )}
-                            <p className="text-sm text-gray-300 line-clamp-2 mb-3">
+                            <p className="text-sm text-gray-300 line-clamp-2 mt-3 mb-3">
                                 {subject.description || `Explore resources for ${subject.name}.`}
                             </p>
 
@@ -72,7 +72,7 @@ export default function SubjectCard({ subject, url }) {
                     </Link>
                     {/* Bottom section for stats and info button */}
                     <div className="mt-auto border-t border-gray-700 p-4 flex justify-between items-center">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                        <div className="flex flex-row sm:flex-row sm:items-center gap-x-3 gap-y-1 text-xs text-gray-400">
                             {subject.resource_count !== undefined && (
                                 <span className="flex items-center">
                                     <TagIcon className="w-4 h-4 mr-1 text-primary-light" />
