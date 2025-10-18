@@ -306,11 +306,11 @@ export default function ResourceDetailPageClient({ slug }) {
                                 </div>
                             </section>
                         )}
-                    </div>
-
                     <AdContainer>
                         <AdUnit />
                     </AdContainer>
+                    </div>
+
 
 
                     <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
