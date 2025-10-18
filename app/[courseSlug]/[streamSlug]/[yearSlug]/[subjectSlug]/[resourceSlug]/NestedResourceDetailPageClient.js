@@ -24,6 +24,8 @@ import LoginDialog from '@/components/Auth/LoginDialog';
 import { GoogleLogin } from '@react-oauth/google';
 import api_client from '@/lib/axiosInstance'; // For login dialog
 import { Button } from '@/components/ui/button'; // For actions
+import { AdContainer } from '@/components/blog/AdContainer';
+import { AdUnit } from '@/components/blog/AdUnit';
 // import { GoogleAdUnit } from '@mesmotronic/next-adsense';
 // import { ResponsiveAdUnit } from 'nextjs-google-adsense';
 
@@ -80,7 +82,6 @@ export default function NestedResourceDetailPageClient({
                         setCurrentIsSaved(resourceResponse.data.is_saved);
                         if (resourceResponse.data.subject_slug) {
                             const relatedResponse = await getResources(1, 7, { subject_slug: resourceResponse.data.subject_slug });
-                            console.log("relatedResponse", relatedResponse)
                             if (!relatedResponse.error && relatedResponse.data?.results) {
                                 setRelatedResources(relatedResponse.data.results.filter(r => r.slug !== resourceSlug).slice(0, 6));
                             }
@@ -294,16 +295,9 @@ export default function NestedResourceDetailPageClient({
                                 )}
                             </div>
 
-
-                            {/* <ResponsiveAdUnit
-                            // className="adsbygoogle"
-                            // style={{ display: "block" }}
-                            publisherId="ca-pub-3792754105959046"
-                            slotId="1937256059"
-                            // data-ad-format="auto"
-                            // data-full-width-responsive="true"
-                        >
-                    </ResponsiveAdUnit> */}
+                            <AdContainer>
+                                <AdUnit />
+                            </AdContainer>
 
 
                             <aside className="lg:col-span-4 xl:col-span-3 space-y-6">

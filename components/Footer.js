@@ -132,7 +132,7 @@ const Footer = () => {
       const listItemKey = item.label;
 
       const iconElement = (
-        <div className="relative">
+        <div key={item.label} className="relative">
           <Icon className="w-6 h-6" /> 
           {item.showIndicator && ( 
             <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary ring-1 ring-offset-1 ring-offset-current ring-gray-900" />
@@ -144,7 +144,7 @@ const Footer = () => {
         return (
           <Link href={item.href} {...commonProps} key={listItemKey}>
             {iconElement}
-            {isDesktop && <span className="mt-1 text-xs">{item.label}</span>} 
+            {isDesktop && <span key={item.label+2} className="mt-1 text-xs">{item.label}</span>} 
           </Link>
         );
       }
@@ -152,7 +152,7 @@ const Footer = () => {
       return (
         <button type="button" {...commonProps} key={listItemKey+1}>
           {iconElement}
-          {isDesktop && <span className="mt-1 text-xs">{item.label}</span>}
+          {isDesktop && <span key={item.label+4} className="mt-1 text-xs">{item.label}</span>}
         </button>
       );
     });

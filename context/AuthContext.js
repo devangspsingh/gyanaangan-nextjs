@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
           api.defaults.headers.Authorization = `Bearer ${currentAccessToken}`;
         } else {
           // Access token is expired, try to refresh
-          console.log("Access token expired, attempting refresh...");
+          // console.log("Access token expired, attempting refresh...");
           if (currentRefreshToken) {
             try {
               const refreshResponse = await api.post('/auth/jwt/refresh/', { refresh: currentRefreshToken });
@@ -80,13 +80,13 @@ export const AuthProvider = ({ children }) => {
               
               setTokens({ access: newAccessToken, refresh: newRefreshToken });
               api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
-              console.log("Token refreshed successfully.");
+              // console.log("Token refreshed successfully.");
             } catch (refreshError) {
-              console.error('Failed to refresh token:', refreshError);
+              // console.error('Failed to refresh token:', refreshError);
               clearAuth(); // Refresh failed, clear auth
             }
           } else {
-            console.log("No refresh token available. Clearing auth.");
+            // console.log("No refresh token available. Clearing auth.");
             clearAuth(); // No refresh token, clear auth
           }
         }

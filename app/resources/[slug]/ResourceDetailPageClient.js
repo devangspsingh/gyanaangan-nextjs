@@ -30,6 +30,8 @@ import LoginDialog from '@/components/Auth/LoginDialog';
 import { GoogleLogin } from '@react-oauth/google';
 import api_client from '@/lib/axiosInstance'; // Renamed to avoid conflict
 import { useRouter } from 'next/navigation'; // useRouter for back button
+import { AdUnit } from '@/components/blog/AdUnit';
+import { AdContainer } from '@/components/blog/AdContainer';
 // import { ResponsiveAdUnit } from 'nextjs-google-adsense';
 // import AdUnit from '@/components/blog/AdUnit';
 
@@ -63,7 +65,6 @@ export default function ResourceDetailPageClient({ slug }) {
                 setError(null);
                 try {
                     const resourceResponse = await getResourceBySlug(slug);
-                    console.log(resourceResponse)
                     if (resourceResponse.error || !resourceResponse.data) {
                         setError(resourceResponse.data?.detail || 'Failed to load resource.');
                         setResource(null);
@@ -73,7 +74,6 @@ export default function ResourceDetailPageClient({ slug }) {
 
                         if (resourceResponse.data.subject_slug) {
                             const relatedResponse = await getResources(1, 7, { subject_slug: resourceResponse.data.subject_slug });
-                            console.log("relatedResponse",relatedResponse)
                             if (!relatedResponse.error && relatedResponse.data?.results) {
                                 setRelatedResources(relatedResponse.data.results.filter(r => r.slug !== slug).slice(0, 6));
                             }
@@ -308,8 +308,9 @@ export default function ResourceDetailPageClient({ slug }) {
                         )}
                     </div>
 
-
-                {/* <AdUnit/> */}
+                    <AdContainer>
+                        <AdUnit />
+                    </AdContainer>
 
 
                     <aside className="lg:col-span-4 xl:col-span-3 space-y-6">

@@ -51,8 +51,6 @@ function SearchResults() {
               (newResults.subjects?.length || 0) +
               (newResults.resources?.length || 0)
             );
-            console.log("Search data received:", data); // Log the raw data
-            console.log("Processed results:", newResults); // Log the processed results
           }
         })
         .catch(err => {
