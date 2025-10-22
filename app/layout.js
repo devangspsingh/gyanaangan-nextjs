@@ -9,6 +9,7 @@ export const metadata = {
   title: 'Gyan Aangan | Explore courses, resources, and subjects....',
   description: 'Explore a variety of courses and resources to enhance your knowledge at Gyan Aangan.',
 }
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 // After (in files like layout.js)
 // import AdSenseComponent from '@/components/blog/AdSenseComponent';
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
           <FooterNavigation />
         </Providers>
       </body>
+      <GoogleAnalytics gaId="G-P37HBDS10M" />
     </html>
   );
 }
