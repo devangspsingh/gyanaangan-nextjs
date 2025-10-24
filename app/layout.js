@@ -6,6 +6,8 @@ import Footer from '@/components/Footer'; // Import the Footer component
 import FooterNavigation from '@/components/FooterNavigation'; // Import the new FooterNavigation component
 import DynamicBackground from './dynamicBackgroud';
 export const metadata = {
+
+  metadataBase: new URL('https://gyanaangan.in'),
   title: 'Gyan Aangan | Explore courses, resources, and subjects....',
   description: 'Explore a variety of courses and resources to enhance your knowledge at Gyan Aangan.',
 }
@@ -16,6 +18,8 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
+
+
 
 export default function RootLayout({ children }) {
   return (

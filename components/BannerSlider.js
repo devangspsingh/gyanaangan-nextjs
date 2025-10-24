@@ -11,15 +11,6 @@ export default function BannerSlider({ banners: initialBanners }) {
   const [isVisible] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Debug: Log banners data
-  useEffect(() => {
-    console.log('BannerSlider - Received banners:', banners);
-    console.log('BannerSlider - Banners count:', banners.length);
-    if (banners.length > 0) {
-      console.log('BannerSlider - First banner:', banners[0]);
-    }
-  }, [banners]);
-
   // Auto-slide effect
   useEffect(() => {
     if (!banners.length || isPaused || !isVisible) return;
@@ -54,7 +45,7 @@ export default function BannerSlider({ banners: initialBanners }) {
 
   const handleBannerClick = async (banner) => {
     await trackBannerClick(banner.id);
-    console.log(banner)
+    // console.log(banner)
   };
 
 //   const handleClose = () => {

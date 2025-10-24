@@ -38,11 +38,7 @@ export default async function HomePage() {
   // Fetch active banners
   const bannersResponse = await getActiveBanners();
   const banners = bannersResponse.error ? [] : bannersResponse.data;
-  
-  console.log('HomePage - Banners Response:', bannersResponse);
-  console.log('HomePage - Banners data:', banners);
-  console.log('HomePage - Banners length:', banners.length);
-  
+
   if (bannersResponse.error) {
     console.error("Failed to load banners.");
   }
