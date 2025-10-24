@@ -105,7 +105,7 @@ export default function BannerSlider({ banners: initialBanners }) {
         {/* Mobile aspect ratio */}
         <div 
           className="block md:hidden" 
-          style={{ aspectRatio: hasMobileImage ? '1600/648' : '1600/324' }}
+          style={{ aspectRatio: hasMobileImage ? '1600/600' : '1600/300' }}
         >
           {banners.map((banner, index) => (
             <div
