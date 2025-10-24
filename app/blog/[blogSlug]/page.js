@@ -7,6 +7,8 @@ import BlogSidebar from '@/components/blog/BlogSidebar';
 import ShareButtons from '@/components/blog/ShareButtons';
 import { Metadata } from 'next';
 import { getGradientForSlug } from '@/components/blog/gradients';
+import { AdContainer } from '@/components/blog/AdContainer';
+import { AdUnit } from '@/components/blog/AdUnit';
 
 // Generate static metadata for SEO
 export async function generateMetadata({ params }) {
@@ -102,11 +104,24 @@ export default async function BlogPostPage({ params }) {
             </div>
           </header>
 
+          <div className="my-8">
+            <AdContainer>
+              <AdUnit />
+            </AdContainer>
+          </div>
+
           {/* Content */}
           <article 
             className="prose prose-invert lg:prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
+
+          {/* Advertisement Banner */}
+          <div className="my-8">
+            <AdContainer>
+              <AdUnit />
+            </AdContainer>
+          </div>
 
           {/* Footer */}
           <footer className="mt-8 pt-8 border-t border-stone-700">
@@ -132,6 +147,16 @@ export default async function BlogPostPage({ params }) {
 
         {/* Sidebar */}
         <aside className="lg:col-span-4 xl:col-span-3">
+          {/* Advertisement in Sidebar */}
+          <div className="mb-6">
+            <AdContainer>
+              <AdUnit 
+                data-ad-slot="1937256059"
+                data-ad-format="vertical"
+              />
+            </AdContainer>
+          </div>
+          
           <BlogSidebar 
             featuredPosts={relatedPosts}
             currentPost={post}

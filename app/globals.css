@@ -121,3 +121,37 @@ body {
 /* Add other global styles or font imports here if needed */
 /* Example for Inter font if not handled by next/font */
 /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap'); */
+
+/* Fix table overflow - make tables responsive */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Add scrollbar styling for better UX */
+.prose table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose table::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.prose table::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.prose table::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Ensure table content doesn't wrap awkwardly */
+.prose table td,
+.prose table th {
+  white-space: nowrap;
+  min-width: fit-content;
+}
