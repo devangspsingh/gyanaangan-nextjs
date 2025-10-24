@@ -60,7 +60,7 @@ body {
 @theme {
   /* Existing primary, stone, gray, yellow colors can also be defined here if you want to manage them via CSS variables */
   /* Example for existing primary color */
-  --color-primary: #D2F6FC;
+  --color-primary: #6BD2F6;
   --color-primary-light: #38bdf8;
   --color-primary-dark: #010717;
   --color-primary-text: #D2F6FC;

@@ -264,3 +264,60 @@ export const viewResourceFileSecurely = async (fileUrlToFetchDirectly) => {
   }
 };
 
+
+// ===========================
+// Banner API Functions
+// ===========================
+
+/**
+ * Get all active banners
+ */
+export const getActiveBanners = cache(async () => {
+  try {
+    const response = await axios.get(getFullUrl('/banners/active/'));
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error fetching active banners:', error);
+    return { data: [], error: true };
+  }
+});
+
+/**
+ * Get the primary banner
+ */
+export const getPrimaryBanner = cache(async () => {
+  try {
+    const response = await axios.get(getFullUrl('/banners/primary/'));
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error fetching primary banner:', error);
+    return { data: null, error: true };
+  }
+});
+
+/**
+ * Track banner view (for analytics)
+ */
+export const trackBannerView = async (bannerId) => {
+  try {
+    const response = await api.post(getFullUrl(`/banners/${bannerId}/track_view/`));
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error tracking banner view:', error);
+    return { data: null, error: true };
+  }
+};
+
+/**
+ * Track banner click (for analytics)
+ */
+export const trackBannerClick = async (bannerId) => {
+  try {
+    const response = await api.post(getFullUrl(`/banners/${bannerId}/track_click/`));
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error tracking banner click:', error);
+    return { data: null, error: true };
+  }
+};
+

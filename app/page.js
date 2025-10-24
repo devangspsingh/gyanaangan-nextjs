@@ -13,8 +13,12 @@ import ResourcesListClient from '../components/home/ResourcesListClient';
 // Import HeroSearchForm (Client Component) and SectionWrapper (Server Component)
 import HeroSearchForm from '../components/HeroSearchForm';
 import SectionWrapper from '../components/SectionWrapper';
+import BannerSlider from '../components/BannerSlider';
 
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ArrowRightIcon } from 'lucide-react';
+import Link from 'next/link';
+import { getLatestNotification, getActiveBanners } from '@/services/apiService';
 
 // Skeleton for individual sections, used as Suspense fallback
 const SectionContentSkeleton = ({ count = 3, CardSkeletonComponent }) => (
@@ -31,13 +35,30 @@ export default async function HomePage() {
   //   console.error("Failed to load notification.");
   // }
 
+  // Fetch active banners
+  const bannersResponse = await getActiveBanners();
+  const banners = bannersResponse.error ? [] : bannersResponse.data;
+  if (bannersResponse.error) {
+    console.error("Failed to load banners.");
+  }
+
   return (
-    <main className="container mx-auto py-4 text-gray-100">
+    <>
+       
+        {banners.length > 0 && (
+           <section className="mb-8">
+             <BannerSlider banners={banners} />
+           </section>
+         )}
+    <main className="container mx-auto pb-4 text-gray-100">
       <ScrollArea className="w-full">
+            {/* Banner Section - Renders immediately after navbar */}
         {/* Hero Section - Renders immediately */}
         <section
-          className="min-h-[70vh] md:min-h-[90vh] relative flex flex-col justify-center items-center text-center py-16 px-4"
+          className="min-h-[70vh] md:min-h-[70vh] relative flex flex-col justify-top items-center text-center py-16 px-4"
         >
+
+
           {/* {notification && notification.title && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-full max-w-2xl p-4 backdrop-blur-sm text-white rounded-lg shadow-lg z-20">
               <h3 className="font-bold">{notification.title}</h3>
@@ -103,5 +124,7 @@ export default async function HomePage() {
         <ScrollBar orientation="vertical" />
       </ScrollArea>
     </main>
+
+    </>
   );
 }
