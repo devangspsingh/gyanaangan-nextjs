@@ -16,7 +16,11 @@ export async function generateMetadata({ params }) {
     const resource = resourceResponse.data;
     const pageTitle = resource.name ? `${resource.name} - ${SITE_NAME}` : `Resource Details - ${SITE_NAME}`;
     const pageDescription = resource.meta_description || resource.description || `Details for resource: ${resource.name} on ${SITE_NAME}.`;
-    const ogImageUrl = resource.og_image_url || DEFAULT_OG_IMAGE;
+    
+    // Generate dynamic OG image URL
+    const ogImageUrl = resource.og_image_url || 
+      `${SITE_URL}/api/og?title=${encodeURIComponent(resource.name || 'Resource')}&description=${encodeURIComponent(pageDescription.slice(0, 150))}&type=resource`;
+    
     const canonicalUrl = `${SITE_URL}/resources/${slug}`;
 
     return {

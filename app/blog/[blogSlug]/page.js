@@ -10,6 +10,8 @@ import { getGradientForSlug } from '@/components/blog/gradients';
 import { AdContainer } from '@/components/blog/AdContainer';
 import { AdUnit } from '@/components/blog/AdUnit';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
+
 // Generate static metadata for SEO
 export async function generateMetadata({ params }) {
   const { blogSlug } = await params;
@@ -23,6 +25,10 @@ export async function generateMetadata({ params }) {
     };
   }
 
+  // Generate dynamic OG image URL
+  const ogImageUrl = post.og_image || post.featured_image || 
+    `${SITE_URL}/api/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent((post.excerpt || post.meta_description || '').slice(0, 150))}&type=blog`;
+
   return {
     title: `${post.title} - GyanAangan Blog`,
     description: post.excerpt || post.meta_description,
@@ -33,7 +39,13 @@ export async function generateMetadata({ params }) {
       authors: [post.author_name],
       publishedTime: post.publish_date,
       modifiedTime: post.updated_at,
-      images: [post.featured_image || post.og_image],
+      images: [ogImageUrl],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt || post.meta_description,
+      images: [ogImageUrl],
     },
   };
 }
