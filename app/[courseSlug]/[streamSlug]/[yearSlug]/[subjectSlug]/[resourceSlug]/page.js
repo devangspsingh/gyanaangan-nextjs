@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { getResourceBySlug, getSpecialPageData } from '@/services/apiService';
 import NestedResourceDetailPageClient from './NestedResourceDetailPageClient';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.gyanaangan.in';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 

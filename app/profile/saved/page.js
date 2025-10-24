@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { getSavedResources } from '@/services/apiService'; // We'll add this to apiService
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.gyanaangan.in';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 const SITE_NAME = 'Gyan Aangan';
 const PAGE_SIZE = 9; // Consistent with other resource lists
 

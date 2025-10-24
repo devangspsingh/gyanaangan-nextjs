@@ -4,7 +4,7 @@ import ResourceDetailPageClient from './ResourceDetailPageClient';
 // Head component from next/head is not used in Server Components for metadata.
 // Metadata is handled by the generateMetadata export.
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.gyanaangan.in';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`; // Ensure this image exists in your public folder
 const SITE_NAME = 'Gyan Aangan';
 
