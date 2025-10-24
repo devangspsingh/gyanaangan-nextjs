@@ -45,6 +45,7 @@ export default function BannerSlider({ banners: initialBanners }) {
 
   const handleBannerClick = async (banner) => {
     await trackBannerClick(banner.id);
+    console.log(banner)
   };
 
 //   const handleClose = () => {
@@ -54,6 +55,9 @@ export default function BannerSlider({ banners: initialBanners }) {
   if (!isVisible || !banners.length) return null;
 
   const currentBanner = banners[currentIndex];
+  
+  // Determine aspect ratio based on screen size and available images
+  const hasMobileImage = currentBanner?.mobile_image_url && currentBanner.mobile_image_url !== currentBanner.image_url;
 
   return (
     <div 
@@ -61,29 +65,62 @@ export default function BannerSlider({ banners: initialBanners }) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Banner Content - Dynamic height based on aspect ratio */}
-      <div className="relative w-full" style={{ aspectRatio: '1600/324' }}>
-        {banners.map((banner, index) => (
-          <div
-            key={banner.id}
-            className={`absolute inset-0 transition-opacity duration-700 ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-          
-            {banner.link_url ? (
-              <Link
-                href={banner.link_url}
-                onClick={() => handleBannerClick(banner)}
-                className="block w-full h-full"
-              >
-                <BannerContent banner={banner} />
-              </Link>
-            ) : (
-              <BannerContent banner={banner} />
-            )}
-          </div>
-        ))}
+      {/* Banner Content - Dynamic height based on screen size and image type */}
+      <div className="relative w-full">
+        {/* Desktop aspect ratio */}
+        <div className="hidden md:block" style={{ aspectRatio: '1600/324' }}>
+          {banners.map((banner, index) => (
+            <div
+              key={`desktop-${banner.id}`}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                index === currentIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              {banner.link_url ? (
+                <Link
+                  href={banner.link_url}
+                  onClick={() => handleBannerClick(banner)}
+                  className="block w-full h-full"
+                >
+                  <BannerContent banner={banner} isMobile={false} />
+                </Link>
+              ) : (
+                <div className="block w-full h-full">
+                  <BannerContent banner={banner} isMobile={false} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile aspect ratio */}
+        <div 
+          className="block md:hidden" 
+          style={{ aspectRatio: hasMobileImage ? '1600/600' : '1600/300' }}
+        >
+          {banners.map((banner, index) => (
+            <div
+              key={`mobile-${banner.id}`}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                index === currentIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              {banner.link_url ? (
+                <Link
+                  href={banner.link_url}
+                  onClick={() => handleBannerClick(banner)}
+                  className="block w-full h-full"
+                >
+                  <BannerContent banner={banner} isMobile={true} />
+                </Link>
+              ) : (
+                <div className="block w-full h-full">
+                  <BannerContent banner={banner} isMobile={true} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
 
         {/* Navigation Arrows */}
         {banners.length > 1 && (
@@ -127,19 +164,27 @@ export default function BannerSlider({ banners: initialBanners }) {
   );
 }
 
-function BannerContent({ banner }) {
+function BannerContent({ banner, isMobile }) {
+  // Use mobile image on mobile if available, otherwise use desktop image
+  const imageUrl = isMobile && banner.mobile_image_url 
+    ? banner.mobile_image_url 
+    : banner.image_url;
+  
+  const aspectRatio = isMobile && banner.mobile_image_url 
+    ? '1600/648' 
+    : '1600/324';
+
   return (
     <div className="relative w-full h-full">
-      {/* Single Image for all devices with 1600x324 aspect ratio */}
       <img
-        src={banner.image_url}
+        src={imageUrl}
         alt={banner.description || banner.title}
         className="w-full h-full object-cover"
-        style={{ aspectRatio: '1600/324' }}
+        style={{ aspectRatio }}
       />
 
       {/* Overlay Text (if link_text exists) */}
-      {banner.link_text && (
+      {/* {banner.link_text && (
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-4 sm:pb-6 md:pb-8">
           <div className="text-center px-4">
             {banner.description && (
@@ -152,7 +197,7 @@ function BannerContent({ banner }) {
             </span>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
