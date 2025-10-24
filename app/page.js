@@ -27,7 +27,7 @@ const SectionContentSkeleton = ({ count = 3, CardSkeletonComponent }) => (
   </div>
 );
 
-
+export const dynamic = 'force-dynamic';
 export default async function HomePage() {
   // const notificationResponse = await getLatestNotification();
   // const notification = notificationResponse.error ? null : notificationResponse.data;
@@ -38,25 +38,30 @@ export default async function HomePage() {
   // Fetch active banners
   const bannersResponse = await getActiveBanners();
   const banners = bannersResponse.error ? [] : bannersResponse.data;
+  
+  console.log('HomePage - Banners Response:', bannersResponse);
+  console.log('HomePage - Banners data:', banners);
+  console.log('HomePage - Banners length:', banners.length);
+  
   if (bannersResponse.error) {
     console.error("Failed to load banners.");
   }
 
   return (
     <>
-       
-        {banners.length > 0 && (
-           <section className="mb-8">
-             <BannerSlider banners={banners} />
-           </section>
-         )}
-    <main className="container mx-auto pb-4 text-gray-100">
-      <ScrollArea className="w-full">
-            {/* Banner Section - Renders immediately after navbar */}
-        {/* Hero Section - Renders immediately */}
-        <section
-          className="min-h-[70vh] md:min-h-[70vh] relative flex flex-col justify-top items-center text-center py-16 px-4"
-        >
+      <main className="container mx-auto pb-4 text-gray-100">
+        <ScrollArea className="w-full">
+          {/* Banner Section - Renders immediately after navbar */}
+          {banners.length > 0 && (
+            <section className="mb-8 -mx-4 sm:mx-0">
+              <BannerSlider banners={banners} />
+            </section>
+          )}
+
+          {/* Hero Section - Renders immediately */}
+          <section
+            className="min-h-[70vh] md:min-h-[70vh] relative flex flex-col justify-top items-center text-center py-16 px-4"
+          >
 
 
           {/* {notification && notification.title && (
