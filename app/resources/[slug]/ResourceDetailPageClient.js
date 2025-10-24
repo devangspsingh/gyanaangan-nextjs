@@ -294,15 +294,33 @@ export default function ResourceDetailPageClient({ slug }) {
                     <div className="lg:col-span-8 xl:col-span-9">
                         <Viewer resource={resource} />
                         {resource.description && (
-                            <section className="mt-8yearSlug rounded-lg shadow">
+                            <section className="mt-8 rounded-lg shadow">
                                 <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
                                 <p className="text-gray-300 font-body-desc leading-relaxed whitespace-pre-wrap">{resource.description}</p>
-                                <div className="font-body-desc py-2 text-gray-400 flex flex-wrap gap-2 mt-3">
-                                    <Badge variant="outline" className={"text-md"}>Type: {resource.resource_type_display || resource.resource_type}</Badge>
-                                    {resource.subject_name && <Badge className="text-md" variant="outline">Subject: {resource.subject_name}</Badge>}
-                                    {resource.educational_year?.name && <Badge className="text-md" variant="outline">Year: {resource.educational_year.name}</Badge>}
-                                    {resource.updated_at && <Badge className="text-md" variant="outline">Last Updated: {resource.updated_at}</Badge>}
-                                    {resource.uploader_name && <Badge className="text-md" variant="outline">By: {resource.uploader_name}</Badge>}
+                                <div className="font-body-desc py-2 text-gray-400 flex flex-wrap gap-2 mt-3 overflow-hidden">
+                                    <Badge variant="outline" className="text-xs sm:text-sm break-words max-w-full">
+                                        <span className="truncate">Type: {resource.resource_type_display || resource.resource_type}</span>
+                                    </Badge>
+                                    {resource.subject_name && (
+                                        <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                                            <span className="truncate">Subject: {resource.subject_name}</span>
+                                        </Badge>
+                                    )}
+                                    {resource.educational_year?.name && (
+                                        <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                                            <span className="truncate">Year: {resource.educational_year.name}</span>
+                                        </Badge>
+                                    )}
+                                    {resource.updated_at && (
+                                        <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                                            <span className="truncate">Last Updated: {resource.updated_at}</span>
+                                        </Badge>
+                                    )}
+                                    {resource.uploader_name && (
+                                        <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                                            <span className="truncate">By: {resource.uploader_name}</span>
+                                        </Badge>
+                                    )}
                                 </div>
                             </section>
                         )}
