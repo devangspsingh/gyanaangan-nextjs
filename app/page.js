@@ -5,10 +5,10 @@ import CourseCardSkeleton from '../components/CourseCardSkeleton';
 import SubjectCardSkeleton from '../components/SubjectCardSkeleton';
 import ResourceCardSkeleton from '../components/ResourceCardSkeleton';
 
-// Import new Client List Components
-import CoursesListClient from '../components/home/CoursesListClient';
-import SubjectsListClient from '../components/home/SubjectsListClient';
-import ResourcesListClient from '../components/home/ResourcesListClient';
+// Import new Server List Components (Courses, Subjects & Resources)
+import CoursesList from '../components/home/CoursesList';
+import SubjectsList from '../components/home/SubjectsList';
+import ResourcesList from '../components/home/ResourcesList';
 
 // Import HeroSearchForm (Client Component) and SectionWrapper (Server Component)
 import HeroSearchForm from '../components/HeroSearchForm';
@@ -93,7 +93,7 @@ export default async function HomePage() {
               linkText="Explore All Available Courses"
           >
             <Suspense fallback={<SectionContentSkeleton count={4} CardSkeletonComponent={CourseCardSkeleton} />}>
-              <CoursesListClient />
+              <CoursesList />
             </Suspense>
           </SectionWrapper>
 
@@ -106,7 +106,7 @@ export default async function HomePage() {
             linkText="Explore All Available Subjects"
         >
           <Suspense fallback={<SectionContentSkeleton count={6} CardSkeletonComponent={SubjectCardSkeleton} />}>
-            <SubjectsListClient />
+            <SubjectsList />
           </Suspense>
         </SectionWrapper>
 
@@ -119,7 +119,7 @@ export default async function HomePage() {
             linkText="Explore All Available Resources"
         >
           <Suspense fallback={<SectionContentSkeleton count={6} CardSkeletonComponent={ResourceCardSkeleton} />}>
-            <ResourcesListClient />
+            <ResourcesList />
           </Suspense>
         </SectionWrapper>
         <ScrollBar orientation="vertical" />

@@ -1,7 +1,7 @@
 export default function PrivacyPolicyPage() {
-  const lastUpdated = "October 26, 2023"; // Example date, keep dynamic if possible
-  const siteUrl = "https://gyanaangan.in"; // Example URL
-  const contactEmail = "dspscpy@gmail.com"; // Example email
+  const lastUpdated = "October 28, 2025"; 
+  const siteUrl = "https://gyanaangan.in";
+  const contactEmail = "gyanaangan.in@gmail.com";
   const siteName = "Gyan Aangan";
 
   return (

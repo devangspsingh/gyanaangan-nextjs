@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { getResources } from '@/services/apiService';
+import { getResourcesServerSide } from '@/services/apiService'; // Changed to server-side
 import ResourcesListClient from './ResourcesListClient'; // Import the new client component
 import ResourceCardSkeleton from '@/components/ResourceCardSkeleton'; // For Suspense fallback
 import Link from 'next/link';
@@ -74,11 +74,19 @@ async function ResourcesPageDataFetcher({ searchParams }) {
   if (!filterParams.search) delete filterParams.search;
   if (!filterParams.resource_type) delete filterParams.resource_type;
 
+  console.log('📄 [ResourcesPage] Fetching with params:', filterParams);
 
-  const resourcesResponse = await getResources(initialPage, PAGE_SIZE, filterParams);
+  // Use server-side API with authentication
+  const resourcesResponse = await getResourcesServerSide(initialPage, PAGE_SIZE, filterParams);
+
+  console.log('📄 [ResourcesPage] Response:', {
+    error: resourcesResponse.error,
+    status: resourcesResponse.status,
+    resultsCount: resourcesResponse.data?.results?.length
+  });
 
   if (resourcesResponse.error) {
-    console.error("Failed to load initial resources:", resourcesResponse.data);
+    console.error("📄 [ResourcesPage] Failed to load initial resources:", resourcesResponse.data);
     return (
         <ResourcesListClient 
             initialResources={[]} 
@@ -92,6 +100,15 @@ async function ResourcesPageDataFetcher({ searchParams }) {
   const initialResources = resourcesResponse.data?.results || [];
   const initialHasNextPage = !!resourcesResponse.data?.next;
   const initialTotalPages = Math.ceil((resourcesResponse.data?.count || 0) / PAGE_SIZE);
+
+  console.log('📄 [ResourcesPage] Rendering with', initialResources.length, 'resources');
+  if (initialResources.length > 0) {
+    console.log('📄 [ResourcesPage] First resource:', {
+      id: initialResources[0].id,
+      name: initialResources[0].name,
+      is_saved: initialResources[0].is_saved
+    });
+  }
 
   return (
     <ResourcesListClient 

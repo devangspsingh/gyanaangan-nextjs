@@ -38,6 +38,10 @@ export const AuthProvider = ({ children }) => {
           }
           setTokens(parsedTokens);
           api.defaults.headers.Authorization = `Bearer ${currentAccessToken}`;
+          
+          // Ensure cookie is also set (in case it was cleared but localStorage persists)
+          document.cookie = `access_token=${currentAccessToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+          console.log('🍪 [Init] Cookie synced from localStorage');
         } else {
           // Access token is expired, try to refresh
           // console.log("Access token expired, attempting refresh...");
@@ -104,8 +108,14 @@ export const AuthProvider = ({ children }) => {
   }, [initializeAuth]);
 
   const login = (userData, access, refresh) => {
+    // Store in localStorage (for client-side)
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('tokens', JSON.stringify({ access, refresh }));
+    
+    // ALSO store access token in cookie (for server-side)
+    document.cookie = `access_token=${access}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+    console.log('🍪 [Login] Cookie set:', `access_token=${access.substring(0, 20)}...`);
+    
     setUser(userData);
     setTokens({ access, refresh });
     api.defaults.headers.Authorization = `Bearer ${access}`;
@@ -119,6 +129,11 @@ export const AuthProvider = ({ children }) => {
   const clearAuth = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('tokens');
+    
+    // ALSO remove the cookie
+    document.cookie = 'access_token=; path=/; max-age=0';
+    console.log('🍪 [Logout] Cookie cleared');
+    
     setUser(null);
     setTokens(null);
     delete api.defaults.headers.Authorization;

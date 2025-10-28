@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import api from '../lib/axiosInstance';
 import axios from 'axios'; // Import axios directly for server-side calls
+import { fetchFromServer } from './serverSideFether'; // Import server-side fetcher
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gyanaangan.in/api';
 
@@ -60,6 +61,46 @@ export const getSubjectBySlug = cache(async (slug) => {
 export const getResources = async (page = 1, pageSize = 9, params = {}) => { 
   // Ensure params are spread correctly, not nested.
   return handleApiResponse(api.get(getFullUrl('/resources/'), { params: { page, page_size: pageSize, ...params } }));
+};
+
+// Server-side version of getResources (with authentication via cookies)
+export const getResourcesServerSide = async (page = 1, pageSize = 9, params = {}) => {
+  // This function can ONLY be called from Server Components
+  // It reads cookies using Next.js cookies() function
+  console.log('📚 [getResourcesServerSide] Called with:', { page, pageSize, params });
+
+  const result = await fetchFromServer('/resources/', 'GET', null, null, { 
+    page, 
+    page_size: pageSize, 
+    ...params 
+  });
+
+  console.log('📚 [getResourcesServerSide] Result:', {
+    error: result.error,
+    status: result.status,
+    hasData: !!result.data,
+    resultsCount: result.data?.results?.length
+  });
+
+  return result;
+};
+
+// Server-side version of getResourceBySlug with authentication
+export const getResourceBySlugServerSide = async (slug) => {
+  // This function can ONLY be called from Server Components
+  // It reads cookies using Next.js cookies() function for authentication
+  console.log('📚 [getResourceBySlugServerSide] Called with slug:', slug);
+
+  const result = await fetchFromServer(`/resources/${slug}/`, 'GET', null, null, {});
+
+  console.log('📚 [getResourceBySlugServerSide] Result:', {
+    error: result.error,
+    status: result.status,
+    hasData: !!result.data,
+    resourceName: result.data?.name
+  });
+
+  return result;
 };
 
 // Example: getResourceBySlug

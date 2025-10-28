@@ -1,0 +1,103 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import ResourceCard from './ResourceCard';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FunnelIcon } from 'lucide-react';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
+export default function SubjectResourcesClient({ 
+  allResources, 
+  courseSlug, 
+  streamSlug, 
+  yearSlug, 
+  subjectSlug 
+}) {
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const resourceTypes = useMemo(() => {
+    const types = new Set(allResources.map(res => res.resource_type));
+    return ['all', ...Array.from(types)];
+  }, [allResources]);
+
+  const filteredResources = useMemo(() => {
+    return allResources.filter(resource => {
+      const typeMatch = activeTab === 'all' || resource.resource_type === activeTab;
+      const searchTermMatch = searchTerm === '' ||
+        resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (resource.description && resource.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (resource.resource_type && resource.resource_type.toLowerCase().includes(searchTerm.toLowerCase()));
+      return typeMatch && searchTermMatch;
+    });
+  }, [allResources, activeTab, searchTerm]);
+
+  if (allResources.length === 0) {
+    return <p className="text-gray-400">No resources found for this subject yet.</p>;
+  }
+
+  return (
+    <>
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h2 className="text-2xl font-semibold text-white">Available Resources</h2>
+        <div className="relative max-w-sm grow w-full sm:w-auto">
+          <input
+            type="search"
+            id="search-main"
+            name="q"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full p-3 text-sm text-gray-400 bg-gray-50 border border-gray-300 rounded-full rounded-br-lg dark:bg-gray-200 dark:placeholder-gray-400 dark:text-gray-800"
+            placeholder="Search resources..."
+            required
+          />
+          <span
+            className="absolute end-1.5 bottom-1.5 p-2 text-sm font-medium h-auto text-primary-dark focus:outline-none"
+            aria-label="Search"
+          >
+            <MagnifyingGlassIcon className="w-5 h-5" />
+          </span>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex items-center gap-x-3 mb-4">
+          <FunnelIcon className="h-5 w-5 text-gray-300 flex-shrink-0" aria-hidden="true" />
+          <ScrollArea className="overflow-x-auto">
+            <TabsList className="flex-grow flex items-center justify-start space-x-2 sm:space-x-3 overflow-x-auto h-auto pb-2 bg-transparent scrollbar-thin scrollbar-thumb-stone-600 scrollbar-track-stone-800 focus-visible:ring-0 focus-visible:outline-none">
+              {resourceTypes.map((type) => (
+                <TabsTrigger
+                  key={type}
+                  value={type}
+                  className="capitalize px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap bg-stone-700 text-gray-300 hover:bg-stone-600 hover:text-gray-100 data-[state=active]:bg-secondary data-[state=active]:text-primary-dark data-[state=active]:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900"
+                >
+                  {type === 'all' ? 'All Types' : type.replace(/_/g, ' ')}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <ScrollBar state="visible" orientation="horizontal" />
+          </ScrollArea>
+        </div>
+
+        <TabsContent value={activeTab} className="mt-2">
+          {filteredResources.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredResources.map((resource) => (
+                <ResourceCard
+                  key={resource.slug}
+                  resource={resource}
+                  customHref={`/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}/${resource.slug}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-8">
+              No resources match your current filter or search term.
+            </p>
+          )}
+        </TabsContent>
+      </Tabs>
+    </>
+  );
+}

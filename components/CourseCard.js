@@ -1,23 +1,8 @@
-// ...existing code...
-'use client';
-
 import Link from 'next/link';
-import { ArrowRightIcon, AcademicCapIcon, InformationCircleIcon } from '@heroicons/react/20/solid'; // Added InformationCircleIcon
-import { useState } from 'react'; // Added useState
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from "@/components/ui/drawer"; // Added Drawer imports
-import { Button } from '@/components/ui/button'; // Added Button import
+import { ArrowRightIcon, AcademicCapIcon } from '@heroicons/react/20/solid';
+import CourseCardDrawer from './CourseCardDrawer'; // Client component for drawer
 
-export default function CourseCard({ course, svgIndex }) { // Added svgIndex prop
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+export default function CourseCard({ course, svgIndex }) {
 
   if (!course) {
     return (
@@ -34,23 +19,20 @@ export default function CourseCard({ course, svgIndex }) { // Added svgIndex pro
     : defaultSvg;
 
   return (
-    <>
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-
-      <div className="relative group card-gradient border border-gray-700 rounded-lg shadow-lg hover:shadow-primary/30 transition-all duration-300 flex flex-col h-full overflow-hidden">
-        {/* Background SVG and decorative element */}
-        <div className="absolute top-0 right-0 h-full w-2/5 md:w-1/3 pointer-events-none z-0 opacity-40 group-hover:opacity-45 transition-opacity duration-300">
-          {/* Decorative half-circle shape */}
-          <div
-            className="absolute -right-1/4 top-1/2 transform -translate-y-1/2 w-3/4 h-3/4 bg-primary/10 rounded-full blur-md"
-          ></div>
-          <img
-            src={svgPath}
-            alt=""
-            onError={(e) => { e.currentTarget.src = defaultSvg; }} // Fallback if numbered SVG fails to load
-            className="absolute inset-0 w-full h-full object-contain object-right p-2" 
-          />
-        </div>
+    <div className="relative group card-gradient border border-gray-700 rounded-lg shadow-lg hover:shadow-primary/30 transition-all duration-300 flex flex-col h-full overflow-hidden">
+      {/* Background SVG and decorative element */}
+      <div className="absolute top-0 right-0 h-full w-2/5 md:w-1/3 pointer-events-none z-0 opacity-40 group-hover:opacity-45 transition-opacity duration-300">
+        {/* Decorative half-circle shape */}
+        <div
+          className="absolute -right-1/4 top-1/2 transform -translate-y-1/2 w-3/4 h-3/4 bg-primary/10 rounded-full blur-md"
+        ></div>
+        <img
+          src={svgPath}
+          alt=""
+          // onError={(e) => { e.currentTarget.src = defaultSvg; }} // Fallback if numbered SVG fails to load
+          className="absolute inset-0 w-full h-full object-contain object-right p-2" 
+        />
+      </div>
 
         {/* Card Content - ensure it's above the background */}
         <div className="relative z-10 flex flex-col h-full">
@@ -126,70 +108,14 @@ export default function CourseCard({ course, svgIndex }) { // Added svgIndex pro
           {/* Footer with action and info button */}
           <div className="mt-auto border-t border-gray-700/50 p-4 flex justify-between items-center">
             <Link href={`/${course.slug}`} className="inline-flex items-center text-sm font-medium text-primary-light group-hover:underline">
-                View Details
-                <ArrowRightIcon className="ml-1.5 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 text-primary-light" />
+              View Details
+              <ArrowRightIcon className="ml-1.5 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 text-primary-light" />
             </Link>
-            <DrawerTrigger asChild>
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation(); 
-                        setIsDrawerOpen(true);
-                    }}
-                    title="More info about the course"
-                    className="p-1.5 text-gray-400 hover:text-primary-light rounded-full hover:bg-stone-700/70 transition-colors duration-200"
-                >
-                    <InformationCircleIcon className="w-6 h-6" />
-                    <span className="sr-only">More info</span>
-                </button>
-            </DrawerTrigger>
+            {/* Client Component for Drawer */}
+            <CourseCardDrawer course={course} />
           </div>
         </div>
       </div>
 
-        <DrawerContent>
-            <div className='max-w-xl mx-auto w-full p-4'>
-                <DrawerHeader className="text-left px-0 pt-0">
-                    <DrawerTitle>{course.name}</DrawerTitle>
-                    <DrawerDescription className="pt-2">
-                        {course.description || "No detailed description available for this course."}
-                    </DrawerDescription>
-                </DrawerHeader>
-                <div className="py-4 space-y-3">
-                    {course.streams && course.streams.length > 0 && (
-                        <div>
-                            <h4 className="text-sm font-semibold text-gray-200 mb-1">Streams:</h4>
-                            <ul className="list-disc list-inside text-sm text-gray-400">
-                                {course.streams.map(stream => (
-                                    <li key={stream.slug}>
-                                        <Link href={`/${course.slug}/${stream.slug}`} className="hover:underline text-primary-light/90 hover:text-primary-light">
-                                            {stream.name}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                    {course.years && course.years.length > 0 && (
-                         <div>
-                            <h4 className="text-sm font-semibold text-gray-200 mb-1">Academic Years:</h4>
-                            <ul className="list-disc list-inside text-sm text-gray-400">
-                                {course.years.map(year => <li key={year.slug}>{year.name || `Year ${year.year}`}</li>)}
-                            </ul>
-                        </div>
-                    )}
-                    {(!course.streams || course.streams.length === 0) && (!course.years || course.years.length === 0) && (
-                        <p className="text-sm text-gray-400">No specific streams or academic years listed for this course.</p>
-                    )}
-                </div>
-                <DrawerFooter className="px-0 pb-0">
-                    <DrawerClose asChild>
-                        <Button variant="outline">Close</Button>
-                    </DrawerClose>
-                </DrawerFooter>
-            </div>
-        </DrawerContent>
-      </Drawer>
-    </>
   );
 }
-// ...existing code...
