@@ -49,6 +49,56 @@ export const fetchFromServer = async (path, method = 'GET', body = null, accessT
             } catch (e) {
                 errorData = { detail: response.statusText };
             }
+            
+            // Check if error is due to expired/invalid token
+            const isTokenError = response.status === 401 && 
+                (errorData?.code === 'token_not_valid' || 
+                 errorData?.detail?.includes('token') || 
+                 errorData?.detail?.includes('Token'));
+
+            if (isTokenError) {
+                console.warn('⚠️ [ServerFetch] Token expired/invalid, retrying without authentication...');
+                
+                // Retry the request WITHOUT authentication header
+                const headersWithoutAuth = {
+                    'Content-Type': 'application/json',
+                };
+                
+                try {
+                    const retryResponse = await fetch(url.toString(), {
+                        method,
+                        headers: headersWithoutAuth,
+                        body: body ? JSON.stringify(body) : null,
+                        cache: 'no-store',
+                    });
+
+                    console.log('📥 [ServerFetch] Retry response status:', retryResponse.status);
+
+                    if (!retryResponse.ok) {
+                        let retryErrorData;
+                        try {
+                            retryErrorData = await retryResponse.json();
+                        } catch (e) {
+                            retryErrorData = { detail: retryResponse.statusText };
+                        }
+                        console.error(`❌ [ServerFetch] Retry failed (${retryResponse.status}):`, retryErrorData);
+                        return { data: retryErrorData, error: true, fullResponse: retryResponse, status: retryResponse.status };
+                    }
+
+                    if (retryResponse.status === 204) {
+                        console.log('✅ [ServerFetch] Retry 204 No Content');
+                        return { data: null, error: false, fullResponse: retryResponse, status: retryResponse.status };
+                    }
+
+                    const retryData = await retryResponse.json();
+                    console.log('✅ [ServerFetch] Retry Success! (unauthenticated request)');
+                    return { data: retryData, error: false, fullResponse: retryResponse, status: retryResponse.status };
+                } catch (retryError) {
+                    console.error(`❌ [ServerFetch] Retry network error:`, retryError.message);
+                    // Fall through to return original error
+                }
+            }
+
             console.error(`❌ [ServerFetch] Server API Error (${response.status}) for ${path}:`, errorData);
             return { data: errorData, error: true, fullResponse: response, status: response.status };
         }

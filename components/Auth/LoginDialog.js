@@ -11,83 +11,76 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { LockKeyholeIcon, SparklesIcon, SaveIcon, PaletteIcon, TrendingUpIcon } from 'lucide-react';
+// Removed unused icons: LockKeyholeIcon, SparklesIcon, SaveIcon, PaletteIcon, TrendingUpIcon
+// If your Google Login button (passed as children) needs an icon, import it there.
 import Link from 'next/link';
 
 // Extracted content to be reusable for both page and modal views
 const LoginDialogContentInner = ({ title, description, children, showBenefits, onExplicitClose, isPage }) => {
   return (
-    <div className={`rounded-3xl card-gradient text-gray-100 ${isPage ? 'w-full max-w-[480px] mx-auto rounded-lg shadow-xl border border-stone-700' : ''}`}>
-      <div className="p-6">
+    // Applied your radial gradient class
+    <div className={`rounded-3xl card-gradient-radial text-gray-100 ${isPage ? 'w-full max-w-[480px] mx-auto rounded-lg shadow-xl border border-stone-700' : ''}`}>
+      <div className="p-8 sm:p-10">
+        
+        {/* --- 1. Logo and Brand Name (Moved to top) --- */}
+        <div className="mb-6 flex flex-col items-center content-center justify-center">
+          <img
+            className="h-22 w-auto" // Adjusted size
+            src="/images/logo white.png" // Assuming this is the tree/book logo
+            alt="Gyan Aangan Logo"
+          />
+          <div className="self-center text-2xl font-semibold whitespace-nowrap text-white">
+            GyanAangan {/* Added space, removed font-mono */}
+          </div>
+        </div>
+
+        {/* --- 2. Title and Description (Centered) --- */}
         {isPage ? (
           // Custom header for page view (no Dialog context)
-          <div className="mb-4 text-center sm:text-left"> {/* Mimicking DialogHeader structure */}
-            <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center justify-center sm:justify-start"> {/* Mimicking DialogTitle */}
-              <LockKeyholeIcon className="w-7 h-7 mr-2 text-primary" /> {title}
+          <div className="mb-4 text-center"> {/* Mimicking DialogHeader, forced text-center */}
+            <h2 className="text-primary! text-3xl font-bold leading-none tracking-tight"> {/* Mimicking DialogTitle, removed icon, adjusted style */}
+              {title}
             </h2>
             {description && (
-              <p className="text-sm text-muted-foreground pt-2 text-gray-400"> {/* Mimicking DialogDescription */}
+              <p className="text-base text-gray-300 pt-3 max-w-sm mx-auto"> {/* Mimicking DialogDescription, adjusted style */}
                 {description}
               </p>
             )}
           </div>
         ) : (
           // Standard DialogHeader for modal view
-          <DialogHeader>
-            <DialogTitle className="flex items-center text-2xl">
-              <LockKeyholeIcon className="w-7 h-7 mr-2 text-primary" /> {title}
+          <DialogHeader className="text-center space-y-0">
+          <DialogTitle className="flex items-center justify-center text-3xl font-bold text-primary-second"> {/* Removed icon, adjusted style */}
+              {title}
             </DialogTitle>
             {description && (
-              <DialogDescription className="pt-2 text-gray-400">
-
+              <DialogDescription className="text-center text-base text-gray-300 max-w-sm mx-auto"> {/* Adjusted style */}
                 {description}
               </DialogDescription>
             )}
           </DialogHeader>
         )}
 
-
-        <div className="my-4 flex flex-col flex-shrink-0 items-center content-center justify-center">
-          <img
-            className="h-20 w-auto"
-            src="/images/logo white.png"
-            alt="Gyan Aangan Logo"
-          />
-          <div className="my-4 self-center font-mono text-2xl font-semibold whitespace-nowrap text-white">
-            GyanAangan
-          </div>
-        </div>
-
-        <div className="py-4">
+        {/* --- 3. Login Button (Passed as children) --- */}
+        <div className="pt-6 pb-2">
           {children} {/* Login mechanism (e.g., GoogleLogin button) goes here */}
         </div>
 
-        {!isPage && onExplicitClose && (
-          <DialogFooter className="sm:justify-end px-6 pb-0 pt-2">
+        {/* --- 4. Close Button (for Modal) --- */}
+        {/* {!isPage && onExplicitClose && (
+          <DialogFooter className="sm:justify-center px-6 pb-0 pt-2">
             <Button variant="outline" onClick={onExplicitClose}>Close</Button>
           </DialogFooter>
-        )}
+        )} */}
       </div>
 
-      {/* {showBenefits && (
+      {/* Benefits section is hidden by default based on showBenefits prop */}
+      {showBenefits && (
         <div className={`p-6 border-t border-stone-700 ${isPage ? 'bg-stone-850/50 rounded-b-lg' : 'bg-stone-850/50'}`}>
           <p className="text-sm font-medium text-gray-200 mb-3 text-center">Why Log In?</p>
-          <ul className="space-y-2 text-xs text-gray-400 max-w-xs mx-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-            <li className="flex items-center">
-              <SparklesIcon className="w-4 h-4 mr-2 text-yellow-400 flex-shrink-0" /> Unlock all features.
-            </li>
-            <li className="flex items-center">
-              <SaveIcon className="w-4 h-4 mr-2 text-green-400 flex-shrink-0" /> Save your resources.
-            </li>
-            <li className="flex items-center">
-              <PaletteIcon className="w-4 h-4 mr-2 text-blue-400 flex-shrink-0" /> Customize your theme.
-            </li>
-            <li className="flex items-center">
-              <TrendingUpIcon className="w-4 h-4 mr-2 text-purple-400 flex-shrink-0" /> Priority course demand.
-            </li>
-          </ul>
+          {/* ... benefits list items ... */}
         </div>
-      )} */}
+      )}
     </div>
   );
 };
@@ -97,9 +90,10 @@ export default function LoginDialog({
   isOpen: controlledIsOpen,
   onOpenChange,
   children,
-  title = "Login to Gyan Aangan",
-  description = "Sign in to unlock exclusive features, save your progress, and personalize your learning experience.",
-  showBenefits = true,
+  // Updated default props to match the image
+  title = "Unlock Full Features",
+  description = "By logging in, you can save resources, subscribe to courses and subjects, receive personalized reminders, and more!",
+  showBenefits = false, // Set to false by default
   isPage = false,
   redirectTo // For modal usage, to pass where to redirect after login
 }) {
@@ -153,7 +147,7 @@ export default function LoginDialog({
   // If it's a modal, use the Dialog component
   return (
     <Dialog open={currentOpen} onOpenChange={currentOnOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-transparent border-none p-0 shadow-none">
+      <DialogContent className="sm:max-w-[480px] bg-transparent border-none p-0">
         {/* DialogContent is made transparent, actual styling is in LoginDialogContentInner */}
         <LoginDialogContentInner
           title={title}

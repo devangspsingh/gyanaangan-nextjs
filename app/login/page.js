@@ -75,10 +75,11 @@ function LoginPageContent() {
               console.error('Google Login Failed');
               toast.error('Google login failed. Please try again.');
             }}
-            theme="filled_blue"
-            shape="pill"
+            theme="outline"
+            shape="rectangular"
             size="large"
-            width="300px" // Adjust width as needed or make it responsive
+            // className=""
+            // width="300px" // Adjust width as needed or make it responsive
           />
           <div className="text-center">
             <p className="text-xs text-gray-500">

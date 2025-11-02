@@ -177,19 +177,21 @@ const Footer = () => {
         <LoginDialog
           isOpen={isLoginModalOpen}
           onOpenChange={setIsLoginModalOpen}
-          title="Login Required"
-          description="Please login to access this feature."
+          title="Unlock Full Features"
+          description="By logging in, you can save resources, subscribe to courses and subjects, receive personalized reminders, and more!"
           redirectTo={loginRedirectPath}
         >
-          <div className="flex flex-col items-center space-y-4 p-4">
+          <div className="flex flex-col items-center">
             <GoogleLogin
               onSuccess={handleGoogleLoginSuccessForModal}
               onError={() => toast.error('Google login failed. Please try again.')}
-              theme="filled_blue"
-              shape="pill"
+              theme="outline"
+              shape="rectangular"
+              size='large'
+              width="100%"
             />
 
-             <div className="text-center">
+             {/* <div className="text-center">
                 <p className="text-xs text-gray-500">
                   By signing in, you agree to our{' '}
                   <Link href="/terms-and-conditions" className="text-primary-light hover:underline">
@@ -200,7 +202,7 @@ const Footer = () => {
                     Privacy Policy
                   </Link>.
                 </p>
-              </div>
+              </div> */}
           </div>
         </LoginDialog>
       )}

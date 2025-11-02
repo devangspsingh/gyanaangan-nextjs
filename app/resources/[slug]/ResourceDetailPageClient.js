@@ -219,11 +219,11 @@ export default function ResourceDetailPageClient({ slug }) {
                 <LoginDialog
                     isOpen={isLoginModalOpen}
                     onOpenChange={setIsLoginModalOpen}
-                    title="Login Required"
-                    description="Please login to perform this action."
+                    title="Unlock Full Features"
+                    description=""
                 >
                     <div className="flex flex-col items-center space-y-4 p-4">
-                        <GoogleLogin onSuccess={handleGoogleLoginSuccessForModal} onError={() => toast.error('Google login failed.')} theme="filled_blue" shape="pill" />
+                        <GoogleLogin onSuccess={handleGoogleLoginSuccessForModal} onError={() => toast.error('Google login failed.')} theme="outline" shape="rectangular" />
                     </div>
                 </LoginDialog>
             )}

@@ -1,16 +1,31 @@
-import React, { Suspense } from 'react';
-import { getResourceBySlug } from '@/services/apiService';
-import ResourceDetailPageClient from './ResourceDetailPageClient'; 
-// Head component from next/head is not used in Server Components for metadata.
-// Metadata is handled by the generateMetadata export.
+import React from 'react';
+import Link from 'next/link';
+import { getResourceBySlugServerSide, getResources } from '@/services/apiService';
+import Viewer from '@/components/Viewer';
+import ResourceCard from '@/components/ResourceCard';
+import ResourceActionsClient from '@/components/ResourceActionsClient';
+import { Badge } from "@/components/ui/badge";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { AdUnit } from '@/components/blog/AdUnit';
+import { AdContainer } from '@/components/blog/AdContainer';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
-const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`; // Ensure this image exists in your public folder
+const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 
 export async function generateMetadata({ params }) {
-  const { slug } =  params; // Removed await
-  const resourceResponse = await getResourceBySlug(slug);
+  console.log('📄 [Resource Page /resources/[slug]] Generating metadata for:', params);
+  
+  const { slug } = params;
+  const resourceResponse = await getResourceBySlugServerSide(slug);
 
   if (!resourceResponse.error && resourceResponse.data) {
     const resource = resourceResponse.data;
@@ -34,10 +49,10 @@ export async function generateMetadata({ params }) {
         description: pageDescription,
         url: canonicalUrl,
         siteName: SITE_NAME,
-        images: [{ url: ogImageUrl, width: 1200, height: 630 }], // Standard OG image dimensions
-        type: 'article', // Or 'website' if more appropriate
+        images: [{ url: ogImageUrl, width: 1200, height: 630 }],
+        type: 'article',
       },
-      twitter: { // Basic Twitter card metadata
+      twitter: {
         card: 'summary_large_image',
         title: pageTitle,
         description: pageDescription,
@@ -46,56 +61,229 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  // Fallback metadata if resource not found or error occurs
   return {
     title: `Resource Not Found - ${SITE_NAME}`,
     description: `The requested resource could not be found on ${SITE_NAME}.`,
   };
 }
 
-// Skeleton for loading state - Updated to match nested style
-const ResourceDetailSkeleton = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center text-white p-4 md:p-8">
-    <div className="w-full max-w-2xl bg-customSlate-800 p-6 rounded-xl shadow-2xl animate-pulse">
-      <div className="h-6 bg-customSlate-700 rounded w-full mb-4"></div> {/* Breadcrumb placeholder */}
-      <div className="h-8 bg-customSlate-700 rounded w-3/4 mb-6"></div> {/* Title Skeleton */}
-      <div className="h-4 bg-customSlate-700 rounded w-full mb-3"></div> {/* Meta info Skeleton */}
-      <div className="h-64 bg-customSlate-700 rounded w-full"></div> {/* Viewer Skeleton */}
-    </div>
-  </div>
-);
-
-async function ResourceDataFetcher(props) {
-  const {slug} = await props
-  // Main resource is no longer fetched here.
-  // It will be fetched client-side in ResourceDetailPageClient.
-
-  // We can still fetch related resources server-side if they are public 
-  // or if we pass a token (though the goal is to move auth-dependent fetches client-side).
-  // For simplicity, let's assume related resources are fetched based on public data for now.
-  // If relatedResources also needs auth, its fetching should also move client-side or slug should be enough.
+export default async function ResourceDetailPageServer({ params }) {
+  console.log('📄 [Resource Page /resources/[slug]] Fetching data for:', params);
   
-  let relatedResourcesData = [];
-  // To fetch related resources, we might need the subject_slug from the main resource.
-  // This creates a dependency. If main resource is client-fetched, related might also need to be.
-  // For now, let's remove related resources fetching from server to avoid complexity,
-  // or assume it's handled differently/client-side.
-  // OR, if related resources can be fetched by slug alone without knowing subject_slug first:
-  // const relatedResponse = await getResources(1, 7, { some_filter_by_slug: slug } /*, accessToken */);
-  // if (!relatedResponse.error && relatedResponse.data?.results) {
-  //   relatedResourcesData = relatedResponse.data.results.filter(r => r.slug !== slug).slice(0, 6);
-  // }
+  const { slug } = params;
 
-  // Pass only the slug. ResourceDetailPageClient will fetch the resource.
-  // Related resources fetching will also be moved to ResourceDetailPageClient.
-  return <ResourceDetailPageClient slug={slug} />;
+  try {
+    // Fetch resource using server-side API with authentication
+    const resourceResponse = await getResourceBySlugServerSide(slug);
+
+    console.log('📄 [Resource Page /resources/[slug]] Response:', {
+      error: resourceResponse.error,
+      status: resourceResponse.status,
+      hasData: !!resourceResponse.data
+    });
+
+    // Handle resource error
+    if (resourceResponse.error || !resourceResponse.data) {
+      const errorMessage = resourceResponse.data?.detail || 'Failed to load resource.';
+      console.error('❌ [Resource Page /resources/[slug]] Failed to load resource:', errorMessage);
+
+      return (
+        <main className="container mx-auto py-8 px-4 text-center text-red-400">
+          <Breadcrumb className="mb-6 text-sm justify-center">
+            <BreadcrumbList>
+              <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem><BreadcrumbLink asChild><Link href="/resources">Resources</Link></BreadcrumbLink></BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem><BreadcrumbPage>Error</BreadcrumbPage></BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 bg-red-900/20 p-6 rounded-lg">
+            <ExclamationTriangleIcon className="h-12 w-12 mx-auto mb-4 text-red-500" />
+            <h1 className="text-2xl font-semibold mb-2">Resource Error</h1>
+            <p>{errorMessage}</p>
+            <Link href="/resources" className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
+              Back to Resources
+            </Link>
+          </div>
+        </main>
+      );
+    }
+
+    const resource = resourceResponse.data;
+
+    // Fetch related resources if subject is available
+    let relatedResources = [];
+    if (resource.subject_slug) {
+      const relatedResponse = await getResources(1, 7, { subject_slug: resource.subject_slug });
+      if (!relatedResponse.error && relatedResponse.data?.results) {
+        relatedResources = relatedResponse.data.results.filter(r => r.slug !== slug).slice(0, 6);
+      }
+    }
+
+    console.log('✅ [Resource Page /resources/[slug]] Data loaded successfully:', {
+      resourceName: resource.name,
+      relatedResourcesCount: relatedResources.length
+    });
+
+    return (
+      <main className="container mx-auto py-8 px-4 text-gray-100">
+        <Breadcrumb className="mb-6 text-sm">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink>
+            </BreadcrumbItem>
+            {/* Dynamically add breadcrumbs if resource has course/stream/year/subject info */}
+            {resource.course_slug && resource.course_name && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild><Link href={`/${resource.course_slug}`}>{resource.course_name}</Link></BreadcrumbLink>
+                </BreadcrumbItem>
+              </>
+            )}
+            {resource.stream_slug && resource.stream_name && resource.course_slug && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild><Link href={`/${resource.course_slug}/${resource.stream_slug}`}>{resource.stream_name}</Link></BreadcrumbLink>
+                </BreadcrumbItem>
+              </>
+            )}
+            {resource.year_slug && resource.year_name && resource.course_slug && resource.stream_slug && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild><Link href={`/${resource.course_slug}/${resource.stream_slug}/${resource.year_slug}`}>{resource.year_name}</Link></BreadcrumbLink>
+                </BreadcrumbItem>
+              </>
+            )}
+            {resource.subject_slug && resource.subject_name && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild><Link href={
+                    resource.course_slug && resource.stream_slug && resource.year_slug ?
+                      `/${resource.course_slug}/${resource.stream_slug}/${resource.year_slug}/${resource.subject_slug}` :
+                      `/subjects/${resource.subject_slug}`
+                  }>{resource.subject_name}</Link></BreadcrumbLink>
+                </BreadcrumbItem>
+              </>
+            )}
+            {!resource.subject_slug && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbLink asChild><Link href="/resources">Resources</Link></BreadcrumbLink></BreadcrumbItem>
+              </>
+            )}
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="truncate max-w-[200px] md:max-w-none">{resource.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        <header className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-heading-section font-extrabold text-white mb-3">{resource.name}</h1>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 xl:col-span-9">
+            <Viewer resource={resource} />
+            
+            {resource.description && (
+              <section className="mt-8 rounded-lg shadow">
+                <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
+                <p className="text-gray-300 font-body-desc leading-relaxed whitespace-pre-wrap">{resource.description}</p>
+                <div className="font-body-desc py-2 text-gray-400 flex flex-wrap gap-2 mt-3 overflow-hidden">
+                  <Badge variant="outline" className="text-xs sm:text-sm break-words max-w-full">
+                    <span className="truncate">Type: {resource.resource_type_display || resource.resource_type}</span>
+                  </Badge>
+                  {resource.subject_name && (
+                    <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                      <span className="truncate">Subject: {resource.subject_name}</span>
+                    </Badge>
+                  )}
+                  {resource.educational_year?.name && (
+                    <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                      <span className="truncate">Year: {resource.educational_year.name}</span>
+                    </Badge>
+                  )}
+                  {resource.updated_at && (
+                    <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                      <span className="truncate">Last Updated: {resource.updated_at}</span>
+                    </Badge>
+                  )}
+                  {resource.uploader_name && (
+                    <Badge className="text-xs sm:text-sm break-words max-w-full" variant="outline">
+                      <span className="truncate">By: {resource.uploader_name}</span>
+                    </Badge>
+                  )}
+                </div>
+              </section>
+            )}
+            
+            <AdContainer>
+              <AdUnit />
+            </AdContainer>
+          </div>
+
+          <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
+            <ResourceActionsClient resource={resource} />
+            
+            {resource.tags && resource.tags.length > 0 && (
+              <div className="p-6 bg-stone-800 rounded-lg shadow">
+                <h3 className="text-lg font-semibold text-white mb-4">Tags</h3>
+                <div className="flex flex-wrap gap-2">
+                  {resource.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="bg-stone-700 text-gray-300 hover:bg-stone-600">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
+
+        {relatedResources.length > 0 && (
+          <section className="mt-12 pt-8 border-t border-stone-700">
+            <h2 className="text-2xl font-semibold text-white mb-6">
+              {resource.subject_name ? `More from ${resource.subject_name}` : "Related Resources"}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedResources.map((relatedRes) => (
+                <ResourceCard key={relatedRes.slug} resource={relatedRes} />
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+    );
+  } catch (error) {
+    console.error('❌ [Resource Page /resources/[slug]] Unexpected error:', error);
+    return (
+      <main className="container mx-auto py-8 px-4 text-center text-red-400">
+        <Breadcrumb className="mb-6 text-sm justify-center">
+          <BreadcrumbList>
+            <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem><BreadcrumbLink asChild><Link href="/resources">Resources</Link></BreadcrumbLink></BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem><BreadcrumbPage>Error</BreadcrumbPage></BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 bg-red-900/20 p-6 rounded-lg">
+          <ExclamationTriangleIcon className="h-12 w-12 mx-auto mb-4 text-red-500" />
+          <h1 className="text-2xl font-semibold mb-2">Unexpected Error</h1>
+          <p>An unexpected error occurred: {error.message}</p>
+          <Link href="/resources" className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
+            Back to Resources
+          </Link>
+        </div>
+      </main>
+    );
+  }
 }
 
-export default function ResourceDetailPageServer({ params }) { 
-  const { slug } = params; 
-  return (
-    <Suspense fallback={<ResourceDetailSkeleton />}>
-      <ResourceDataFetcher slug={slug} />
-    </Suspense>
-  );
-}
+export const dynamic = 'force-dynamic';

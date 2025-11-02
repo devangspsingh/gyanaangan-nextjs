@@ -78,15 +78,15 @@ export default function ResourceActionsClient({ resource }) {
         <LoginDialog
           isOpen={isLoginModalOpen}
           onOpenChange={setIsLoginModalOpen}
-          title="Login Required"
-          description="Please login to perform this action."
+          title="Unlock Full Features"
+          description="By logging in, you can save resources, subscribe to courses and subjects, receive personalized reminders, and more!"
         >
           <div className="flex flex-col items-center space-y-4 p-4">
             <GoogleLogin
               onSuccess={handleGoogleLoginSuccessForModal}
               onError={() => toast.error('Google login failed.')}
-              theme="filled_blue"
-              shape="pill"
+              theme="outline"
+              shape="rectangular"
             />
           </div>
         </LoginDialog>

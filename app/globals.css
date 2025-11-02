@@ -37,6 +37,7 @@
 
   /* Your custom color palettes */
   --color-primary: #D2F6FC;
+  --color-primary-second: #D2F6FC;
   --color-primary-light: #38bdf8;
   --color-primary-dark: #010717;
   /* This seems very dark, ensure it's intended for primary-dark */
@@ -88,6 +89,11 @@ body {
   @apply bg-gradient-to-tl hover:from-[#3D7BAA] from-[#3D7BAA]/50 from-10% via-[#234B6C] via-20% via-[#17334C] via-40% via-[#10273D] via-60% to-[#0A1B2D] to-100%;
 
 }
+.card-gradient-radial {
+  background-image: radial-gradient(circle, #3D7BAA 0%, #234B6C 4%, #17334C 40%, #10273D 60%, #0A1B2D 100%);
+}
+
+
 
 @layer base {
   body {

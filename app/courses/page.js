@@ -1,5 +1,4 @@
 import { getCourses } from '../../services/apiService'; // Adjust path
-import CourseCardSkeleton from '../../components/CourseCardSkeleton'; // Adjust path
 import CourseCard from '@/components/CourseCard';
 import Link from 'next/link';
 

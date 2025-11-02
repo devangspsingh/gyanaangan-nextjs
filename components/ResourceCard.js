@@ -113,7 +113,7 @@ export default function ResourceCard({ resource, variant = 'default', customHref
                 <LoginDialog
                     isOpen={isLoginModalOpen}
                     onOpenChange={setIsLoginModalOpen}
-                    title="Login Required"
+                    title="Unlock Full Features"
                     description="Please login to save or download resources."
                     redirectTo={router.asPath} // Pass current path for redirection after login
                 >
@@ -121,8 +121,8 @@ export default function ResourceCard({ resource, variant = 'default', customHref
                         <GoogleLogin
                             onSuccess={handleGoogleLoginSuccessForModal}
                             onError={() => toast.error('Google login failed. Please try again.')}
-                            theme="filled_blue"
-                            shape="pill"
+                            theme="outline"
+                            shape="rectangular"
                         />
                         <p className="text-xs text-gray-500 text-center">
                             By signing in, you agree to our Terms of Service and Privacy Policy.
