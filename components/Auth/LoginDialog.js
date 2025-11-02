@@ -8,19 +8,14 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-// Removed unused icons: LockKeyholeIcon, SparklesIcon, SaveIcon, PaletteIcon, TrendingUpIcon
-// If your Google Login button (passed as children) needs an icon, import it there.
-import Link from 'next/link';
 
 // Extracted content to be reusable for both page and modal views
 const LoginDialogContentInner = ({ title, description, children, showBenefits, onExplicitClose, isPage }) => {
   return (
     // Applied your radial gradient class
     <div className={`rounded-3xl card-gradient-radial text-gray-100 ${isPage ? 'w-full max-w-[480px] mx-auto rounded-lg shadow-xl border border-stone-700' : ''}`}>
-      <div className="p-8 sm:p-10">
+      <div className="px-4 py-8 md:p-8 sm:p-10">
         
         {/* --- 1. Logo and Brand Name (Moved to top) --- */}
         <div className="mb-6 flex flex-col items-center content-center justify-center">
