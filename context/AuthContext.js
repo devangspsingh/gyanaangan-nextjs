@@ -31,17 +31,46 @@ export const AuthProvider = ({ children }) => {
         const decodedAccessToken = jwtDecode(currentAccessToken);
         
         if (decodedAccessToken.exp * 1000 > Date.now()) {
-          // Access token is valid
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            setUser(JSON.parse(storedUser));
-          }
+          // Access token is valid, fetch fresh user data from API
           setTokens(parsedTokens);
           api.defaults.headers.Authorization = `Bearer ${currentAccessToken}`;
           
           // Ensure cookie is also set (in case it was cleared but localStorage persists)
           document.cookie = `access_token=${currentAccessToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
           console.log('🍪 [Init] Cookie synced from localStorage');
+          
+          // Fetch fresh user profile data from API
+          try {
+            const profileResponse = await api.get('/profiles/me/');
+            const profileData = profileResponse.data;
+            
+            // Transform profile data to user object
+            const userData = {
+              id: profileData.user.id,
+              email: profileData.user.email,
+              username: profileData.user.username,
+              name: profileData.user.first_name,
+              picture: profileData.profile_pic_url || profileData.img_google_url,
+              is_staff: profileData.user.is_staff,
+              is_superuser: profileData.user.is_superuser,
+              bio: profileData.bio,
+              emoji_tag: profileData.emoji_tag,
+            };
+            
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+            console.log('✅ [Init] User profile fetched from API');
+          } catch (profileError) {
+            console.error('❌ [Init] Failed to fetch user profile:', profileError);
+            // If profile fetch fails, try to use stored user data as fallback
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+              setUser(JSON.parse(storedUser));
+              console.log('⚠️ [Init] Using cached user data');
+            } else {
+              clearAuth();
+            }
+          }
         } else {
           // Access token is expired, try to refresh
           // console.log("Access token expired, attempting refresh...");
@@ -107,23 +136,81 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, [initializeAuth]);
 
-  const login = (userData, access, refresh) => {
-    // Store in localStorage (for client-side)
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = async (userData, access, refresh) => {
+    // Store tokens first
     localStorage.setItem('tokens', JSON.stringify({ access, refresh }));
     
     // ALSO store access token in cookie (for server-side)
     document.cookie = `access_token=${access}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
     console.log('🍪 [Login] Cookie set:', `access_token=${access.substring(0, 20)}...`);
     
-    setUser(userData);
     setTokens({ access, refresh });
     api.defaults.headers.Authorization = `Bearer ${access}`;
+    
+    // Fetch fresh profile data from API instead of using login response
+    try {
+      const profileResponse = await api.get('/profiles/me/');
+      const profileData = profileResponse.data;
+      
+      // Transform profile data to user object
+      const freshUserData = {
+        id: profileData.user.id,
+        email: profileData.user.email,
+        username: profileData.user.username,
+        name: profileData.user.first_name,
+        picture: profileData.profile_pic_url || profileData.img_google_url,
+        is_staff: profileData.user.is_staff,
+        is_superuser: profileData.user.is_superuser,
+        bio: profileData.bio,
+        emoji_tag: profileData.emoji_tag,
+      };
+      
+      localStorage.setItem('user', JSON.stringify(freshUserData));
+      setUser(freshUserData);
+      console.log('✅ [Login] User profile fetched from API');
+    } catch (error) {
+      console.error('❌ [Login] Failed to fetch profile, using login data:', error);
+      // Fallback to login response data
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    }
   };
 
   const logout = () => {
     clearAuth();
     router.push('/login');
+  };
+  
+  const refreshUserProfile = async () => {
+    if (!tokens?.access) {
+      console.warn('⚠️ [RefreshProfile] No access token available');
+      return;
+    }
+    
+    try {
+      const profileResponse = await api.get('/profiles/me/');
+      const profileData = profileResponse.data;
+      
+      const userData = {
+        id: profileData.user.id,
+        email: profileData.user.email,
+        username: profileData.user.username,
+        name: profileData.user.first_name,
+        picture: profileData.profile_pic_url || profileData.img_google_url,
+        is_staff: profileData.user.is_staff,
+        is_superuser: profileData.user.is_superuser,
+        bio: profileData.bio,
+        emoji_tag: profileData.emoji_tag,
+      };
+      
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      console.log('✅ [RefreshProfile] User profile refreshed');
+      return userData;
+    } catch (error) {
+      console.error('❌ [RefreshProfile] Failed to refresh profile:', error);
+      throw error;
+    }
   };
   
   const clearAuth = () => {
@@ -140,7 +227,15 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, tokens, login, logout, loading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      tokens, 
+      login, 
+      logout, 
+      refreshUserProfile, 
+      loading, 
+      isAuthenticated: !!user 
+    }}>
       {children}
     </AuthContext.Provider>
   );

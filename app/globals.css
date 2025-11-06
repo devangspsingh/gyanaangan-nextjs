@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@700&family=Inter:wght@400;500;600;700&family=Roboto:wght@500;700;800&display=swap');
 @import "tailwindcss";
+@import "tw-animate-css";
 @plugin "@tailwindcss/typography";
+/* @custom-variant dark (&:is(.dark *)); */
+
 /* Tailwind v4 specific import */
 
 :root {
@@ -19,6 +22,14 @@
   /* Apply dark theme by default based on your existing setup */
   --background: var(--background-dark);
   --foreground: var(--foreground-dark);
+  --sidebar: var(--background-dark);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 /* This @theme inline block is for Tailwind v4 to pick up CSS variables for its utilities */
@@ -49,6 +60,15 @@
   --color-customSlate-400: #A0AEC0;
   --color-customSlate-600: #4A5568;
   --color-customSlate-700: #2D3748;
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
 }
 
 body {
@@ -89,13 +109,13 @@ body {
   @apply bg-gradient-to-tl hover:from-[#3D7BAA] from-[#3D7BAA]/50 from-10% via-[#234B6C] via-20% via-[#17334C] via-40% via-[#10273D] via-60% to-[#0A1B2D] to-100%;
 
 }
+
 .card-gradient-radial {
   background-image: radial-gradient(circle, #3D7BAA 0%, #234B6C 4%, #17334C 40%, #10273D 60%, #0A1B2D 100%);
 }
 
-
-
 @layer base {
+
   body {
     @apply bg-background text-foreground;
     /* Use Tailwind utilities derived from CSS variables */
@@ -106,7 +126,6 @@ body {
   /* h1, h2, h3, h4, h5, h6 { @apply font-sans; } */
   /* Default to Inter */
 }
-
 
 /* Print styles from base.html */
 @media print {
