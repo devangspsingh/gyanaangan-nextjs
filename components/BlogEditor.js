@@ -236,7 +236,7 @@ export default function BlogEditor({ initialData = null, isEdit = false }) {
             </div>
 
             {/* Content Editor */}
-            <div className="rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
+            <div className="rounded-lg shadow border-b border-t py-2 border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Content *
@@ -261,6 +261,8 @@ export default function BlogEditor({ initialData = null, isEdit = false }) {
                 <p className="text-red-500 text-sm mt-2">{errors.content}</p>
               )}
             </div>
+
+            <hr />
 
             {/* Excerpt */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
@@ -484,7 +486,7 @@ export default function BlogEditor({ initialData = null, isEdit = false }) {
                 Separate tags with commas
               </p>
             </div>
-            
+
             {/* Author Info */}
             {initialData?.author_name && (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">

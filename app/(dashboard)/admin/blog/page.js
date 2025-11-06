@@ -81,6 +81,12 @@ export default function BlogManagementPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div>
+            {/* <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          >
+            ← 
+          </Link> */}
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Blog Posts
           </h1>
@@ -88,7 +94,7 @@ export default function BlogManagementPage() {
             Manage your blog content
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Link
             href="/admin/blog/categories"
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -96,12 +102,7 @@ export default function BlogManagementPage() {
             <Tag className="w-5 h-5" />
             Manage Categories
           </Link>
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-          >
-            ← Admin Dashboard
-          </Link>
+        
           <Link
             href="/admin/blog/new"
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

@@ -125,7 +125,7 @@ const MainToolbarContent = ({
         <ImageUploadButton text="Add" />
       </ToolbarGroup>
       <Spacer />
-      {isMobile && <ToolbarSeparator />}
+      {/* {isMobile && <ToolbarSeparator />} */}
       <ToolbarGroup>
         <ThemeToggle />
       </ToolbarGroup>
@@ -234,18 +234,19 @@ export function SimpleEditor({ content: initialContent, onChange }) {
       <EditorContext.Provider value={{ editor }}>
         <Toolbar
           ref={toolbarRef}
-          style={{
-            ...(isMobile
-              ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
-              : {}),
-          }}>
+          // style={{
+          //   ...(isMobile
+          //     ? {
+          //         bottom: `calc(100% - ${height - rect.y}px)`,
+          //       }
+          //     : {}),
+          // }}
+          >
           {mobileView === "main" ? (
             <MainToolbarContent
               onHighlighterClick={() => setMobileView("highlighter")}
               onLinkClick={() => setMobileView("link")}
-              isMobile={isMobile} />
+              isMobile={isMobile} />              
           ) : (
             <MobileToolbarContent
               type={mobileView === "highlighter" ? "highlighter" : "link"}
