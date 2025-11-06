@@ -1,24 +1,22 @@
 import { Suspense } from 'react';
 
 // Import Card Skeletons (these are used by the client list components as fallbacks)
-import CourseCardSkeleton from '../../components/CourseCardSkeleton';
-import SubjectCardSkeleton from '../../components/SubjectCardSkeleton';
-import ResourceCardSkeleton from '../../components/ResourceCardSkeleton';
+import CourseCardSkeleton from '@/components/CourseCardSkeleton';
+import SubjectCardSkeleton from '@/components/SubjectCardSkeleton';
+import ResourceCardSkeleton from '@/components/ResourceCardSkeleton';
 
 // Import new Server List Components (Courses, Subjects & Resources)
-import CoursesList from '../../components/home/CoursesList';
-import SubjectsList from '../../components/home/SubjectsList';
-import ResourcesList from '../../components/home/ResourcesList';
+import CoursesList from '@/components/home/CoursesList';
+import SubjectsList from '@/components/home/SubjectsList';
+import ResourcesList from '@/components/home/ResourcesList';
 
 // Import HeroSearchForm (Client Component) and SectionWrapper (Server Component)
-import HeroSearchForm from '../../components/HeroSearchForm';
-import SectionWrapper from '../../components/SectionWrapper';
-import BannerSlider from '../../components/BannerSlider';
+import HeroSearchForm from '@/components/HeroSearchForm';
+import SectionWrapper from '@/components/SectionWrapper';
+import BannerSlider from '@/components/BannerSlider';
 
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { ArrowRightIcon } from 'lucide-react';
-import Link from 'next/link';
-import { getLatestNotification, getActiveBanners } from '@/services/apiService';
+import { getActiveBanners } from '@/services/apiService';
 
 // Skeleton for individual sections, used as Suspense fallback
 const SectionContentSkeleton = ({ count = 3, CardSkeletonComponent }) => (

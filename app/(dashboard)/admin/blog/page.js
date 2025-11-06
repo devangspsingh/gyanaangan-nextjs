@@ -20,6 +20,7 @@ export default function BlogManagementPage() {
 
   useEffect(() => {
     fetchPosts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, filterStatus]);
 
   const fetchPosts = async () => {

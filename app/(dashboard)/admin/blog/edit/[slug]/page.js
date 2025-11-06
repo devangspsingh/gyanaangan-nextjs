@@ -11,23 +11,24 @@ export default function EditBlogPostPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setLoading(true);
+        const data = await getAdminBlogPost(params.slug);
+        setPost(data);
+      } catch (error) {
+        console.error('Error fetching post:', error);
+        alert('Failed to load post');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     if (params.slug) {
       fetchPost();
     }
   }, [params.slug]);
 
-  const fetchPost = async () => {
-    try {
-      setLoading(true);
-      const data = await getAdminBlogPost(params.slug);
-      setPost(data);
-    } catch (error) {
-      console.error('Error fetching post:', error);
-      alert('Failed to load post');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

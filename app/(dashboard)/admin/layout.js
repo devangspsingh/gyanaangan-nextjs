@@ -40,7 +40,7 @@ function AppSidebar({ user }) {
             <SidebarHeader>
                 <div className="p-2 flex items-center gap-2">
                     <div className="flex size-10 bg-primary-dark items-center justify-center rounded-md text-primary-foreground">
-                        <img src="/images/logo white.png" className="size-10 font-bold" />
+                        <img src="/images/logo white.png" alt='logo' className="size-10 font-bold" />
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">Gyan Aangan</span>
