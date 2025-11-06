@@ -34,23 +34,23 @@ import LoginDialog from './Auth/LoginDialog'; // Import LoginDialog
 import { GoogleLogin } from '@react-oauth/google'; // For the login dialog content
 import api from '../lib/axiosInstance'; // For login handler within dialog
 
-const ResourceTypeIcon = ({ type }) => {
+const ResourceTypeIcon = ({ type, name }) => {
     const iconSize = "h-6 w-6 text-white"; // Consistent icon size and color
     switch (type?.toLowerCase()) {
         case 'notes':
-            return <FaBook className={iconSize} title="Notes" />;
+            return <FaBook className={iconSize} title={`Notes - ${name}`} />;
         case 'pyq':
-            return <FaClipboardList className={iconSize} title="Previous Year Question Paper" />
+            return <FaClipboardList className={iconSize} title={`Previous Year Question Paper - ${name}`} />
         case 'lab manual':
-            return <BeakerIcon className={iconSize} title="Lab Manual" />;
+            return <BeakerIcon className={iconSize} title={`Lab Manual - ${name}`} />;
         case 'video':
-            return <FaYoutube className={iconSize} title="Video" />;
+            return <FaYoutube className={iconSize} title={`Video - ${name}`} />;
         case 'image':
-            return <PhotoIcon className={iconSize} title="Image" />;
+            return <PhotoIcon className={iconSize} title={`Image - ${name}`} />;
         case 'pdf':
-            return <FaFilePdf className={iconSize} title="PDF Document" />;
+            return <FaFilePdf className={iconSize} title={`PDF Document - ${name}`} />;
         default:
-            return <FaBook className={iconSize} title="Resource File" />; // Default icon
+            return <FaBook className={iconSize} title={`Resource File - ${name}`} />; // Default icon
     }
 };
 
@@ -131,13 +131,13 @@ export default function ResourceCard({ resource, variant = 'default', customHref
                 </LoginDialog>
             )}
             <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                <div className="w-full rounded-2xl overflow-hidden card-gradient shadow-xl">
+                <article className="w-full rounded-2xl overflow-hidden card-gradient shadow-xl">
                     <Link href={effectiveHref} className="block"> {/* Use effectiveHref */}
                         {/* Modified Header Section */}
                         <div className="flex items-center w-full py-3"> {/* Overall padding and flex container for the top row */}
                             {/* Icon: No background, shrink-0 to maintain size */}
                             <div className="shrink-0 pl-4 pr-2 flex items-center justify-center">
-                                <ResourceTypeIcon type={resource.resource_type} />
+                                <ResourceTypeIcon type={resource.resource_type} name={resource.name} />
                             </div>
                             {/* Resource Name & Subject (conditional for 'detailed' variant) */}
                             <div className="ml-1 flex-grow bg-secondary text-primary-dark font-semibold text-sm sm:text-base rounded-l-full pl-4 pr-5 py-3"> {/* Adjusted py */}
@@ -202,7 +202,7 @@ export default function ResourceCard({ resource, variant = 'default', customHref
                             </div>
                         </div>
                     </Link>
-                </div>
+                </article>
 
                 <DrawerContent>
                     <div className='max-w-xl mx-auto w-full p-4'>
