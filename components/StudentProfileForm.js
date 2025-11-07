@@ -197,7 +197,7 @@ export default function StudentProfileForm({ onComplete }) {
           </Dialog>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 text-sm">
           <div className="flex items-center gap-2">
             <GraduationCap className="w-4 h-4 text-gray-500" />
             <div>

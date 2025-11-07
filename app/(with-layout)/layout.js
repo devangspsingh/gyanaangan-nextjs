@@ -4,6 +4,7 @@ import '@/app/globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer'; // Import the Footer component
 import FooterNavigation from '@/components/FooterNavigation'; // Import the new FooterNavigation component
+import ProfileCompleteAlert from '@/components/ProfileCompleteAlert'; // Import ProfileCompleteAlert
 import DynamicBackground from '../dynamicBackgroud';
 
 export const metadata = {
@@ -55,6 +56,7 @@ export default function RootLayout({ children }) {
             <p>🚫 Oops! This page does not like printers. 😊<br />Please enjoy it online!</p>
           </div>
           <Footer />
+          <ProfileCompleteAlert />
           <FooterNavigation />
         </Providers>
       </body>

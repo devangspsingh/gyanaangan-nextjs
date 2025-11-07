@@ -27,7 +27,7 @@ export default function SubjectCard({ subject, url }) {
   }
 
   return (
-    <div className="relative group card-gradient border border-gray-700 rounded-lg shadow-lg hover:shadow-primary/30 transition-all duration-300 flex flex-col h-full">
+    <article className="relative group card-gradient border border-gray-700 rounded-lg shadow-lg hover:shadow-primary/30 transition-all duration-300 flex flex-col h-full">
       <Link href={url} className="flex flex-col flex-grow p-5 pb-0"> {/* Adjusted padding */}
         <div className="flex-grow ">
           <h3 className="text-xl font-semibold text-primary-dark mb-1 -m-5 p-5 rounded-t-lg bg-secondary transition-colors duration-300 truncate" title={subject.name}>
@@ -74,6 +74,6 @@ export default function SubjectCard({ subject, url }) {
         {/* Client Component for Drawer */}
         <SubjectCardDrawer subject={subject} />
       </div>
-    </div>
+    </article>
   );
 }
