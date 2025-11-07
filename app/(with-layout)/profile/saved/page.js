@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import SavedResourcesListClient from './SavedResourcesListClient'; // We'll create this next
 import ResourceCardSkeleton from '@/components/ResourceCardSkeleton';
+import MySubscriptions from '@/components/MySubscriptions';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -75,18 +76,29 @@ export default function SavedResourcesPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem><BreadcrumbLink asChild><Link href="/profile">Profile</Link></BreadcrumbLink></BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbItem><BreadcrumbPage>Saved Resources</BreadcrumbPage></BreadcrumbItem>
+          <BreadcrumbItem><BreadcrumbPage>Saved & Subscriptions</BreadcrumbPage></BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <header className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-white mb-2">Your Saved Resources</h1>
+        <h1 className="text-4xl font-bold text-white mb-2">Your Library</h1>
         <p className="text-lg text-gray-400">
-          Access all the learning materials you&apos;ve bookmarked for later.
+          Access your subscriptions and saved learning materials.
         </p>
       </header>
-      <Suspense fallback={<PageSkeleton />}>
-        <SavedResourcesDataFetcher />
-      </Suspense>
+
+      {/* Subscriptions Section */}
+      <section className="mb-12">
+        {/* <h2 className="text-2xl font-bold text-white mb-4">My Subscriptions</h2> */}
+        <MySubscriptions />
+      </section>
+
+      {/* Saved Resources Section */}
+      <section>
+        <h2 className="text-2xl font-bold text-white mb-4">Saved Resources</h2>
+        <Suspense fallback={<PageSkeleton />}>
+          <SavedResourcesDataFetcher />
+        </Suspense>
+      </section>
     </main>
   );
 }

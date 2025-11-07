@@ -158,8 +158,16 @@ export const searchSite = async (query, page = 1, pageSize = 10) => {
 
 export const getSpecialPageData = async (courseSlug, streamSlug, yearSlug) => {
   try {
-    const response = await api.get(`/special-pages/details/${courseSlug}/${streamSlug}/${yearSlug}/`);
-    return { data: response.data, error: false };
+    // Check if we're on server-side
+    if (typeof window === 'undefined') {
+      // Server-side: use fetchFromServer with cookies for authentication
+      const response = await fetchFromServer(`/special-pages/details/${courseSlug}/${streamSlug}/${yearSlug}/`);
+      return { data: response.data, error: false };
+    } else {
+      // Client-side: use axios instance
+      const response = await api.get(`/special-pages/details/${courseSlug}/${streamSlug}/${yearSlug}/`);
+      return { data: response.data, error: false };
+    }
   } catch (error) {
     console.error(`Error fetching special page for ${courseSlug}/${streamSlug}/${yearSlug}:`, error);
     return { data: null, error: true };
@@ -361,4 +369,80 @@ export const trackBannerClick = async (bannerId) => {
     return { data: null, error: true };
   }
 };
+
+// ==================== Student Profile API ====================
+
+/**
+ * Get current user's student profile
+ */
+export const getMyStudentProfile = async () => {
+  try {
+    const response = await api.get(getFullUrl('/student-profiles/me/'));
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error fetching student profile:', error);
+    return { data: null, error: true };
+  }
+};
+
+/**
+ * Update current user's student profile
+ */
+export const updateMyStudentProfile = async (profileData) => {
+  try {
+    const response = await api.post(getFullUrl('/student-profiles/update-me/'), profileData);
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error updating student profile:', error);
+    return { data: error.response?.data || null, error: true };
+  }
+};
+
+// ==================== Subscription API ====================
+
+/**
+ * Get all subscriptions for the current user
+ */
+export const getMySubscriptions = async () => {
+  try {
+    const response = await api.get(getFullUrl('/subscriptions/'));
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error fetching subscriptions:', error);
+    return { data: null, error: true };
+  }
+};
+
+/**
+ * Toggle subscription to a special page (course/stream/year)
+ */
+export const toggleSpecialPageSubscription = async (specialPageId) => {
+  try {
+    const response = await api.post(
+      getFullUrl('/subscriptions/toggle-special-page/'),
+      { special_page_id: specialPageId }
+    );
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error toggling special page subscription:', error);
+    return { data: error.response?.data || null, error: true };
+  }
+};
+
+/**
+ * Toggle subscription to a subject
+ */
+export const toggleSubjectSubscription = async (subjectId) => {
+  try {
+    const response = await api.post(
+      getFullUrl('/subscriptions/toggle-subject/'),
+      { subject_id: subjectId }
+    );
+    return { data: response.data, error: false };
+  } catch (error) {
+    console.error('Error toggling subject subscription:', error);
+    return { data: error.response?.data || null, error: true };
+  }
+};
+
 

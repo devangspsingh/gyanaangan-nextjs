@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 import toast from 'react-hot-toast';
 import Link from 'next/link'; // Import Link
+import StudentProfileForm from '@/components/StudentProfileForm';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -68,7 +69,7 @@ export default function ProfilePage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="max-w-2xl mx-auto shadow-xl bg-primary-dark/20 backdrop-blur-sm rounded-lg p-8">
+        <div className="max-w-2xl mx-auto shadow-xl bg-primary-dark/20 backdrop-blur-sm rounded-lg p-2">
           <div className="flex flex-col items-center mb-8">
             {user.picture && (
               <img
@@ -82,6 +83,14 @@ export default function ProfilePage() {
           </div>
 
           <div className="space-y-6">
+            {/* Student Profile Section */}
+            <div>
+              {/* <h3 className="text-xl font-semibold text-white mb-3">Academic Profile</h3> */}
+              {/* <div className="bg-stone-700/50 rounded-md"> */}
+                <StudentProfileForm />
+              {/* </div> */}
+            </div>
+
             {user.profile?.bio && ( // Assuming bio might come from user.profile if you extend AuthContext user object
                 <div>
                     <h3 className="text-xl font-semibold text-white mb-2">Bio</h3>
@@ -125,7 +134,7 @@ export default function ProfilePage() {
                 )}
                 
                 <Link href="/profile/saved" className="block w-full text-center px-6 py-3 border border-primary text-primary-light rounded-md hover:bg-primary hover:text-white transition-colors duration-200">
-                    View Saved Resources
+                    View Subscriptions & Saved Resources
                 </Link>
                 {/* Add other profile links here if needed */}
             </div>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getSpecialPageData } from '../../../../../services/apiService';
 import SubjectCard from '../../../../../components/SubjectCard';
+import SubscribeButton from '../../../../../components/SubscribeButton';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }) {
   
   const { courseSlug, streamSlug, yearSlug } =await params;
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
-  
+  console.log(response.data)
   if (response.error || !response.data) {
     return {
       title: 'Page Not Found - Gyan Aangan',
@@ -54,7 +55,7 @@ export default async function SpecialPage({ params }) {
   
   const { courseSlug, streamSlug, yearSlug } = await params;
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
-  
+  console.log(response.data)
   // console.log('📄 [Year Page] Response status:', response.error ? 'Error' : 'Success');
   
   if (response.error || !response.data) {
@@ -72,12 +73,6 @@ export default async function SpecialPage({ params }) {
   }
 
   const pageData = response.data;
-  // console.log('✅ [Year Page] Page data loaded:', {
-  //   course: pageData.course?.name,
-  //   stream: pageData.stream?.name,
-  //   year: pageData.year?.name,
-  //   subjectsCount: pageData.subjects?.length || 0
-  // });
 
 
   return (
@@ -115,12 +110,20 @@ export default async function SpecialPage({ params }) {
       </Breadcrumb>
 
       <header className="mb-8">
-        <h1 className="md:text-4xl text-2xl font-bold text-white mb-2">
-          {pageData.course?.name} - {pageData.stream?.name} {pageData.year?.name}
-        </h1>
-        <p className="text-lg md:text-xl text-gray-400">
-          For {pageData.year?.name ? `${pageData.year.name} Subjects` : `Year ${pageData.year?.year} Students`}
-        </p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div>
+            <h1 className="md:text-4xl text-2xl font-bold text-white mb-2">
+              {pageData.course?.name} - {pageData.stream?.name} {pageData.year?.name}
+            </h1>
+            <p className="text-lg md:text-xl text-gray-400">
+              For {pageData.year?.name ? `${pageData.year.name} Subjects` : `Year ${pageData.year?.year} Students`}
+            </p>
+          </div>
+          <SubscribeButton 
+            specialPageId={pageData.id} 
+            isSubscribed={pageData.is_subscribed}
+          />
+        </div>
         {pageData.description && <p className="text-gray-300 mt-4 leading-relaxed">{pageData.description}</p>}
       </header>
 
