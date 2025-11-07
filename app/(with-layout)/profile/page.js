@@ -129,7 +129,15 @@ export default function ProfilePage() {
                     href="/admin" 
                     className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors duration-200"
                   >
-                    🛡️ Admin Dashboard
+                    Admin
+                  </Link>
+                )}
+                {(user.is_staff || user.is_superuser) && (
+                  <Link 
+                    href="https://api.gyanaangan.in/admin" 
+                    className="block w-full text-center px-6 py-3 bg-red-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors duration-200"
+                  >
+                    Admin Old
                   </Link>
                 )}
                 
