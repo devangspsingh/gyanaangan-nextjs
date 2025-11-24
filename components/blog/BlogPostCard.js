@@ -12,7 +12,7 @@ export default function BlogPostCard({ post }) {
         {/* 1. Image Container (Stays the same) */}
         <div className="relative aspect-video overflow-hidden">
           {post.featured_image ? (
-            <img
+            <Image
               src={post.featured_image}
               alt={post.title}
               fill
@@ -34,7 +34,7 @@ export default function BlogPostCard({ post }) {
             </div>
           )}
           {post.category && (
-            <Badge className="absolute top-4 left-4 bg-slate-700/40 hover:bg-gray-700/50 z-10">
+            <Badge className="absolute top-4 left-4 bg-slate-700/40 hover:bg-gray-700/50 z-10 text-white border-none backdrop-blur-sm">
               {post.category.name}
             </Badge>
           )}
@@ -52,11 +52,11 @@ export default function BlogPostCard({ post }) {
 
           {/* 3. Meta Footer (Pushed to the bottom) */}
           {/* "mt-auto" is the magic class that pushes this block down */}
-          <div className="flex items-center text-xs text-gray-400 pt-2">
+          <div className="flex items-center text-xs text-gray-400 pt-2 mt-auto">
             <time dateTime={post.publish_date}>
               {formatDate(post.publish_date)}
             </time>
-            <span className="ml-auto font-semibold text-white/90">
+            <span className="ml-auto font-semibold text-white/90 group-hover:text-blue-400 transition-colors">
               Read More →
             </span>
           </div>
