@@ -46,38 +46,39 @@ const EventListingClient = () => {
   });
 
   useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const params = {
+          page: pagination.page,
+          page_size: 12,
+          time: timeFilter === 'all' ? undefined : timeFilter,
+          type: selectedType === 'all' ? undefined : selectedType,
+          search: searchQuery || undefined,
+        };
+
+        const { data, error, fullResponse } = await getEvents(params);
+
+        if (!error && data) {
+          setEvents(data.results || []);
+          setPagination({
+            page: pagination.page,
+            totalPages: Math.ceil((data.count || 0) / 12),
+            totalCount: data.count || 0,
+          });
+        } else {
+          console.error('Error fetching events:', error);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchEvents();
   }, [timeFilter, selectedType, searchQuery, pagination.page]);
 
-  const fetchEvents = async () => {
-    setLoading(true);
-    try {
-      const params = {
-        page: pagination.page,
-        page_size: 12,
-        time: timeFilter === 'all' ? undefined : timeFilter,
-        type: selectedType === 'all' ? undefined : selectedType,
-        search: searchQuery || undefined,
-      };
 
-      const { data, error, fullResponse } = await getEvents(params);
-
-      if (!error && data) {
-        setEvents(data.results || []);
-        setPagination({
-          page: pagination.page,
-          totalPages: Math.ceil((data.count || 0) / 12),
-          totalCount: data.count || 0,
-        });
-      } else {
-        console.error('Error fetching events:', error);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSearch = (e) => {
     e.preventDefault();

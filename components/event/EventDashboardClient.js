@@ -58,58 +58,59 @@ const EventDashboardClient = ({ slug }) => {
     const [addingParticipant, setAddingParticipant] = useState(false);
 
     useEffect(() => {
+
+        const fetchDashboardData = async () => {
+            setLoading(true);
+            try {
+                // Fetch event details
+                const eventResponse = await eventService.getEventBySlug(slug);
+                if (eventResponse.error) {
+                    toast.error(eventResponse.message || 'Failed to load event');
+                    router.push('/event');
+                    return;
+                }
+
+                // Check permissions (must be admin of the organization)
+                if (!eventResponse.data.organization_details.user_is_admin) {
+                    toast.error('Access Denied', {
+                        description: 'You do not have permission to access this dashboard.'
+                    });
+                    router.push(`/event/${slug}`);
+                    return;
+                }
+
+                setEvent(eventResponse.data);
+
+                // Fetch dashboard stats
+                const statsResponse = await eventService.getEventDashboard(slug);
+                if (!statsResponse.error) {
+                    setStats(statsResponse.data);
+                }
+
+                // Fetch registrations
+                const registrationsResponse = await eventService.getEventRegistrations(slug);
+                if (!registrationsResponse.error) {
+                    setRegistrations(registrationsResponse.data.results || registrationsResponse.data);
+                }
+
+                // Fetch manual participants
+                const manualParticipantsResponse = await eventService.getManualParticipants(slug);
+                if (!manualParticipantsResponse.error) {
+                    setManualParticipants(manualParticipantsResponse.data.results || manualParticipantsResponse.data);
+                }
+
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                toast.error('Failed to load dashboard data');
+            } finally {
+                setLoading(false);
+            }
+        };
         if (!authLoading) {
             fetchDashboardData();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug, authLoading]);
-
-    const fetchDashboardData = async () => {
-        setLoading(true);
-        try {
-            // Fetch event details
-            const eventResponse = await eventService.getEventBySlug(slug);
-            if (eventResponse.error) {
-                toast.error(eventResponse.message || 'Failed to load event');
-                router.push('/event');
-                return;
-            }
-
-            // Check permissions (must be admin of the organization)
-            if (!eventResponse.data.organization_details.user_is_admin) {
-                toast.error('Access Denied', {
-                    description: 'You do not have permission to access this dashboard.'
-                });
-                router.push(`/event/${slug}`);
-                return;
-            }
-
-            setEvent(eventResponse.data);
-
-            // Fetch dashboard stats
-            const statsResponse = await eventService.getEventDashboard(slug);
-            if (!statsResponse.error) {
-                setStats(statsResponse.data);
-            }
-
-            // Fetch registrations
-            const registrationsResponse = await eventService.getEventRegistrations(slug);
-            if (!registrationsResponse.error) {
-                setRegistrations(registrationsResponse.data.results || registrationsResponse.data);
-            }
-
-            // Fetch manual participants
-            const manualParticipantsResponse = await eventService.getManualParticipants(slug);
-            if (!manualParticipantsResponse.error) {
-                setManualParticipants(manualParticipantsResponse.data.results || manualParticipantsResponse.data);
-            }
-
-        } catch (error) {
-            console.error('Error fetching dashboard data:', error);
-            toast.error('Failed to load dashboard data');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleAttendance = async (registrationId, status) => {
         try {

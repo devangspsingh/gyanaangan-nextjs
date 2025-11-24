@@ -75,89 +75,89 @@ const EventCreateForm = ({ isEditMode = false, eventSlug = null }) => {
   const [tagInput, setTagInput] = useState('');
 
   useEffect(() => {
+
+    const fetchMyOrganizations = async () => {
+      setLoadingOrgs(true);
+      try {
+        const response = await organizationService.getMyOrganizations();
+        if (!response.error) {
+          const orgs = response.data.results || response.data;
+          // Filter only organizations where user is admin
+          console.log(orgs)
+          const adminOrgs = orgs.filter(org => org.user_is_admin);
+          setMyOrganizations(adminOrgs);
+
+          if (adminOrgs.length === 0) {
+            toast({
+              title: 'No Organizations',
+              description: 'You need to be an admin of an organization to create events.',
+              variant: 'destructive',
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching organizations:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load your organizations',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoadingOrgs(false);
+      }
+    };
+
+    const fetchEventData = async () => {
+      try {
+        const response = await eventService.getEventBySlug(eventSlug);
+        if (!response.error) {
+          const event = response.data;
+
+          // Parse dates and times
+          const startDate = new Date(event.start_datetime);
+          const endDate = new Date(event.end_datetime);
+          const regDeadline = event.registration_deadline ? new Date(event.registration_deadline) : null;
+
+          setFormData({
+            title: event.title,
+            description: event.description,
+            short_description: event.short_description || '',
+            event_type: event.event_type,
+            organization: event.organization.id,
+            start_date: startDate.toISOString().split('T')[0],
+            start_time: startDate.toTimeString().slice(0, 5),
+            end_date: endDate.toISOString().split('T')[0],
+            end_time: endDate.toTimeString().slice(0, 5),
+            venue_name: event.venue_name || '',
+            meeting_link: event.meeting_link || '',
+            is_online: event.is_online,
+            max_participants: event.max_participants || '',
+            registration_deadline: regDeadline ? regDeadline.toISOString().split('T')[0] : '',
+            registration_deadline_time: regDeadline ? regDeadline.toTimeString().slice(0, 5) : '',
+            is_featured: event.is_featured,
+            is_published: event.is_published,
+            is_registration_open: event.is_registration_open,
+            tags: event.tags || [],
+          });
+
+          if (event.cover_image) {
+            setCoverImagePreview(event.cover_image);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching event data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load event data',
+          variant: 'destructive',
+        });
+      }
+    };
     fetchMyOrganizations();
     if (isEditMode && eventSlug) {
       fetchEventData();
     }
   }, [isEditMode, eventSlug]);
-
-  const fetchMyOrganizations = async () => {
-    setLoadingOrgs(true);
-    try {
-      const response = await organizationService.getMyOrganizations();
-      if (!response.error) {
-        const orgs = response.data.results || response.data;
-        // Filter only organizations where user is admin
-        console.log(orgs)
-        const adminOrgs = orgs.filter(org => org.user_is_admin);
-        setMyOrganizations(adminOrgs);
-        
-        if (adminOrgs.length === 0) {
-          toast({
-            title: 'No Organizations',
-            description: 'You need to be an admin of an organization to create events.',
-            variant: 'destructive',
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching organizations:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load your organizations',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoadingOrgs(false);
-    }
-  };
-
-  const fetchEventData = async () => {
-    try {
-      const response = await eventService.getEventBySlug(eventSlug);
-      if (!response.error) {
-        const event = response.data;
-        
-        // Parse dates and times
-        const startDate = new Date(event.start_datetime);
-        const endDate = new Date(event.end_datetime);
-        const regDeadline = event.registration_deadline ? new Date(event.registration_deadline) : null;
-
-        setFormData({
-          title: event.title,
-          description: event.description,
-          short_description: event.short_description || '',
-          event_type: event.event_type,
-          organization: event.organization.id,
-          start_date: startDate.toISOString().split('T')[0],
-          start_time: startDate.toTimeString().slice(0, 5),
-          end_date: endDate.toISOString().split('T')[0],
-          end_time: endDate.toTimeString().slice(0, 5),
-          venue_name: event.venue_name || '',
-          meeting_link: event.meeting_link || '',
-          is_online: event.is_online,
-          max_participants: event.max_participants || '',
-          registration_deadline: regDeadline ? regDeadline.toISOString().split('T')[0] : '',
-          registration_deadline_time: regDeadline ? regDeadline.toTimeString().slice(0, 5) : '',
-          is_featured: event.is_featured,
-          is_published: event.is_published,
-          is_registration_open: event.is_registration_open,
-          tags: event.tags || [],
-        });
-
-        if (event.cover_image) {
-          setCoverImagePreview(event.cover_image);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching event data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load event data',
-        variant: 'destructive',
-      });
-    }
-  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -609,7 +609,7 @@ const EventCreateForm = ({ isEditMode = false, eventSlug = null }) => {
                 min="1"
               />
               <p className="text-sm text-muted-foreground mt-1">
-                Leave empty if there's no limit on participants
+                Leave empty if there is no limit on participants
               </p>
             </div>
 

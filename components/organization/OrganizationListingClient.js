@@ -110,6 +110,8 @@ const OrganizationListingClient = () => {
 
   useEffect(() => {
     fetchOrganizations();
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, searchQuery, pagination.page]);
 
   const fetchOrganizations = async () => {

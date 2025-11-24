@@ -25,37 +25,38 @@ const OrganizationDetailClient = ({ slug }) => {
   const [activeTab, setActiveTab] = useState('about');
 
   useEffect(() => {
-    fetchOrganizationData();
-  }, [slug]);
-
-  const fetchOrganizationData = async () => {
-    setLoading(true);
-    try {
-      // Fetch organization details
-      const { data: orgData, error: orgError } = await getOrganizationBySlug(slug);
-
-      if (orgError || !orgData) {
-        console.error('Error fetching organization:', orgError);
-        router.push('/organization');
-        return;
+    const fetchOrganizationData = async () => {
+      setLoading(true);
+      try {
+        // Fetch organization details
+        const { data: orgData, error: orgError } = await getOrganizationBySlug(slug);
+  
+        if (orgError || !orgData) {
+          console.error('Error fetching organization:', orgError);
+          router.push('/organization');
+          return;
+        }
+  
+        setOrganization(orgData);
+  
+        // Fetch events
+        const { data: eventsData } = await getOrganizationEvents(slug);
+        setEvents(eventsData?.results || []);
+  
+        // Fetch members
+        const { data: membersData } = await getOrganizationMembers(slug);
+        setMembers(membersData || []);
+  
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchOrganizationData();
+    
+  }, [router, slug]);
 
-      setOrganization(orgData);
-
-      // Fetch events
-      const { data: eventsData } = await getOrganizationEvents(slug);
-      setEvents(eventsData?.results || []);
-
-      // Fetch members
-      const { data: membersData } = await getOrganizationMembers(slug);
-      setMembers(membersData || []);
-
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -75,7 +76,7 @@ const OrganizationDetailClient = ({ slug }) => {
         <Building2 className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
         <h2 className="text-2xl font-bold mb-2">Organization Not Found</h2>
         <p className="text-muted-foreground mb-4">
-          The organization you're looking for doesn't exist.
+          The organization you are looking for does not exist.
         </p>
         <Button onClick={() => router.push('/organization')}>
           Browse Organizations
@@ -251,7 +252,7 @@ const OrganizationDetailClient = ({ slug }) => {
                 <Calendar className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No events yet</h3>
                 <p className="text-muted-foreground">
-                  This organization hasn't hosted any events yet.
+                  This organization has not hosted any events yet.
                 </p>
               </CardContent>
             </Card>
@@ -326,7 +327,7 @@ const OrganizationDetailClient = ({ slug }) => {
                 <Building2 className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No gallery images</h3>
                 <p className="text-muted-foreground">
-                  This organization hasn't uploaded any gallery images yet.
+                  This organization has not uploaded any gallery images yet.
                 </p>
               </CardContent>
             </Card>

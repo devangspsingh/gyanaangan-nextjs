@@ -12,34 +12,35 @@ const OrganizationEditForm = ({ slug }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchOrganization = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await getOrganizationBySlug(slug);
+        
+        if (error || !data) {
+          console.error('Error fetching organization:', error);
+          router.push('/organization');
+          return;
+        }
+  
+        // Check if user is admin
+        if (!data.user_is_admin) {
+          router.push(`/organization/${slug}`);
+          return;
+        }
+  
+        setOrganization(data);
+      } catch (error) {
+        console.error('Error:', error);
+        router.push('/organization');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchOrganization();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
-  const fetchOrganization = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await getOrganizationBySlug(slug);
-      
-      if (error || !data) {
-        console.error('Error fetching organization:', error);
-        router.push('/organization');
-        return;
-      }
-
-      // Check if user is admin
-      if (!data.user_is_admin) {
-        router.push(`/organization/${slug}`);
-        return;
-      }
-
-      setOrganization(data);
-    } catch (error) {
-      console.error('Error:', error);
-      router.push('/organization');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

@@ -33,27 +33,27 @@ const AttendanceVerificationClient = ({ registrationId }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        const fetchVerification = async () => {
+            setLoading(true);
+            try {
+                const response = await eventService.verifyAttendance(registrationId);
+                if (response.error) {
+                    setError(response.data?.error || 'Failed to verify attendance');
+                } else {
+                    setVerification(response.data);
+                }
+            } catch (error) {
+                console.error('Error verifying attendance:', error);
+                setError('An error occurred while verifying attendance');
+            } finally {
+                setLoading(false);
+            }
+        };
         if (registrationId) {
             fetchVerification();
         }
     }, [registrationId]);
 
-    const fetchVerification = async () => {
-        setLoading(true);
-        try {
-            const response = await eventService.verifyAttendance(registrationId);
-            if (response.error) {
-                setError(response.data?.error || 'Failed to verify attendance');
-            } else {
-                setVerification(response.data);
-            }
-        } catch (error) {
-            console.error('Error verifying attendance:', error);
-            setError('An error occurred while verifying attendance');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleShare = async () => {
         const url = window.location.href;
@@ -186,7 +186,7 @@ const AttendanceVerificationClient = ({ registrationId }) => {
                                     className="object-cover opacity-20 blur-xl"
                                 />
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent" />
+                            <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/80 to-transparent" />
                         </div>
 
                         <div className="relative z-10 p-8 flex flex-col h-full justify-between">
