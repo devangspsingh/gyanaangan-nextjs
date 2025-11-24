@@ -306,7 +306,7 @@ const Footer = () => {
                   <ProfileButtonContent isDesktop={true} />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="end" className="w-56 bg-gray-900 border-gray-800 text-gray-200 ml-2">
+              <DropdownMenuContent side="right" align="end" className="bg-gray-900 border-gray-800 text-gray-200 ml-2">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none text-white">{user?.name || 'User'}</p>
