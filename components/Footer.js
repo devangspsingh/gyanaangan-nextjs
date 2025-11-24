@@ -5,13 +5,23 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useNotification } from '@/context/NotificationContext';
 import toast from 'react-hot-toast';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import LoginDialog from './Auth/LoginDialog';
 import { GoogleLogin } from '@react-oauth/google';
 import api from '../lib/axiosInstance';
-import { cn } from '@/lib/utils'; // Assuming you have a cn utility, if not I'll use template literals below
+import { cn } from '@/lib/utils';
 
-// Imports for Icons
+// Shadcn UI Imports
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// Icons
 import {
   HomeIcon,
   BookmarkIcon,
@@ -19,9 +29,9 @@ import {
   BellIcon,
   UserCircleIcon,
   CalendarIcon,
-  BuildingLibraryIcon, // Using Library for Organization (Educational context)
-  AcademicCapIcon, // For Certificates
-  UserIcon, // For Profile in dropdown
+  BuildingLibraryIcon,
+  AcademicCapIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 import {
   HomeIcon as HomeSolidIcon,
@@ -39,25 +49,10 @@ const Footer = () => {
   const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginRedirectPath, setLoginRedirectPath] = useState('/');
-  
-  // State for Profile Dropdown
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const profileMenuRef = useRef(null);
 
   useEffect(() => {
     refreshNotifications();
   }, [pathname, refreshNotifications]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
-        setIsProfileMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -156,9 +151,11 @@ const Footer = () => {
       };
 
       const commonProps = {
-        className: `flex flex-col items-center p-2 rounded-md transition-colors duration-200 ease-in-out ${
-          isActive ? 'text-primary' : 'text-gray-400 hover:text-primary-light'
-        } ${isDesktop ? 'w-full justify-start' : ''}`,
+        className: cn(
+          "flex flex-col items-center p-2 rounded-md transition-colors duration-200 ease-in-out",
+          isActive ? "text-primary" : "text-gray-400 hover:text-primary-light",
+          isDesktop && "w-full justify-start"
+        ),
         onClick: handleClick,
       };
 
@@ -198,58 +195,30 @@ const Footer = () => {
       e.preventDefault();
       setLoginRedirectPath('/profile');
       setIsLoginModalOpen(true);
-    } else {
-      // Toggle Dropdown for logged in users
-      e.preventDefault();
-      setIsProfileMenuOpen(!isProfileMenuOpen);
     }
+    // If authenticated, the DropdownMenuTrigger handles the click automatically
   };
 
-  // Dropdown Component
-  const ProfileDropdown = ({ isDesktop }) => {
-    if (!isProfileMenuOpen) return null;
-
-    const items = [
-      { label: 'Profile', href: '/profile', icon: UserIcon },
-      { label: 'My Registrations (Beta)', href: '/event/my-registrations', icon: AcademicCapIcon },
-    ];
-
-    return (
-      <div 
-        className={`absolute bg-gray-900 border border-gray-700 rounded-lg shadow-xl overflow-hidden min-w-[160px] z-50 animate-in fade-in zoom-in-95 duration-200
-          ${isDesktop ? 'left-full bottom-0 ml-2 mb-2' : 'bottom-full right-0 mb-2 mr-2'}
-        `}
-      >
-        <div className="py-1">
-           <div className="px-3 py-2 border-b border-gray-800">
-              <p className="text-sm font-medium text-white truncate">{user?.name || 'User'}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-           </div>
-          {items.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={() => setIsProfileMenuOpen(false)}
-              className="flex items-center px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors gap-2"
-            >
-              <item.icon className="w-4 h-4" />
-              {item.label}
-            </Link>
-          ))}
-          {/* Optional Logout button in dropdown */}
-          {/* <button
-            onClick={() => {
-              // logout logic
-              setIsProfileMenuOpen(false);
-            }}
-            className="w-full flex items-center px-4 py-2 text-sm text-red-400 hover:bg-gray-800 transition-colors gap-2"
-          >
-             Log out
-          </button> */}
-        </div>
-      </div>
-    );
-  };
+  // Shared Profile Button UI to reuse in both Mobile/Desktop triggers
+  const ProfileButtonContent = ({ isDesktop }) => (
+    <div 
+      className={cn(
+        "relative flex flex-col items-center p-2 rounded-md transition-colors cursor-pointer",
+        isProfileActive ? "text-primary" : "text-gray-400 hover:text-primary-light",
+        isDesktop && "w-full"
+      )}
+    >
+      {isAuthenticated && user?.picture ? (
+        <img src={user.picture} alt="Profile" className={cn("rounded-full", isDesktop ? "w-8 h-8" : "w-6 h-6")} />
+      ) : (
+        <ProfileIconComponent className={cn(isDesktop ? "w-8 h-8" : "w-6 h-6")} />
+      )}
+      {!isAuthenticated && (
+        <span className="absolute top-1 right-1 block h-2 w-2 rounded-full ring-1 ring-gray-900 bg-primary animate-pulse" />
+      )}
+      {isDesktop && <span className="mt-1 text-xs">Profile</span>}
+    </div>
+  );
 
   return (
     <>
@@ -275,58 +244,102 @@ const Footer = () => {
       )}
 
       {/* Mobile Bottom Bar */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-gray-950/10 backdrop-blur-md border-t border-gray-700/50 text-white flex justify-around items-center p-2 shadow-lg md:hidden z-40">
+      <footer className="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur-md border-t border-gray-700/50 text-white flex justify-around items-center p-2 shadow-lg md:hidden z-40">
         {renderNavItems(false)}
         
-        {/* Mobile Profile Button Container */}
-        <div className="relative" ref={!isAuthenticated ? null : profileMenuRef}>
-          {isAuthenticated && <ProfileDropdown isDesktop={false} />}
-          <button
-            onClick={handleProfileClick}
-            className={`relative flex flex-col items-center p-2 rounded-md transition-colors ${
-              isProfileActive || isProfileMenuOpen ? 'text-primary' : 'text-gray-400 hover:text-primary-light'
-            }`}
-          >
-            {isAuthenticated && user?.picture ? (
-              <img src={user.picture} alt="Profile" className="w-6 h-6 rounded-full" />
-            ) : (
-              <ProfileIconComponent className="w-6 h-6" />
-            )}
-            {!isAuthenticated && (
-              <span className="absolute top-1 right-1 block h-2 w-2 rounded-full ring-1 ring-gray-900 bg-primary animate-pulse" />
-            )}
+        {/* Mobile Profile Button with Shadcn Dropdown */}
+        {isAuthenticated ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="outline-none">
+                <ProfileButtonContent isDesktop={false} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="end" className="bg-gray-900 border-gray-800 text-gray-200">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none text-white">{user?.name || 'User'}</p>
+                  <p className="text-xs leading-none text-gray-500">{user?.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-800" />
+              
+              <DropdownMenuItem asChild>
+                <Link href="/profile" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
+                  <UserIcon className="w-4 h-4" />
+                  <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem asChild>
+                <Link href="/event/my-registrations" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
+                  <AcademicCapIcon className="w-4 h-4" />
+                  <span>My Events (Beta)</span>
+                </Link>
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator className="bg-gray-800" />
+              {/* <DropdownMenuItem onClick={logout} className="text-red-400 focus:text-red-300 focus:bg-gray-800 cursor-pointer">
+                Log out
+              </DropdownMenuItem> */}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <button onClick={handleProfileClick}>
+             <ProfileButtonContent isDesktop={false} />
           </button>
-        </div>
+        )}
       </footer>
 
-      {/* Desktop Right Sidebar (Actually Left Sidebar based on styling) */}
+      {/* Desktop Left Sidebar */}
       <aside className="fixed left-0 top-16 h-[calc(100vh-theme(space.16))] bg-gray-950/10 backdrop-blur-sm border-r border-gray-700/50 text-white hidden md:flex flex-col items-center justify-center space-y-4 p-3 shadow-lg z-40 w-20">
         <div className="flex flex-col items-center space-y-4 w-full">
           {renderNavItems(true)}
         </div>
         
         <div className="mt-auto mb-4 w-full flex justify-center"> 
-          {/* Desktop Profile Button Container */}
-          <div className="relative" ref={!isAuthenticated ? null : profileMenuRef}>
-            {isAuthenticated && <ProfileDropdown isDesktop={true} />}
-            <button 
-              onClick={handleProfileClick}
-              className={`relative flex flex-col items-center p-2 rounded-md transition-colors w-full ${
-                isProfileActive || isProfileMenuOpen ? 'text-primary' : 'text-gray-400 hover:text-primary-light'
-              }`}
-              title="Profile"
-            >
-              {isAuthenticated && user?.picture ? (
-                <img src={user.picture} alt="Profile" className="w-8 h-8 rounded-full" />
-              ) : (
-                <ProfileIconComponent className="w-8 h-8" />
-              )}
-              {!isAuthenticated && (
-                <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full ring-1 ring-gray-900 bg-primary animate-pulse" />
-              )}
-              <span className="mt-1 text-xs">Profile</span>
+          {/* Desktop Profile Button with Shadcn Dropdown */}
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="outline-none w-full">
+                  <ProfileButtonContent isDesktop={true} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="end" className="w-56 bg-gray-900 border-gray-800 text-gray-200 ml-2">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none text-white">{user?.name || 'User'}</p>
+                    <p className="text-xs leading-none text-gray-500">{user?.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-800" />
+                
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
+                    <UserIcon className="w-4 h-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem asChild>
+                  <Link href="/event/my-registrations" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
+                    <AcademicCapIcon className="w-4 h-4" />
+                    <span>My Registrations</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator className="bg-gray-800" />
+                <DropdownMenuItem onClick={logout} className="text-red-400 focus:text-red-300 focus:bg-gray-800 cursor-pointer">
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <button onClick={handleProfileClick} className="w-full">
+               <ProfileButtonContent isDesktop={true} />
             </button>
-          </div>
+          )}
         </div>
       </aside>
     </>

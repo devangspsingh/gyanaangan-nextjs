@@ -11,6 +11,8 @@ export default function robots() {
           '/admin/',
           '/login',
           '/profile/',
+          '/event/',
+          '/organization/',
           '/_next/',
           '/static/',
           '/api.gyanaangan.in', // Disallow API subdomain
