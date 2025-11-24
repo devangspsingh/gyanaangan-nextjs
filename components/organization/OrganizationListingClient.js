@@ -101,7 +101,7 @@ const OrganizationListingClient = () => {
   const [organizations, setOrganizations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
-  const [filter, setFilter] = useState(searchParams.get('filter') || 'all');
+  const [filter, setFilter] = useState(searchParams.get('filter') || 'verified');
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
@@ -192,8 +192,7 @@ const OrganizationListingClient = () => {
 
         {/* Filter Tabs */}
         <Tabs value={filter} onValueChange={handleFilterChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="all">All Organizations</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="verified">Verified</TabsTrigger>
             <TabsTrigger value="my">My Organizations</TabsTrigger>
           </TabsList>
@@ -240,7 +239,7 @@ const OrganizationListingClient = () => {
               variant="outline"
               onClick={() => {
                 setSearchQuery('');
-                setFilter('all');
+                setFilter('verified');
                 setPagination({ page: 1, totalPages: 1, totalCount: 0 });
               }}
             >
