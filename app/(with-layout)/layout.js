@@ -28,13 +28,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${roboto_mono.variable}`}>
       {/* <head> */}
-        <Script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3792754105959046`}
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-        {/* <script
+      <Script
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3792754105959046`}
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
+      {/* <script
       async
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3792754105959046`}
       crossOrigin="anonymous"
@@ -47,8 +47,7 @@ export default function RootLayout({ children }) {
           <Header />
           {/* <GoogleAdSense publisherId="ca-pub-3792754105959046" /> */}
           {/* <AdSenseComponent/> */}
-          <div className="container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">
-
+          <div className="relative container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">
             {children}
           </div>
 
@@ -60,7 +59,9 @@ export default function RootLayout({ children }) {
           <FooterNavigation />
         </Providers>
       </body>
-      <GoogleAnalytics gaId="G-P37HBDS10M" />
+      {process.env.NEXT_PUBLIC_DEV ? "" :
+        <GoogleAnalytics gaId="G-P37HBDS10M" />
+      }
     </html>
   );
 }
