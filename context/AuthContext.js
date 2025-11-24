@@ -28,22 +28,24 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
+        // Set header IMMEDIATELY to avoid race conditions with other components
+        api.defaults.headers.Authorization = `Bearer ${currentAccessToken}`;
+        setTokens(parsedTokens);
+
         const decodedAccessToken = jwtDecode(currentAccessToken);
-        
+
         if (decodedAccessToken.exp * 1000 > Date.now()) {
           // Access token is valid, fetch fresh user data from API
-          setTokens(parsedTokens);
-          api.defaults.headers.Authorization = `Bearer ${currentAccessToken}`;
-          
+
           // Ensure cookie is also set (in case it was cleared but localStorage persists)
           document.cookie = `access_token=${currentAccessToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
           console.log('🍪 [Init] Cookie synced from localStorage');
-          
+
           // Fetch fresh user profile data from API
           try {
             const profileResponse = await api.get('/profiles/me/');
             const profileData = profileResponse.data;
-            
+
             // Transform profile data to user object
             const userData = {
               id: profileData.user.id,
@@ -56,7 +58,7 @@ export const AuthProvider = ({ children }) => {
               bio: profileData.bio,
               emoji_tag: profileData.emoji_tag,
             };
-            
+
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
             console.log('✅ [Init] User profile fetched from API');
@@ -68,7 +70,10 @@ export const AuthProvider = ({ children }) => {
               setUser(JSON.parse(storedUser));
               console.log('⚠️ [Init] Using cached user data');
             } else {
-              clearAuth();
+              // If no cached user, we might want to clear auth or just stay logged in with token only
+              // For now, let's keep the token but maybe retry later?
+              // Or clear if we strictly need user profile.
+              // Let's keep it, as token is valid.
             }
           }
         } else {
@@ -79,24 +84,24 @@ export const AuthProvider = ({ children }) => {
               const refreshResponse = await api.post('/auth/jwt/refresh/', { refresh: currentRefreshToken });
               const newAccessToken = refreshResponse.data.access;
               // Djoser's refresh might also return a new refresh token if ROTATE_REFRESH_TOKENS is True
-              const newRefreshToken = refreshResponse.data.refresh || currentRefreshToken; 
+              const newRefreshToken = refreshResponse.data.refresh || currentRefreshToken;
 
               localStorage.setItem('tokens', JSON.stringify({ access: newAccessToken, refresh: newRefreshToken }));
-              
+
               const newDecodedAccessToken = jwtDecode(newAccessToken);
               // Assuming user data doesn't change on refresh, otherwise re-fetch or update user
-              const storedUser = localStorage.getItem('user'); 
+              const storedUser = localStorage.getItem('user');
               if (storedUser) {
-                 // Optionally, verify if user ID in new token matches stored user
+                // Optionally, verify if user ID in new token matches stored user
                 const userObj = JSON.parse(storedUser);
                 if (userObj.id === newDecodedAccessToken.user_id) {
-                    setUser(userObj);
+                  setUser(userObj);
                 } else {
-                    // Mismatch, clear and force re-login or fetch new user data
-                    console.warn("User ID mismatch after token refresh. Clearing auth.");
-                    clearAuth();
-                    setLoading(false);
-                    return;
+                  // Mismatch, clear and force re-login or fetch new user data
+                  console.warn("User ID mismatch after token refresh. Clearing auth.");
+                  clearAuth();
+                  setLoading(false);
+                  return;
                 }
               } else {
                 // If no user stored, but token refreshed, this is an edge case.
@@ -110,7 +115,7 @@ export const AuthProvider = ({ children }) => {
                 setLoading(false);
                 return;
               }
-              
+
               setTokens({ access: newAccessToken, refresh: newRefreshToken });
               api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
               // console.log("Token refreshed successfully.");
@@ -139,19 +144,19 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData, access, refresh) => {
     // Store tokens first
     localStorage.setItem('tokens', JSON.stringify({ access, refresh }));
-    
+
     // ALSO store access token in cookie (for server-side)
     document.cookie = `access_token=${access}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
     console.log('🍪 [Login] Cookie set:', `access_token=${access.substring(0, 20)}...`);
-    
+
     setTokens({ access, refresh });
     api.defaults.headers.Authorization = `Bearer ${access}`;
-    
+
     // Fetch fresh profile data from API instead of using login response
     try {
       const profileResponse = await api.get('/profiles/me/');
       const profileData = profileResponse.data;
-      
+
       // Transform profile data to user object
       const freshUserData = {
         id: profileData.user.id,
@@ -164,7 +169,7 @@ export const AuthProvider = ({ children }) => {
         bio: profileData.bio,
         emoji_tag: profileData.emoji_tag,
       };
-      
+
       localStorage.setItem('user', JSON.stringify(freshUserData));
       setUser(freshUserData);
       console.log('✅ [Login] User profile fetched from API');
@@ -180,17 +185,17 @@ export const AuthProvider = ({ children }) => {
     clearAuth();
     router.push('/login');
   };
-  
+
   const refreshUserProfile = async () => {
     if (!tokens?.access) {
       console.warn('⚠️ [RefreshProfile] No access token available');
       return;
     }
-    
+
     try {
       const profileResponse = await api.get('/profiles/me/');
       const profileData = profileResponse.data;
-      
+
       const userData = {
         id: profileData.user.id,
         email: profileData.user.email,
@@ -202,7 +207,7 @@ export const AuthProvider = ({ children }) => {
         bio: profileData.bio,
         emoji_tag: profileData.emoji_tag,
       };
-      
+
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       console.log('✅ [RefreshProfile] User profile refreshed');
@@ -212,29 +217,29 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
-  
+
   const clearAuth = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('tokens');
-    
+
     // ALSO remove the cookie
     document.cookie = 'access_token=; path=/; max-age=0';
     console.log('🍪 [Logout] Cookie cleared');
-    
+
     setUser(null);
     setTokens(null);
     delete api.defaults.headers.Authorization;
   }
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      tokens, 
-      login, 
-      logout, 
-      refreshUserProfile, 
-      loading, 
-      isAuthenticated: !!user 
+    <AuthContext.Provider value={{
+      user,
+      tokens,
+      login,
+      logout,
+      refreshUserProfile,
+      loading,
+      isAuthenticated: !!user
     }}>
       {children}
     </AuthContext.Provider>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { Bars3Icon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
-import { Button } from '@/components/ui/button'; 
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -21,6 +21,8 @@ const navigation = [
   { name: 'Courses', href: '/courses' },
   { name: 'Blog', href: '/blog' },
   { name: 'About', href: '/about' },
+  { name: 'Events', href: '/event', mobileOnly: true }, // Added mobileOnly flag
+  { name: 'Organizations', href: '/organization', mobileOnly: true }, // Added mobileOnly flag
 ];
 
 export default function Header() {
@@ -29,7 +31,6 @@ export default function Header() {
 
   const navigateToSearchPage = () => {
     router.push('/search');
-    // SheetClose will handle closing the sheet if this is called from within it
   };
 
   return (
@@ -50,10 +51,11 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="bg-gray-950/90 backdrop-blur-sm text-gray-300 border-r border-gray-700/50 w-[280px] p-6 pt-10" // Added pt-10 for top spacing
+                className="bg-gray-950/90 backdrop-blur-sm text-gray-300 border-r border-gray-700/50 w-[280px] p-6 pt-10"
               >
-<SheetHeader><SheetTitle>Menu</SheetTitle></SheetHeader>
-                <div className="space-y-2">
+                <SheetHeader><SheetTitle className="text-gray-200">Menu</SheetTitle></SheetHeader>
+                <div className="space-y-1">
+                  {/* Mobile Menu renders ALL items (Events & Org included) */}
                   {navigation.map((item) => (
                     <SheetClose asChild key={item.name}>
                       <Link
@@ -64,6 +66,7 @@ export default function Header() {
                       </Link>
                     </SheetClose>
                   ))}
+                  
                   <SheetClose asChild>
                     <button
                       onClick={navigateToSearchPage}
@@ -73,10 +76,23 @@ export default function Header() {
                       Search
                     </button>
                   </SheetClose>
+                  
+                  {/* My Certificates remains in Mobile Menu */}
+                  {/* {isAuthenticated && (
+                    <SheetClose asChild>
+                      <Link
+                        href="/event/my-registrations"
+                        className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
+                      >
+                        My Certificates
+                      </Link>
+                    </SheetClose>
+                  )} */}
                 </div>
               </SheetContent>
             </Sheet>
           </div>
+          
           <div className="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
             <Link href="/" className="flex flex-shrink-0 items-center">
               <img
@@ -89,18 +105,23 @@ export default function Header() {
               </span>
             </Link>
             <div className="hidden md:ml-6 md:flex md:space-x-4">
+              {/* Desktop Menu: Filters out items with mobileOnly: true */}
               {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                >
-                  {item.name}
-                </Link>
+                !item.mobileOnly && (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                  >
+                    {item.name}
+                  </Link>
+                )
               ))}
             </div>
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 md:static md:inset-auto md:ml-6 md:pr-0">
+          
+          <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-2 md:static md:inset-auto md:ml-6 md:pr-0">
+            
             <button
               onClick={navigateToSearchPage}
               title="Search"
@@ -109,11 +130,9 @@ export default function Header() {
               <MagnifyingGlassIcon className="h-6 w-6" />
               <span className="sr-only">Search</span>
             </button>
-            {/* Placeholder for authentication buttons or other items */}
           </div>
         </div>
       </div>
-      {/* Disclosure.Panel is no longer needed as its content is in SheetContent */}
     </nav>
   );
 }
