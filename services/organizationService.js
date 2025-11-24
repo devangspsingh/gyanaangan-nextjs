@@ -204,6 +204,17 @@ export const getMyOrganizations = async () => {
   );
 };
 
+/**
+ * Check current user's permissions for an organization
+ * @param {string} slug - Organization slug
+ * @returns {Object} { is_member, is_admin, role, permissions }
+ */
+export const checkPermissions = async (slug) => {
+  return handleApiResponse(
+    api.get(getFullUrl(`/organizations/${slug}/check_user_permissions/`))
+  );
+};
+
 // Default export with all functions
 const organizationService = {
   getOrganizations,
@@ -219,10 +230,9 @@ const organizationService = {
   getOrganizationGallery,
   addGalleryImage,
   removeGalleryImage,
-//   deleteOrganizationGalleryImage,
-
   getOrganizationStats,
   getMyOrganizations,
+  checkPermissions,
 };
 
 export default organizationService;
