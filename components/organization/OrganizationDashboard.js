@@ -76,7 +76,8 @@ const OrganizationDashboard = ({ slug }) => {
         }
   
         // Check if user is admin
-        if (!orgResponse.data.user_is_admin) {
+        const permissionsResponse = await organizationService.checkPermissions(slug);
+        if (permissionsResponse.error || !permissionsResponse.data.is_admin) {
           toast({
             title: 'Access Denied',
             description: 'You do not have permission to access this dashboard.',

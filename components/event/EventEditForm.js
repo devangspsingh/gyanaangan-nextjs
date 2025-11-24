@@ -9,6 +9,7 @@ import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import EventCreateForm from './EventCreateForm';
 import eventService from '@/services/eventService';
+import organizationService from '@/services/organizationService';
 
 import { useAuth } from '@/context/AuthContext';
 
@@ -37,7 +38,10 @@ const EventEditForm = ({ slug }) => {
         setEvent(response.data);
   
         // Check if user has permission to edit (must be admin of the organization)
-        if (!response.data.organization_details.user_is_admin) {
+        const permissionsResponse = await organizationService.checkPermissions(
+          response.data.organization_details.slug
+        );
+        if (permissionsResponse.error || !permissionsResponse.data.is_admin) {
           toast({
             title: 'Access Denied',
             description: 'You do not have permission to edit this event.',

@@ -36,6 +36,7 @@ import {
   Shield,
 } from 'lucide-react';
 import eventService from '@/services/eventService';
+import organizationService from '@/services/organizationService';
 
 import { useAuth } from '@/context/AuthContext';
 
@@ -44,6 +45,7 @@ const EventDetailClient = ({ slug }) => {
   const { loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [event, setEvent] = useState(null);
+  const [permissions, setPermissions] = useState({ is_admin: false });
   const [registering, setRegistering] = useState(false);
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
 
@@ -58,6 +60,16 @@ const EventDetailClient = ({ slug }) => {
           return;
         }
         setEvent(response.data);
+        
+        // Fetch user permissions for the organization
+        if (response.data.organization_details?.slug) {
+          const permissionsResponse = await organizationService.checkPermissions(
+            response.data.organization_details.slug
+          );
+          if (!permissionsResponse.error) {
+            setPermissions(permissionsResponse.data);
+          }
+        }
       } catch (error) {
         console.error('Error fetching event:', error);
         toast.error('An error occurred while loading event details');
@@ -599,7 +611,7 @@ const EventDetailClient = ({ slug }) => {
           )}
 
           {/* Admin Actions */}
-          {event.organization_details.user_is_admin && (
+          {permissions.is_admin && (
             <Card>
               <CardHeader>
                 <CardTitle>Manage Event</CardTitle>

@@ -76,38 +76,46 @@ const EventCreateForm = ({ isEditMode = false, eventSlug = null }) => {
 
   useEffect(() => {
 
-    const fetchMyOrganizations = async () => {
-      setLoadingOrgs(true);
-      try {
-        const response = await organizationService.getMyOrganizations();
-        if (!response.error) {
-          const orgs = response.data.results || response.data;
-          // Filter only organizations where user is admin
-          console.log(orgs)
-          const adminOrgs = orgs.filter(org => org.user_is_admin);
-          setMyOrganizations(adminOrgs);
-
-          if (adminOrgs.length === 0) {
-            toast({
-              title: 'No Organizations',
-              description: 'You need to be an admin of an organization to create events.',
-              variant: 'destructive',
-            });
-          }
+  const fetchMyOrganizations = async () => {
+    setLoadingOrgs(true);
+    try {
+      const response = await organizationService.getMyOrganizations();
+      if (!response.error) {
+        const orgs = response.data.results || response.data;
+        
+        // Check permissions for each organization to filter admin orgs
+        const orgsWithPermissions = await Promise.all(
+          orgs.map(async (org) => {
+            const permissionResponse = await organizationService.checkPermissions(org.slug);
+            return {
+              ...org,
+              user_is_admin: !permissionResponse.error && permissionResponse.data.is_admin
+            };
+          })
+        );
+        
+        const adminOrgs = orgsWithPermissions.filter(org => org.user_is_admin);
+        setMyOrganizations(adminOrgs);
+        
+        if (adminOrgs.length === 0) {
+          toast({
+            title: 'No Organizations',
+            description: 'You need to be an admin of an organization to create events.',
+            variant: 'destructive',
+          });
         }
-      } catch (error) {
-        console.error('Error fetching organizations:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load your organizations',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoadingOrgs(false);
       }
-    };
-
-    const fetchEventData = async () => {
+    } catch (error) {
+      console.error('Error fetching organizations:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load your organizations',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingOrgs(false);
+    }
+  };    const fetchEventData = async () => {
       try {
         const response = await eventService.getEventBySlug(eventSlug);
         if (!response.error) {

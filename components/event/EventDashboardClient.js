@@ -33,6 +33,7 @@ import {
     Search
 } from 'lucide-react';
 import eventService from '@/services/eventService';
+import organizationService from '@/services/organizationService';
 
 import { useAuth } from '@/context/AuthContext';
 
@@ -71,7 +72,10 @@ const EventDashboardClient = ({ slug }) => {
                 }
 
                 // Check permissions (must be admin of the organization)
-                if (!eventResponse.data.organization_details.user_is_admin) {
+                const permissionsResponse = await organizationService.checkPermissions(
+                    eventResponse.data.organization_details.slug
+                );
+                if (permissionsResponse.error || !permissionsResponse.data.is_admin) {
                     toast.error('Access Denied', {
                         description: 'You do not have permission to access this dashboard.'
                     });

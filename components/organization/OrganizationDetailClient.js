@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getOrganizationBySlug, getOrganizationEvents, getOrganizationMembers } from '@/services/organizationService';
+import { getOrganizationBySlug, getOrganizationEvents, getOrganizationMembers, checkPermissions } from '@/services/organizationService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,7 @@ const OrganizationDetailClient = ({ slug }) => {
   const [organization, setOrganization] = useState(null);
   const [events, setEvents] = useState([]);
   const [members, setMembers] = useState([]);
+  const [permissions, setPermissions] = useState({ is_admin: false, is_member: false });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('about');
 
@@ -39,13 +40,22 @@ const OrganizationDetailClient = ({ slug }) => {
   
         setOrganization(orgData);
   
+        // Fetch user permissions
+        const permissionsResponse = await checkPermissions(slug);
+        if (!permissionsResponse.error) {
+          setPermissions(permissionsResponse.data);
+        }
+  
         // Fetch events
         const { data: eventsData } = await getOrganizationEvents(slug);
         setEvents(eventsData?.results || []);
   
-        // Fetch members
-        const { data: membersData } = await getOrganizationMembers(slug);
-        setMembers(membersData || []);
+        // Fetch members (only if admin)
+        if (!permissionsResponse.error && permissionsResponse.data.is_admin) {
+          const { data: membersData } = await getOrganizationMembers(slug);
+          console.log('Members Data', membersData)
+          setMembers(membersData || []);
+        }
   
       } catch (error) {
         console.error('Error:', error);
@@ -114,7 +124,7 @@ const OrganizationDetailClient = ({ slug }) => {
         )}
 
         {/* Action Buttons */}
-        {organization.user_is_admin && (
+        {permissions.is_admin && (
           <div className="absolute top-4 right-4 flex gap-2">
             <Button size="sm" onClick={() => router.push(`/organization/${slug}/edit`)}>
               <Edit className="w-4 h-4 mr-2" />
@@ -178,10 +188,9 @@ const OrganizationDetailClient = ({ slug }) => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="about">About</TabsTrigger>
           <TabsTrigger value="events">Events ({events.length})</TabsTrigger>
-          <TabsTrigger value="members">Members ({members.length})</TabsTrigger>
           <TabsTrigger value="gallery">Gallery</TabsTrigger>
         </TabsList>
 
@@ -286,7 +295,8 @@ const OrganizationDetailClient = ({ slug }) => {
         </TabsContent>
 
         {/* Members Tab */}
-        <TabsContent value="members" className="mt-6">
+        {/* <TabsContent value="members" className="mt-6">
+          {console.log(members.length)}
           {members.length === 0 ? (
             <Card>
               <CardContent className="py-16 text-center">
@@ -296,7 +306,7 @@ const OrganizationDetailClient = ({ slug }) => {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {members.map((member) => (
+              {members && members.map((member) => (
                 <Card key={member.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -317,7 +327,7 @@ const OrganizationDetailClient = ({ slug }) => {
               ))}
             </div>
           )}
-        </TabsContent>
+        </TabsContent> */}
 
         {/* Gallery Tab */}
         <TabsContent value="gallery" className="mt-6">

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getOrganizationBySlug } from '@/services/organizationService';
+import { getOrganizationBySlug, checkPermissions } from '@/services/organizationService';
 import OrganizationCreateForm from './OrganizationCreateForm';
 import { Loader2 } from 'lucide-react';
 
@@ -24,7 +24,8 @@ const OrganizationEditForm = ({ slug }) => {
         }
   
         // Check if user is admin
-        if (!data.user_is_admin) {
+        const permissionsResponse = await checkPermissions(slug);
+        if (permissionsResponse.error || !permissionsResponse.data.is_admin) {
           router.push(`/organization/${slug}`);
           return;
         }
