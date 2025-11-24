@@ -48,29 +48,30 @@ const EventDetailClient = ({ slug }) => {
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
 
   useEffect(() => {
+    const fetchEventDetails = async () => {
+      setLoading(true);
+      try {
+        const response = await eventService.getEventBySlug(slug);
+        if (response.error) {
+          toast.error('Failed to load event details');
+          router.push('/event');
+          return;
+        }
+        setEvent(response.data);
+      } catch (error) {
+        console.error('Error fetching event:', error);
+        toast.error('An error occurred while loading event details');
+        router.push('/event');
+      } finally {
+        setLoading(false);
+      }
+    };
     if (!authLoading) {
       fetchEventDetails();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, authLoading]);
 
-  const fetchEventDetails = async () => {
-    setLoading(true);
-    try {
-      const response = await eventService.getEventBySlug(slug);
-      if (response.error) {
-        toast.error('Failed to load event details');
-        router.push('/event');
-        return;
-      }
-      setEvent(response.data);
-    } catch (error) {
-      console.error('Error fetching event:', error);
-      toast.error('An error occurred while loading event details');
-      router.push('/event');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleRegister = async () => {
     setRegistering(true);
@@ -197,7 +198,7 @@ const EventDetailClient = ({ slug }) => {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
             <div className="flex items-center gap-2 mb-2">
               {getEventStatusBadge()}

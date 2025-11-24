@@ -60,71 +60,72 @@ const OrganizationDashboard = ({ slug }) => {
   const [uploadingGallery, setUploadingGallery] = useState(false);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [slug]);
-
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    try {
-      // Fetch organization details
-      const orgResponse = await organizationService.getOrganizationBySlug(slug);
-      if (orgResponse.error) {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        // Fetch organization details
+        const orgResponse = await organizationService.getOrganizationBySlug(slug);
+        if (orgResponse.error) {
+          toast({
+            title: 'Error',
+            description: orgResponse.error,
+            variant: 'destructive',
+          });
+          router.push('/organization');
+          return;
+        }
+  
+        // Check if user is admin
+        if (!orgResponse.data.user_is_admin) {
+          toast({
+            title: 'Access Denied',
+            description: 'You do not have permission to access this dashboard.',
+            variant: 'destructive',
+          });
+          router.push(`/organization/${slug}`);
+          return;
+        }
+  
+        setOrganization(orgResponse.data);
+  
+        // Fetch stats
+        const statsResponse = await organizationService.getOrganizationStats(slug);
+        if (!statsResponse.error) {
+          setStats(statsResponse.data);
+        }
+  
+        // Fetch members
+        const membersResponse = await organizationService.getOrganizationMembers(slug);
+        if (!membersResponse.error) {
+          setMembers(membersResponse.data.results || membersResponse.data);
+        }
+  
+        // Fetch events
+        const eventsResponse = await organizationService.getOrganizationEvents(slug);
+        if (!eventsResponse.error) {
+          setEvents(eventsResponse.data.results || eventsResponse.data);
+        }
+  
+        // Fetch gallery
+        const galleryResponse = await organizationService.getOrganizationGallery(slug);
+        if (!galleryResponse.error) {
+          setGallery(galleryResponse.data.results || galleryResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
         toast({
           title: 'Error',
-          description: orgResponse.error,
+          description: 'Failed to load dashboard data',
           variant: 'destructive',
         });
-        router.push('/organization');
-        return;
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchDashboardData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
-      // Check if user is admin
-      if (!orgResponse.data.user_is_admin) {
-        toast({
-          title: 'Access Denied',
-          description: 'You do not have permission to access this dashboard.',
-          variant: 'destructive',
-        });
-        router.push(`/organization/${slug}`);
-        return;
-      }
-
-      setOrganization(orgResponse.data);
-
-      // Fetch stats
-      const statsResponse = await organizationService.getOrganizationStats(slug);
-      if (!statsResponse.error) {
-        setStats(statsResponse.data);
-      }
-
-      // Fetch members
-      const membersResponse = await organizationService.getOrganizationMembers(slug);
-      if (!membersResponse.error) {
-        setMembers(membersResponse.data.results || membersResponse.data);
-      }
-
-      // Fetch events
-      const eventsResponse = await organizationService.getOrganizationEvents(slug);
-      if (!eventsResponse.error) {
-        setEvents(eventsResponse.data.results || eventsResponse.data);
-      }
-
-      // Fetch gallery
-      const galleryResponse = await organizationService.getOrganizationGallery(slug);
-      if (!galleryResponse.error) {
-        setGallery(galleryResponse.data.results || galleryResponse.data);
-      }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load dashboard data',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddMember = async () => {
     if (!newMemberEmail.trim()) {
@@ -625,7 +626,7 @@ const OrganizationDashboard = ({ slug }) => {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Events</h2>
-              <p className="text-muted-foreground">Manage your organization's events</p>
+              <p className="text-muted-foreground">Manage your organization&apos;s events</p>
             </div>
             <Button asChild>
               <Link href="/event/create">
@@ -703,7 +704,7 @@ const OrganizationDashboard = ({ slug }) => {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Gallery</h2>
-              <p className="text-muted-foreground">Manage your organization's photo gallery</p>
+              <p className="text-muted-foreground">Manage your organization&apos;s photo gallery</p>
             </div>
             <Button onClick={() => setUploadGalleryOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
@@ -803,7 +804,7 @@ const OrganizationDashboard = ({ slug }) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Upload Gallery Images</DialogTitle>
-            <DialogDescription>Select images to upload to your organization's gallery</DialogDescription>
+            <DialogDescription>Select images to upload to your organization&apos;s gallery</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-2 mb-4">

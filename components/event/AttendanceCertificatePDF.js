@@ -203,6 +203,7 @@ const AttendanceCertificatePDF = ({ verification, qrCodeDataUrl }) => {
                 {/* 1. BRANDING HEADER */}
                 <View style={styles.header}>
                     <Image
+                    alt="logo"
                         src="https://gyanaangan.in/images/logo%20white.png"
                         style={styles.logo}
                     />
@@ -228,6 +229,7 @@ const AttendanceCertificatePDF = ({ verification, qrCodeDataUrl }) => {
                     <View style={styles.participantSection}>
                         {verification.user_details.profile_pic_url && (
                             <Image
+                            alt="Profile Image"
                                 src={verification.user_details.profile_pic_url}
                                 style={styles.profileImage}
                             />
@@ -248,6 +250,7 @@ const AttendanceCertificatePDF = ({ verification, qrCodeDataUrl }) => {
                                 <View style={styles.orgHeader}>
                                     {verification.event_details.organization_details.logo && (
                                         <Image
+                                        alt="Organization Logo"
                                             src={verification.event_details.organization_details.logo}
                                             style={styles.orgLogo}
                                         />
@@ -288,7 +291,7 @@ const AttendanceCertificatePDF = ({ verification, qrCodeDataUrl }) => {
                 {/* 4. FOOTER WITH BRANDING */}
                 <View style={styles.footer}>
                     {qrCodeDataUrl && (
-                        <Image src={qrCodeDataUrl} style={styles.qrCode} />
+                        <Image  alt="QR Code" src={qrCodeDataUrl} style={styles.qrCode} />
                     )}
                     <View style={styles.footerTextContainer}>
                         <Text style={styles.footerBranding}>Powered by GyanAangan</Text>

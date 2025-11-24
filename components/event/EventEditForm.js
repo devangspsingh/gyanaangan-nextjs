@@ -20,51 +20,52 @@ const EventEditForm = ({ slug }) => {
   const [hasPermission, setHasPermission] = useState(false);
 
   useEffect(() => {
-    if (!authLoading) {
-      fetchEvent();
-    }
-  }, [slug, authLoading]);
-
-  const fetchEvent = async () => {
-    setLoading(true);
-    try {
-      const response = await eventService.getEventBySlug(slug);
-      if (response.error) {
+    const fetchEvent = async () => {
+      setLoading(true);
+      try {
+        const response = await eventService.getEventBySlug(slug);
+        if (response.error) {
+          toast({
+            title: 'Error',
+            description: response.message || 'Failed to load event',
+            variant: 'destructive',
+          });
+          router.push('/event');
+          return;
+        }
+  
+        setEvent(response.data);
+  
+        // Check if user has permission to edit (must be admin of the organization)
+        if (!response.data.organization_details.user_is_admin) {
+          toast({
+            title: 'Access Denied',
+            description: 'You do not have permission to edit this event.',
+            variant: 'destructive',
+          });
+          router.push(`/event/${slug}`);
+          return;
+        }
+  
+        setHasPermission(true);
+      } catch (error) {
+        console.error('Error fetching event:', error);
         toast({
           title: 'Error',
-          description: response.message || 'Failed to load event',
+          description: 'Failed to load event data',
           variant: 'destructive',
         });
         router.push('/event');
-        return;
+      } finally {
+        setLoading(false);
       }
-
-      setEvent(response.data);
-
-      // Check if user has permission to edit (must be admin of the organization)
-      if (!response.data.organization_details.user_is_admin) {
-        toast({
-          title: 'Access Denied',
-          description: 'You do not have permission to edit this event.',
-          variant: 'destructive',
-        });
-        router.push(`/event/${slug}`);
-        return;
-      }
-
-      setHasPermission(true);
-    } catch (error) {
-      console.error('Error fetching event:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load event data',
-        variant: 'destructive',
-      });
-      router.push('/event');
-    } finally {
-      setLoading(false);
+    };
+    if (!authLoading) {
+      fetchEvent();
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, authLoading]);
+
 
   if (loading) {
     return (

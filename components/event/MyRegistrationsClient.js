@@ -33,8 +33,32 @@ const MyRegistrationsClient = () => {
     const [loading, setLoading] = useState(true);
     const [registrations, setRegistrations] = useState([]);
     const [activeTab, setActiveTab] = useState('upcoming');
-
+    
     useEffect(() => {
+        const fetchRegistrations = async () => {
+            setLoading(true);
+            try {
+                let response;
+                if (activeTab === 'upcoming') {
+                    response = await eventService.getMyUpcomingRegistrations();
+                } else if (activeTab === 'past') {
+                    response = await eventService.getMyPastRegistrations();
+                } else {
+                    response = await eventService.getMyRegistrations();
+                }
+    
+                if (response.error) {
+                    toast.error('Failed to load registrations');
+                } else {
+                    setRegistrations(response.data.results || response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching registrations:', error);
+                toast.error('An error occurred while loading registrations');
+            } finally {
+                setLoading(false);
+            }
+        };
         if (!authLoading) {
             if (!user) {
                 router.push('/login?redirect=/event/my-registrations');
@@ -42,32 +66,10 @@ const MyRegistrationsClient = () => {
             }
             fetchRegistrations();
         }
+        
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authLoading, user, activeTab]);
 
-    const fetchRegistrations = async () => {
-        setLoading(true);
-        try {
-            let response;
-            if (activeTab === 'upcoming') {
-                response = await eventService.getMyUpcomingRegistrations();
-            } else if (activeTab === 'past') {
-                response = await eventService.getMyPastRegistrations();
-            } else {
-                response = await eventService.getMyRegistrations();
-            }
-
-            if (response.error) {
-                toast.error('Failed to load registrations');
-            } else {
-                setRegistrations(response.data.results || response.data);
-            }
-        } catch (error) {
-            console.error('Error fetching registrations:', error);
-            toast.error('An error occurred while loading registrations');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const getStatusBadge = (status) => {
         switch (status) {
