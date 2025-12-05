@@ -350,6 +350,34 @@ const Footer = () => {
                   </Link>
                 </DropdownMenuItem>
 
+                {(user?.is_staff || user?.is_superuser) && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/admin"
+                        className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        <span>Admin</span>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="https://api.gyanaangan.in/admin"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        <span>Admin Old</span>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator className="bg-gray-800" />
+                  </>
+                )}
+
                 <DropdownMenuItem asChild>
                   <Link href="/event/my-registrations" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
                     <AcademicCapIcon className="w-4 h-4" />
