@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
-import { Home, FileText, Loader2 } from "lucide-react";
+import { Home, FileText, Loader2, BarChart2 } from "lucide-react";
 
 // Shadcn UI Components
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,6 +31,7 @@ import {
 
 const navigation = [
     { name: 'Dashboard', href: '/admin', icon: Home },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart2 },
     { name: 'Blog Posts', href: '/admin/blog', icon: FileText },
 ];
 
@@ -132,7 +133,7 @@ export default function AdminLayout({ children }) {
             {/* Use SidebarInset for proper margin handling */}
             <SidebarInset>
                 {/* Header (Sticky) */}
-                <header className="sticky top-0 z-20 flex h-16 flex-shrink-0 items-center gap-4 border-b border-border bg-background px-6">
+                <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-4 border-b border-border bg-background px-6">
                     <SidebarTrigger />
                     <h2 className="text-xl font-semibold">
                         Dashboard Admin

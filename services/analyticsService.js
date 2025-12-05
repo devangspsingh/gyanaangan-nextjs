@@ -13,13 +13,30 @@ let visitorIdPromise = null;
 const getVisitorId = () => {
     if (typeof window === 'undefined') return Promise.resolve(null);
 
+    // Helper to get/create a persistent random ID for this browser context (LocalStorage)
+    // This ensures Incognito vs Normal tabs have different IDs (because LS is not shared)
+    const getContextId = () => {
+        let contextId = localStorage.getItem('analytics_context_id');
+        if (!contextId) {
+            contextId = crypto.randomUUID ? crypto.randomUUID() : 'ctx_' + Date.now() + '_' + Math.random();
+            localStorage.setItem('analytics_context_id', contextId);
+        }
+        return contextId;
+    };
+
     if (!visitorIdPromise) {
         visitorIdPromise = FingerprintJS.load()
             .then(fp => fp.get())
-            .then(result => result.visitorId)
+            .then(result => {
+                const fpId = result.visitorId;
+                const ctxId = getContextId();
+                // Composite ID: Fingerprint + Context
+                return `${fpId}_${ctxId}`;
+            })
             .catch(error => {
                 console.error("Analytics: Failed to get visitor ID", error);
-                return 'unknown-visitor-' + Date.now(); // Fallback
+                const ctxId = getContextId();
+                return 'unknown_' + ctxId; // Fallback
             });
     }
     return visitorIdPromise;
@@ -28,39 +45,34 @@ const getVisitorId = () => {
 /**
  * Gathers detailed device/browser information.
  */
+import { UAParser } from 'ua-parser-js';
+
+/**
+ * Gathers detailed device/browser information.
+ */
 const getDeviceInfo = () => {
     if (typeof window === 'undefined') return {};
 
-    const ua = navigator.userAgent;
-    let os = "Unknown OS";
-    let browser = "Unknown Browser";
-
-    // Simple client-side parsing (can be enhanced or rely on backend parsing of UA)
-    if (ua.indexOf("Win") !== -1) os = "Windows";
-    else if (ua.indexOf("Mac") !== -1) os = "MacOS";
-    else if (ua.indexOf("Linux") !== -1) os = "Linux";
-    else if (ua.indexOf("Android") !== -1) os = "Android";
-    else if (ua.indexOf("like Mac") !== -1) os = "iOS";
-
-    if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
-    else if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
-    else if (ua.indexOf("Safari") !== -1) browser = "Safari";
-    else if (ua.indexOf("Edge") !== -1) browser = "Edge";
+    const parser = new UAParser();
+    const result = parser.getResult();
 
     return {
-        userAgent: ua,
-        language: navigator.language,
-        platform: navigator.platform,
+        userAgent: navigator.userAgent,
         screen: {
             width: window.screen.width,
             height: window.screen.height,
             colorDepth: window.screen.colorDepth,
         },
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        parsed_os: os,
-        parsed_browser: browser,
-        device_memory: navigator.deviceMemory,
-        hardware_concurrency: navigator.hardwareConcurrency,
+        // Detailed parsed info from UAParser
+        os_name: result.os.name,
+        os_version: result.os.version,
+        browser_name: result.browser.name,
+        browser_version: result.browser.version,
+        device_model: result.device.model,
+        device_type: result.device.type, // mobile, tablet, smarttv, wearable, embedded
+        device_vendor: result.device.vendor,
+        cpu_architecture: result.cpu.architecture,
     };
 };
 
