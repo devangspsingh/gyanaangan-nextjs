@@ -17,22 +17,34 @@ export default function LoginNudge() {
     const router = useRouter();
 
     useEffect(() => {
-        // Only show on resource pages (and handle exclusions implicity or explicitly if needed)
-        // User requested: "only on resource viewer page"
-        // if (loading || !pathname.includes('/resources')) {
-        //     return;
-        // }
-
-        if (isAuthenticated) return;
-
+        let isMounted = true;
         let timer = null;
 
-        const checkVisitorStatus = async () => {
+        const runCheck = async () => {
+            // 1. Wait for Auth Loading to complete
+            // If loading is true, we simply do nothing. 
+            // When loading becomes false, this effect will re-run (due to dependency).
+            if (loading) return;
+
+            // 2. If User is Authenticated, do nothing.
+            if (isAuthenticated) return;
+
+            // 3. Page Restriction check (only show on /resources)
+            if (!pathname.startsWith('/resources')) return;
+
             try {
                 const visitorId = await AnalyticsService.getVisitorId();
+                if (!isMounted) return; // Component unmounted or dependencies changed
                 if (!visitorId) return;
 
+                // Re-check auth state just in case it changed during await
+                // Note: We can't access live 'isAuthenticated' here easily without refs, 
+                // but 'isMounted' combined with dependency array handles most cases.
+                // If isAuthenticated becomes true, the effect cleanly unmounts (isMounted=false).
+
                 const response = await api.get(`/tracking/visitor-status/${visitorId}/`);
+                if (!isMounted) return;
+
                 const status = response.data.status;
 
                 if (status === 'block') {
@@ -46,30 +58,37 @@ export default function LoginNudge() {
                     return;
                 }
 
-                // allow
+                // allow: check session to avoid spam
                 if (sessionStorage.getItem('gyanaangan_nudge_shown')) return;
 
                 timer = setTimeout(() => {
-                    setOpen(true);
-                    setCanClose(true);
-                    sessionStorage.setItem('gyanaangan_nudge_shown', 'true');
+                    if (isMounted) {
+                        setOpen(true);
+                        setCanClose(true);
+                        sessionStorage.setItem('gyanaangan_nudge_shown', 'true');
+                    }
                 }, 10000);
+
             } catch (error) {
                 console.error('LoginNudge: Failed to check visitor status', error);
+                if (!isMounted) return;
 
+                // Fallback on error
                 if (sessionStorage.getItem('gyanaangan_nudge_shown')) return;
-
                 timer = setTimeout(() => {
-                    setOpen(true);
-                    setCanClose(true);
-                    sessionStorage.setItem('gyanaangan_nudge_shown', 'true');
+                    if (isMounted) {
+                        setOpen(true);
+                        setCanClose(true);
+                        sessionStorage.setItem('gyanaangan_nudge_shown', 'true');
+                    }
                 }, 10000);
             }
         };
 
-        checkVisitorStatus();
+        runCheck();
 
         return () => {
+            isMounted = false;
             if (timer) clearTimeout(timer);
         };
     }, [isAuthenticated, loading, pathname, router]);
