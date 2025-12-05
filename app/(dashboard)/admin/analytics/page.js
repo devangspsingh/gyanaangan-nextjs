@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import api_client from '@/lib/axiosInstance';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Users, Monitor, Globe, Smartphone, Activity, ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     useReactTable,
     getCoreRowModel,
@@ -54,14 +55,17 @@ export default function AnalyticsDashboard() {
                 <StatsCard title="Total Sessions" value={counts.total_sessions} icon={Globe} />
                 <StatsCard title="Total Events" value={counts.total_events} icon={Activity} />
                 <StatsCard title="Active Sessions" value={counts.active_sessions} icon={Monitor} description="Currently active" />
+                <StatsCard title="Unique IPs" value={counts.unique_ips} icon={Monitor} description="Distinct IP addresses" />
+                <StatsCard title="Unique Users" value={counts.unique_users} icon={Users} description="Authenticated users" />
             </div>
 
-            {/* Breakdown Charts (Tables for V1) */}
+            {/* ... (Breakdown Charts) ... */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <BreakdownCard title="Top Operating Systems" data={charts.os} icon={Monitor} dataKey="os" />
                 <BreakdownCard title="Top Browsers" data={charts.browser} icon={Globe} dataKey="browser" />
                 <BreakdownCard title="Device Types" data={charts.device} icon={Smartphone} dataKey="device_type" />
             </div>
+
 
             {/* Recent Activity Table using TanStack Table */}
             <h2 className="text-xl font-semibold tracking-tight pt-4">Activity Log</h2>
@@ -70,7 +74,6 @@ export default function AnalyticsDashboard() {
     );
 }
 
-// ... StatsCard and BreakdownCard components remain same ...
 function StatsCard({ title, value, icon: Icon, description }) {
     return (
         <Card>
@@ -111,7 +114,6 @@ function BreakdownCard({ title, data, icon: Icon, dataKey }) {
     );
 }
 
-
 function RecentActivityTable() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -123,6 +125,9 @@ function RecentActivityTable() {
     const [eventType, setEventType] = useState('');
     const [userStatus, setUserStatus] = useState('');
     const [visitorId, setVisitorId] = useState('');
+
+    // IP Dialog State
+    const [selectedIp, setSelectedIp] = useState(null);
 
     const fetchEvents = async () => {
         setLoading(true);
@@ -163,6 +168,7 @@ function RecentActivityTable() {
     }, [pagination.pageIndex, pagination.pageSize, search, eventType, userStatus, visitorId]);
 
 
+
     const columns = useMemo(() => [
         {
             accessorKey: 'event_type',
@@ -186,7 +192,17 @@ function RecentActivityTable() {
         {
             accessorKey: 'session.visitor.ip_address',
             header: 'IP Address',
-            cell: info => info.getValue() || 'N/A'
+            cell: info => {
+                const ip = info.getValue();
+                return ip ? (
+                    <button
+                        onClick={() => setSelectedIp(ip)}
+                        className="text-blue-500 hover:underline hover:text-blue-700 transition-colors text-left"
+                    >
+                        {ip}
+                    </button>
+                ) : 'N/A';
+            }
         },
         {
             accessorKey: 'timestamp',
@@ -204,8 +220,7 @@ function RecentActivityTable() {
         },
         onPaginationChange: setPagination,
         getCoreRowModel: getCoreRowModel(),
-        manualPagination: true, // Tell table we are handling pagination server-side
-        // debugTable: true,
+        manualPagination: true,
     });
 
     return (
@@ -218,12 +233,11 @@ function RecentActivityTable() {
                             <input
                                 placeholder="Search User, IP, URL..."
                                 value={search}
-                                onChange={e => { setSearch(e.target.value); setPagination(old => ({ ...old, pageIndex: 0 })); }} // Reset page on search
+                                onChange={e => { setSearch(e.target.value); setPagination(old => ({ ...old, pageIndex: 0 })); }}
                                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring pl-8"
                             />
                         </div>
                         <div className="relative w-[180px]">
-                            {/* <Filter className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /> */}
                             <select
                                 value={eventType}
                                 onChange={e => { setEventType(e.target.value); setPagination(old => ({ ...old, pageIndex: 0 })); }}
@@ -325,6 +339,76 @@ function RecentActivityTable() {
                     </div>
                 </div>
             </CardContent>
+
+            <IPDetailsDialog
+                ip={selectedIp}
+                open={!!selectedIp}
+                onOpenChange={(open) => !open && setSelectedIp(null)}
+            />
         </Card>
+    );
+}
+
+function IPDetailsDialog({ ip, open, onOpenChange }) {
+    const [details, setDetails] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (open && ip) {
+            setLoading(true);
+            setError(null);
+            setDetails(null);
+            // Using ipapi.co (free tier, rate limits apply)
+            fetch(`https://ipapi.co/${ip}/json/`)
+                .then(async res => {
+                    if (!res.ok) throw new Error("Failed to fetch IP details");
+                    return res.json();
+                })
+                .then(data => setDetails(data))
+                .catch(err => {
+                    console.error(err);
+                    setError("Could not load IP details.");
+                })
+                .finally(() => setLoading(false));
+        }
+    }, [open, ip]);
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>IP Information</DialogTitle>
+                    <DialogDescription>Details for {ip}</DialogDescription>
+                </DialogHeader>
+
+                {loading ? (
+                    <div className="flex justify-center p-4">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                ) : error ? (
+                    <div className="text-red-500 text-sm">{error}</div>
+                ) : details ? (
+                    <div className="space-y-2 text-sm">
+                        <div className="grid grid-cols-3 gap-2 border-b pb-2">
+                            <span className="font-medium">Location:</span>
+                            <span className="col-span-2">{details.city}, {details.region}, {details.country_name}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 border-b pb-2">
+                            <span className="font-medium">ISP:</span>
+                            <span className="col-span-2">{details.org}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 border-b pb-2">
+                            <span className="font-medium">Timezone:</span>
+                            <span className="col-span-2">{details.timezone}</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            <span className="font-medium">Coordinates:</span>
+                            <span className="col-span-2">{details.latitude}, {details.longitude}</span>
+                        </div>
+                    </div>
+                ) : null}
+            </DialogContent>
+        </Dialog>
     );
 }
