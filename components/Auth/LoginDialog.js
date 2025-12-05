@@ -16,7 +16,7 @@ const LoginDialogContentInner = ({ title, description, children, showBenefits, o
     // Applied your radial gradient class
     <div className={`rounded-3xl card-gradient-radial text-gray-100 ${isPage ? 'w-full max-w-[480px] mx-auto rounded-lg shadow-xl border border-stone-700' : ''}`}>
       <div className="px-4 py-8 md:p-8 sm:p-10">
-        
+
         {/* --- 1. Logo and Brand Name (Moved to top) --- */}
         <div className="mb-6 flex flex-col items-center content-center justify-center">
           <img
@@ -45,7 +45,7 @@ const LoginDialogContentInner = ({ title, description, children, showBenefits, o
         ) : (
           // Standard DialogHeader for modal view
           <DialogHeader className="text-center space-y-0">
-          <DialogTitle className="flex items-center justify-center text-3xl font-bold text-primary-second"> {/* Removed icon, adjusted style */}
+            <DialogTitle className="flex items-center justify-center text-3xl font-bold text-primary-second"> {/* Removed icon, adjusted style */}
               {title}
             </DialogTitle>
             {description && (
@@ -142,7 +142,22 @@ export default function LoginDialog({
   // If it's a modal, use the Dialog component
   return (
     <Dialog open={currentOpen} onOpenChange={currentOnOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-transparent border-none p-0">
+      <DialogContent
+        className={`bg-transparent border-none p-0 ${
+          // If forced, use typical modal size but ensure it cannot be closed interaction-wise (handled by onOpenChange)
+          // User requested "full screen non closeable". 
+          // We can make it larger or centered. Shadcn Dialog is already centered.
+          // Let's rely on the backdrop and removing close button.
+          // If purely full screen content is desired: "w-screen h-screen max-w-none rounded-none"
+          // usage: isForced ? "w-screen h-screen max-w-none rounded-none flex items-center justify-center" : "sm:max-w-[480px]"
+          // But looking at "LoginDialogContentInner", it has rounded corners. 
+          // Let's stick to the card design but make it very prominent.
+          "sm:max-w-[480px]"
+          }`}
+        // Hide close button if forced (requires Shadcn override or css)
+        // Usually [&>button]:hidden in regular css or class
+        hideCloseButton={controlledIsOpen === true && onOpenChange && !isPage} // Heuristic or pass explicit prop
+      >
         {/* DialogContent is made transparent, actual styling is in LoginDialogContentInner */}
         <LoginDialogContentInner
           title={title}

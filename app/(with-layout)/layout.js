@@ -22,6 +22,7 @@ import Script from 'next/script';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
 import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
+import LoginNudge from '@/components/Auth/LoginNudge'; // Import LoginNudge
 
 export default function RootLayout({ children }) {
   return (
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
         <Providers>
           <DynamicBackground /> {/* Use the client component for dynamic background */}
           <AnalyticsTracker />
+          <LoginNudge />
           <Header />
           {/* <GoogleAdSense publisherId="ca-pub-3792754105959046" /> */}
           {/* <AdSenseComponent/> */}
