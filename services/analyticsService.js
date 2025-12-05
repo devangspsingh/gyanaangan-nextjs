@@ -113,12 +113,28 @@ export const trackEvent = async (eventType, metadata = {}, targetResource = '') 
             encoded_info: encodedDeviceInfo // Sending encoded info
         };
 
+        // Prepare headers
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+
+        // Attempt to get the access token from localStorage (mimicking axiosInstance logic)
+        try {
+            const storedTokens = localStorage.getItem('tokens');
+            if (storedTokens) {
+                const { access } = JSON.parse(storedTokens);
+                if (access) {
+                    headers['Authorization'] = `Bearer ${access}`;
+                }
+            }
+        } catch (e) {
+            console.error("Analytics: Failed to get auth token", e);
+        }
+
         // Use fetch with keepalive and credentials
         await fetch(TRACKING_ENDPOINT, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: headers,
             body: JSON.stringify(payload),
             keepalive: true,
             credentials: 'include'
