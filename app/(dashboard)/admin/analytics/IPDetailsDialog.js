@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import api_client from '@/lib/axiosInstance';
-import { Loader2, Globe, Monitor } from 'lucide-react';
+import { Loader2, Globe, Monitor, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
@@ -77,6 +77,25 @@ export default function IPDetailsDialog({ visitor, open, onOpenChange }) {
                 </DialogHeader>
 
                 <div className="space-y-6">
+                    {/* User Info Section */}
+                    {visitorDetails?.last_user && (
+                        <div className="p-4 rounded-md border bg-blue-50/50 dark:bg-blue-900/10 space-y-3">
+                            <h4 className="text-sm font-semibold flex items-center gap-2">
+                                <Users className="h-4 w-4" /> Associated User
+                            </h4>
+                            <div className="text-sm space-y-1">
+                                <div className="grid grid-cols-3 gap-2">
+                                    <span className="font-medium">Name:</span>
+                                    <span className="col-span-2">{visitorDetails.last_user.name}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <span className="font-medium">Email:</span>
+                                    <span className="col-span-2">{visitorDetails.last_user.email}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Access Control Section */}
                     {visitorDetails && (
                         <div className="p-4 rounded-md border bg-muted/30 space-y-3">

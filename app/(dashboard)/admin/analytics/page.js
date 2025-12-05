@@ -1,28 +1,54 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import api_client from '@/lib/axiosInstance';
-import { Loader2, Users, Monitor, Globe, Smartphone, Activity, ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+// import { api_client } from '@/lib/api_client';
 import {
     useReactTable,
     getCoreRowModel,
     flexRender,
 } from '@tanstack/react-table';
+import { Loader2, Users, Monitor, Globe, Smartphone, Activity, ChevronLeft, ChevronRight, Search, RefreshCw, Filter } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import IPDetailsDialog from './IPDetailsDialog';
-import Link from 'next/link';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import toast from 'react-hot-toast';
+import api from '@/lib/axiosInstance';
 
 export default function AnalyticsDashboard() {
     const [data, setData] = useState(null);
+    const [activitySeries, setActivitySeries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Chart Filters
+    const [chartFilters, setChartFilters] = useState({
+        isActive: false,
+        authenticated: false,
+        path: ''
+    });
 
     const fetchAnalytics = async () => {
         setLoading(true);
         try {
-            const response = await api_client.get('/tracking/dashboard-stats/');
-            setData(response.data);
+            const params = new URLSearchParams();
+            params.append('minutes', '30');
+            if (chartFilters.isActive) params.append('is_active', 'true');
+            if (chartFilters.authenticated) params.append('authenticated', 'true');
+            if (chartFilters.path) params.append('path', chartFilters.path);
+
+            const [statsRes, seriesRes] = await Promise.all([
+                api.get('/tracking/dashboard-stats/'),
+                api.get(`/tracking/dashboard-activity-series/?${params.toString()}`)
+            ]);
+            setData(statsRes.data);
+            setActivitySeries(seriesRes.data.map(item => ({
+                ...item,
+                time: new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            })));
         } catch (err) {
             console.error("Failed to fetch analytics:", err);
             setError("Failed to load analytics data.");
@@ -31,14 +57,41 @@ export default function AnalyticsDashboard() {
         }
     };
 
+    // Separate fetch for just chart update (faster, less disruptive)
+    const refreshChart = async () => {
+        try {
+            const params = new URLSearchParams();
+            params.append('minutes', '30');
+            if (chartFilters.isActive) params.append('is_active', 'true');
+            if (chartFilters.authenticated) params.append('authenticated', 'true');
+            if (chartFilters.path) params.append('path', chartFilters.path);
+
+            const seriesRes = await api.get(`/tracking/dashboard-activity-series/?${params.toString()}`);
+            setActivitySeries(seriesRes.data.map(item => ({
+                ...item,
+                time: new Date(item.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            })));
+            toast.success("Chart updated");
+        } catch (err) {
+            console.error("Failed to refresh chart:", err);
+        }
+    }
+
     useEffect(() => {
         fetchAnalytics();
-    }, []);
+
+        // Poll for live data every 30 seconds
+        const interval = setInterval(() => {
+            // We can just refresh chart to be lighter
+            refreshChart();
+        }, 30000);
+        return () => clearInterval(interval);
+    }, [chartFilters]);
 
     if (loading && !data) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="flex items-center justify-center h-screen">
+                <Loader2 className="h-8 w-8 animate-spin" />
             </div>
         );
     }
@@ -73,6 +126,91 @@ export default function AnalyticsDashboard() {
                 <StatsCard title="Unique IPs" value={counts.unique_ips} icon={Monitor} description="Distinct IP addresses" />
                 <StatsCard title="Unique Users" value={counts.unique_users} icon={Users} description="Authenticated users" />
             </div>
+
+            {/* Live Activity Chart */}
+            <Card className="col-span-4">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle>Live Activity (Last 30 Minutes)</CardTitle>
+                    <Button variant="ghost" size="icon" onClick={refreshChart} title="Refresh Chart">
+                        <RefreshCw className="h-4 w-4" />
+                    </Button>
+                </CardHeader>
+                <CardContent className="pl-2">
+                    <div className="h-[200px] w-full mb-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={activitySeries}>
+                                <defs>
+                                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                                <XAxis
+                                    dataKey="time"
+                                    stroke="#888888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                    axisLine={false}
+                                />
+                                <YAxis
+                                    stroke="#888888"
+                                    fontSize={12}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(value) => `${value}`}
+                                />
+                                <RechartsTooltip
+                                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
+                                    itemStyle={{ color: 'hsl(var(--foreground))' }}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="count"
+                                    stroke="#8884d8"
+                                    fillOpacity={1}
+                                    fill="url(#colorCount)"
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* Filters Control Bar */}
+                    <div className="flex flex-col sm:flex-row gap-4 border-t pt-4 items-center">
+                        <div className="flex items-center gap-2">
+                            <Filter className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Filters:</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Switch
+                                id="active-mode"
+                                checked={chartFilters.isActive}
+                                onCheckedChange={(c) => setChartFilters(prev => ({ ...prev, isActive: c }))}
+                            />
+                            <Label htmlFor="active-mode" className="text-sm">Live Sessions Only</Label>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Switch
+                                id="auth-mode"
+                                checked={chartFilters.authenticated}
+                                onCheckedChange={(c) => setChartFilters(prev => ({ ...prev, authenticated: c }))}
+                            />
+                            <Label htmlFor="auth-mode" className="text-sm">Logged In Only</Label>
+                        </div>
+
+                        <div className="flex-1 max-w-sm">
+                            <input
+                                placeholder="Filter by Page Path..."
+                                value={chartFilters.path}
+                                onChange={e => setChartFilters(prev => ({ ...prev, path: e.target.value }))}
+                                className="flex h-8 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Breakdown Charts */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -163,7 +301,7 @@ function RecentActivityTable() {
 
             if (visitorId) params.append('session__visitor__visitor_id', visitorId);
 
-            const response = await api_client.get(`/tracking/dashboard/events/?${params.toString()}`);
+            const response = await api.get(`/tracking/dashboard/events/?${params.toString()}`);
             setData(response.data.results);
             setRowCount(response.data.count); // Total count for pagination
         } catch (err) {

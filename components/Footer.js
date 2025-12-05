@@ -163,8 +163,8 @@ const Footer = () => {
 
       const iconElement = (
         <div key={item.label} className="relative">
-          <Icon className="w-6 h-6" /> 
-          {item.showIndicator && ( 
+          <Icon className="w-6 h-6" />
+          {item.showIndicator && (
             <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary ring-1 ring-offset-1 ring-offset-current ring-gray-900" />
           )}
         </div>
@@ -174,14 +174,14 @@ const Footer = () => {
         return (
           <Link href={item.href} {...commonProps} key={listItemKey}>
             {iconElement}
-            {isDesktop && <span key={item.label+2} className="mt-1 text-xs">{item.label}</span>} 
+            {isDesktop && <span key={item.label + 2} className="mt-1 text-xs">{item.label}</span>}
           </Link>
         );
       }
       return (
-        <button type="button" {...commonProps} key={listItemKey+1}>
+        <button type="button" {...commonProps} key={listItemKey + 1}>
           {iconElement}
-          {isDesktop && <span key={item.label+4} className="mt-1 text-xs">{item.label}</span>}
+          {isDesktop && <span key={item.label + 4} className="mt-1 text-xs">{item.label}</span>}
         </button>
       );
     });
@@ -201,7 +201,7 @@ const Footer = () => {
 
   // Shared Profile Button UI to reuse in both Mobile/Desktop triggers
   const ProfileButtonContent = ({ isDesktop }) => (
-    <div 
+    <div
       className={cn(
         "relative flex flex-col items-center p-2 rounded-md transition-colors cursor-pointer",
         isProfileActive ? "text-primary" : "text-gray-400 hover:text-primary-light",
@@ -246,7 +246,7 @@ const Footer = () => {
       {/* Mobile Bottom Bar */}
       <footer className="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur-md border-t border-gray-700/50 text-white flex justify-around items-center p-2 shadow-lg md:hidden z-40">
         {renderNavItems(false)}
-        
+
         {/* Mobile Profile Button with Shadcn Dropdown */}
         {isAuthenticated ? (
           <DropdownMenu>
@@ -263,21 +263,49 @@ const Footer = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-800" />
-              
+
               <DropdownMenuItem asChild>
                 <Link href="/profile" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
                   <UserIcon className="w-4 h-4" />
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
-              
+
+              {(user?.is_staff || user?.is_superuser) && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/admin"
+                      className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white"
+                    >
+                      <UserIcon className="w-4 h-4" />
+                      <span>Admin</span>
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="https://api.gyanaangan.in/admin"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white"
+                    >
+                      <UserIcon className="w-4 h-4" />
+                      <span>Admin Old</span>
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="bg-gray-800" />
+                </>
+              )}
+
               <DropdownMenuItem asChild>
                 <Link href="/event/my-registrations" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
                   <AcademicCapIcon className="w-4 h-4" />
                   <span>My Events (Beta)</span>
                 </Link>
               </DropdownMenuItem>
-              
+
               <DropdownMenuSeparator className="bg-gray-800" />
               {/* <DropdownMenuItem onClick={logout} className="text-red-400 focus:text-red-300 focus:bg-gray-800 cursor-pointer">
                 Log out
@@ -286,7 +314,7 @@ const Footer = () => {
           </DropdownMenu>
         ) : (
           <button onClick={handleProfileClick}>
-             <ProfileButtonContent isDesktop={false} />
+            <ProfileButtonContent isDesktop={false} />
           </button>
         )}
       </footer>
@@ -296,8 +324,8 @@ const Footer = () => {
         <div className="flex flex-col items-center space-y-4 w-full">
           {renderNavItems(true)}
         </div>
-        
-        <div className="mt-auto mb-4 w-full flex justify-center"> 
+
+        <div className="mt-auto mb-4 w-full flex justify-center">
           {/* Desktop Profile Button with Shadcn Dropdown */}
           {isAuthenticated ? (
             <DropdownMenu>
@@ -314,21 +342,21 @@ const Footer = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-800" />
-                
+
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
                     <UserIcon className="w-4 h-4" />
                     <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
-                
+
                 <DropdownMenuItem asChild>
                   <Link href="/event/my-registrations" className="cursor-pointer flex items-center gap-2 focus:bg-gray-800 focus:text-white">
                     <AcademicCapIcon className="w-4 h-4" />
                     <span>My Registrations</span>
                   </Link>
                 </DropdownMenuItem>
-                
+
                 <DropdownMenuSeparator className="bg-gray-800" />
                 <DropdownMenuItem onClick={logout} className="text-red-400 focus:text-red-300 focus:bg-gray-800 cursor-pointer">
                   Log out
@@ -337,7 +365,7 @@ const Footer = () => {
             </DropdownMenu>
           ) : (
             <button onClick={handleProfileClick} className="w-full">
-               <ProfileButtonContent isDesktop={true} />
+              <ProfileButtonContent isDesktop={true} />
             </button>
           )}
         </div>
