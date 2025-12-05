@@ -29,8 +29,8 @@ export default function LoginNudge() {
             // 2. If User is Authenticated, do nothing.
             if (isAuthenticated) return;
 
-            // 3. Page Restriction check (only show on /resources)
-            if (!pathname.startsWith('/resources')) return;
+            // 3. Page Restriction check (dont show on blog)
+            if (pathname.startsWith('/blog')) return;
 
             try {
                 const visitorId = await AnalyticsService.getVisitorId();
@@ -67,7 +67,7 @@ export default function LoginNudge() {
                         setCanClose(true);
                         sessionStorage.setItem('gyanaangan_nudge_shown', 'true');
                     }
-                }, 10000);
+                }, 7000);
 
             } catch (error) {
                 console.error('LoginNudge: Failed to check visitor status', error);
@@ -81,7 +81,7 @@ export default function LoginNudge() {
                         setCanClose(true);
                         sessionStorage.setItem('gyanaangan_nudge_shown', 'true');
                     }
-                }, 10000);
+                }, 7000);
             }
         };
 

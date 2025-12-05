@@ -17,7 +17,7 @@ export default function AccessDenied() {
                 </p>
                 <div className="pt-4">
                     <Button asChild variant="outline">
-                        <Link href="mailto:support@gyanaangan.in">Contact Support</Link>
+                        <Link href="mailto:gyanaangan.in@gmail.com">Contact Support</Link>
                     </Button>
                 </div>
             </div>
