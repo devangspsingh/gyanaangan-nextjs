@@ -273,7 +273,7 @@ function RecentActivityTable() {
                 </div>
             </CardHeader>
             <CardContent className="p-0">
-                <div className="rounded-md border">
+                <div className="rounded-md border overflow-x-scroll">
                     <table className="w-full caption-bottom text-sm text-left">
                         <thead className="[&_tr]:border-b">
                             {table.getHeaderGroups().map(headerGroup => (
@@ -376,7 +376,7 @@ function IPDetailsDialog({ ip, open, onOpenChange }) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>IP Information</DialogTitle>
                     <DialogDescription>Details for {ip}</DialogDescription>
@@ -389,22 +389,36 @@ function IPDetailsDialog({ ip, open, onOpenChange }) {
                 ) : error ? (
                     <div className="text-red-500 text-sm">{error}</div>
                 ) : details ? (
-                    <div className="space-y-2 text-sm">
-                        <div className="grid grid-cols-3 gap-2 border-b pb-2">
-                            <span className="font-medium">Location:</span>
-                            <span className="col-span-2">{details.city}, {details.region}, {details.country_name}</span>
+                    <div className="space-y-4 text-sm">
+                        <div className="space-y-2">
+                            <div className="grid grid-cols-3 gap-2 border-b pb-2">
+                                <span className="font-medium">Location:</span>
+                                <span className="col-span-2">{details.city}, {details.region}, {details.country_name}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 border-b pb-2">
+                                <span className="font-medium">ISP:</span>
+                                <span className="col-span-2">{details.org}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 border-b pb-2">
+                                <span className="font-medium">Timezone:</span>
+                                <span className="col-span-2">{details.timezone}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                <span className="font-medium">Coordinates:</span>
+                                <span className="col-span-2">{details.latitude}, {details.longitude}</span>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 border-b pb-2">
-                            <span className="font-medium">ISP:</span>
-                            <span className="col-span-2">{details.org}</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2 border-b pb-2">
-                            <span className="font-medium">Timezone:</span>
-                            <span className="col-span-2">{details.timezone}</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                            <span className="font-medium">Coordinates:</span>
-                            <span className="col-span-2">{details.latitude}, {details.longitude}</span>
+
+                        {/* Google Maps Embed */}
+                        <div className="rounded-md overflow-hidden border">
+                            <iframe
+                                width="100%"
+                                height="200"
+                                style={{ border: 0 }}
+                                loading="lazy"
+                                allowFullScreen
+                                src={`https://maps.google.com/maps?q=${details.latitude},${details.longitude}&z=13&ie=UTF8&iwloc=&output=embed`}
+                            ></iframe>
                         </div>
                     </div>
                 ) : null}
