@@ -63,7 +63,7 @@ const PageSkeleton = () => (
 );
 
 async function ResourcesPageDataFetcher({ searchParams }) {
-  const {q,type} = await searchParams
+  const { q, type } = await searchParams
   const initialPage = 1;
   const filterParams = {
     search: searchParams?.q || '',
@@ -74,26 +74,26 @@ async function ResourcesPageDataFetcher({ searchParams }) {
   if (!filterParams.search) delete filterParams.search;
   if (!filterParams.resource_type) delete filterParams.resource_type;
 
-  console.log('📄 [ResourcesPage] Fetching with params:', filterParams);
+  // console.log('📄 [ResourcesPage] Fetching with params:', filterParams);
 
   // Use server-side API with authentication
   const resourcesResponse = await getResourcesServerSide(initialPage, PAGE_SIZE, filterParams);
 
-  console.log('📄 [ResourcesPage] Response:', {
-    error: resourcesResponse.error,
-    status: resourcesResponse.status,
-    resultsCount: resourcesResponse.data?.results?.length
-  });
+  // console.log('📄 [ResourcesPage] Response:', {
+  //   error: resourcesResponse.error,
+  //   status: resourcesResponse.status,
+  //   resultsCount: resourcesResponse.data?.results?.length
+  // });
 
   if (resourcesResponse.error) {
     console.error("📄 [ResourcesPage] Failed to load initial resources:", resourcesResponse.data);
     return (
-        <ResourcesListClient 
-            initialResources={[]} 
-            initialHasNextPage={false} 
-            initialTotalPages={0}
-            initialFilterParams={filterParams}
-        />
+      <ResourcesListClient
+        initialResources={[]}
+        initialHasNextPage={false}
+        initialTotalPages={0}
+        initialFilterParams={filterParams}
+      />
     );
   }
 
@@ -101,18 +101,18 @@ async function ResourcesPageDataFetcher({ searchParams }) {
   const initialHasNextPage = !!resourcesResponse.data?.next;
   const initialTotalPages = Math.ceil((resourcesResponse.data?.count || 0) / PAGE_SIZE);
 
-  console.log('📄 [ResourcesPage] Rendering with', initialResources.length, 'resources');
-  if (initialResources.length > 0) {
-    console.log('📄 [ResourcesPage] First resource:', {
-      id: initialResources[0].id,
-      name: initialResources[0].name,
-      is_saved: initialResources[0].is_saved
-    });
-  }
+  // console.log('📄 [ResourcesPage] Rendering with', initialResources.length, 'resources');
+  // if (initialResources.length > 0) {
+  //   console.log('📄 [ResourcesPage] First resource:', {
+  //     id: initialResources[0].id,
+  //     name: initialResources[0].name,
+  //     is_saved: initialResources[0].is_saved
+  //   });
+  // }
 
   return (
-    <ResourcesListClient 
-      initialResources={initialResources} 
+    <ResourcesListClient
+      initialResources={initialResources}
       initialHasNextPage={initialHasNextPage}
       initialTotalPages={initialTotalPages}
       initialFilterParams={filterParams}

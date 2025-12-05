@@ -22,8 +22,7 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 
 export async function generateMetadata({ params }) {
-  console.log('📄 [Resource Page /resources/[slug]] Generating metadata for:', params);
-  
+
   const { slug } = params;
   const resourceResponse = await getResourceBySlugServerSide(slug);
 
@@ -31,11 +30,11 @@ export async function generateMetadata({ params }) {
     const resource = resourceResponse.data;
     const pageTitle = resource.name ? `${resource.name} - ${SITE_NAME}` : `Resource Details - ${SITE_NAME}`;
     const pageDescription = resource.meta_description || resource.description || `Details for resource: ${resource.name} on ${SITE_NAME}.`;
-    
+
     // Generate dynamic OG image URL
-    const ogImageUrl = resource.og_image_url || 
+    const ogImageUrl = resource.og_image_url ||
       `${SITE_URL}/api/og?title=${encodeURIComponent(resource.name || 'Resource')}&description=${encodeURIComponent(pageDescription.slice(0, 150))}&type=resource`;
-    
+
     const canonicalUrl = `${SITE_URL}/resources/${slug}`;
 
     return {
@@ -68,19 +67,14 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ResourceDetailPageServer({ params }) {
-  console.log('📄 [Resource Page /resources/[slug]] Fetching data for:', params);
-  
+
   const { slug } = params;
 
   try {
     // Fetch resource using server-side API with authentication
     const resourceResponse = await getResourceBySlugServerSide(slug);
 
-    console.log('📄 [Resource Page /resources/[slug]] Response:', {
-      error: resourceResponse.error,
-      status: resourceResponse.status,
-      hasData: !!resourceResponse.data
-    });
+
 
     // Handle resource error
     if (resourceResponse.error || !resourceResponse.data) {
@@ -190,7 +184,7 @@ export default async function ResourceDetailPageServer({ params }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 xl:col-span-9">
             <Viewer resource={resource} />
-            
+
             {resource.description && (
               <section className="mt-8 rounded-lg shadow">
                 <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
@@ -222,7 +216,7 @@ export default async function ResourceDetailPageServer({ params }) {
                 </div>
               </section>
             )}
-            
+
             <AdContainer>
               <AdUnit />
             </AdContainer>
@@ -230,7 +224,7 @@ export default async function ResourceDetailPageServer({ params }) {
 
           <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
             <ResourceActionsClient resource={resource} />
-            
+
             {resource.tags && resource.tags.length > 0 && (
               <div className="p-6 bg-stone-800 rounded-lg shadow">
                 <h3 className="text-lg font-semibold text-white mb-4">Tags</h3>

@@ -108,7 +108,7 @@ export default function AdminLayout({ children }) {
         if (!loading && !user) {
             router.push('/login?redirect=/admin');
         } else if (!loading && user && !user.is_staff) {
-            console.log(user);
+            // console.log(user);
             router.push('/');
         }
     }, [user, loading, router]);

@@ -12,6 +12,8 @@ import api_client from '@/lib/axiosInstance';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
+import { trackEvent } from '@/services/analyticsService';
+
 export default function ResourceActionsClient({ resource }) {
   const { isAuthenticated, login: setAuthState } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
@@ -65,9 +67,16 @@ export default function ResourceActionsClient({ resource }) {
       toast.error('Please login to download resources');
       return;
     }
-    
+
     // If authenticated, open the download URL
     if (resource?.download_url) {
+      // Track the download event
+      trackEvent('download', {
+        resource_name: resource.name,
+        resource_type: resource.resource_type,
+        resource_slug: resource.slug
+      }, resource.slug);
+
       window.open(resource.download_url, '_blank');
     }
   };
@@ -123,16 +132,16 @@ export default function ResourceActionsClient({ resource }) {
           </Button>
           {console.log(resource)}
           {resource?.privacy?.includes('download') && (
-            <Button 
+            <Button
               onClick={handleDownload}
-              variant="outline" 
+              variant="outline"
               className="w-full justify-start text-gray-200 hover:bg-stone-700 border-stone-600"
             >
               <DownloadIconHero className="w-5 h-5 mr-2" />
               Download
             </Button>
           )}
-          
+
           <Button
             onClick={handleShare}
             variant="outline"

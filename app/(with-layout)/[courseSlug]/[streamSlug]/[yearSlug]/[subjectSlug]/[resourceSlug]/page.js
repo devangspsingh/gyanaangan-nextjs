@@ -22,21 +22,21 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 
 export async function generateMetadata({ params }) {
-  console.log('📄 [Resource Page] Generating metadata for:', params);
-  
+  // console.log('📄 [Resource Page] Generating metadata for:', params);
+
   const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = params;
-  
+
   const resourceResponse = await getResourceBySlugServerSide(resourceSlug);
 
   if (!resourceResponse.error && resourceResponse.data) {
     const resource = resourceResponse.data;
     const pageTitle = resource.name ? `${resource.name} - ${resource.subject_name || subjectSlug} - ${SITE_NAME}` : `Resource - ${SITE_NAME}`;
     const pageDescription = resource.meta_description || resource.description || `View resource ${resource.name} on ${SITE_NAME}.`;
-    
+
     // Generate dynamic OG image URL
-    const ogImageUrl = resource.og_image_url || 
+    const ogImageUrl = resource.og_image_url ||
       `${SITE_URL}/api/og?title=${encodeURIComponent(resource.name || 'Resource')}&description=${encodeURIComponent(pageDescription.slice(0, 150))}&type=resource`;
-    
+
     const canonicalUrl = `${SITE_URL}/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}/${resourceSlug}`;
 
     return {
@@ -69,8 +69,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function NestedResourceDetailPage({ params }) {
-  console.log('📄 [Resource Page] Fetching data for:', params);
-  
+  // console.log('📄 [Resource Page] Fetching data for:', params);
+
   const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = params;
 
   try {
@@ -80,16 +80,16 @@ export default async function NestedResourceDetailPage({ params }) {
       getSpecialPageData(courseSlug, streamSlug, yearSlug)
     ]);
 
-    console.log('📄 [Resource Page] Responses received:', {
-      resource: resourceResponse.error ? 'Error' : 'Success',
-      parentData: parentDataResponse.error ? 'Error' : 'Success'
-    });
+    // console.log('📄 [Resource Page] Responses received:', {
+    //   resource: resourceResponse.error ? 'Error' : 'Success',
+    //   parentData: parentDataResponse.error ? 'Error' : 'Success'
+    // });
 
     // Handle resource error
     if (resourceResponse.error || !resourceResponse.data) {
       const errorMessage = resourceResponse.data?.detail || 'Failed to load resource.';
       console.error('❌ [Resource Page] Failed to load resource:', errorMessage);
-      
+
       const displayErrorParentData = parentDataResponse.data || {
         course: { name: courseSlug || "Course", slug: courseSlug },
         stream: { name: streamSlug || "Stream", slug: streamSlug },
@@ -134,10 +134,10 @@ export default async function NestedResourceDetailPage({ params }) {
       }
     }
 
-    console.log('✅ [Resource Page] Data loaded successfully:', {
-      resourceName: resource.name,
-      relatedResourcesCount: relatedResources.length
-    });
+    // console.log('✅ [Resource Page] Data loaded successfully:', {
+    //   resourceName: resource.name,
+    //   relatedResourcesCount: relatedResources.length
+    // });
 
     // Handle parent data
     const displayParentData = parentDataResponse.data || {
@@ -189,7 +189,7 @@ export default async function NestedResourceDetailPage({ params }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 xl:col-span-9">
             <Viewer resource={resource} />
-            
+
             {resource.description && (
               <section className="mt-8 rounded-lg shadow">
                 <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
@@ -216,7 +216,7 @@ export default async function NestedResourceDetailPage({ params }) {
                 </div>
               </section>
             )}
-            
+
             <AdContainer>
               <AdUnit />
             </AdContainer>
@@ -224,7 +224,7 @@ export default async function NestedResourceDetailPage({ params }) {
 
           <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
             <ResourceActionsClient resource={resource} />
-            
+
             {resource.tags && resource.tags.length > 0 && (
               <div className="p-6 bg-stone-800 rounded-lg shadow">
                 <h3 className="text-lg font-semibold text-white mb-4">Tags</h3>

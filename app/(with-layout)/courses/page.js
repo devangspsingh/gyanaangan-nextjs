@@ -38,7 +38,7 @@ export default async function CoursesPage({ searchParams }) {
   const page = Number(searchParams?.page) || 1;
   const pageSize = 9;
 
-  console.log('📄 [CoursesPage] Fetching courses for page:', page);
+  // console.log('📄 [CoursesPage] Fetching courses for page:', page);
 
   const response = await getCourses(page, pageSize);
 
@@ -61,7 +61,7 @@ export default async function CoursesPage({ searchParams }) {
   const totalCount = response.data?.count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  console.log('📄 [CoursesPage] Loaded', courses.length, 'courses, total pages:', totalPages);
+  // console.log('📄 [CoursesPage] Loaded', courses.length, 'courses, total pages:', totalPages);
 
   return (
     <div className="container mx-auto py-8 px-4 text-gray-100">
@@ -82,9 +82,8 @@ export default async function CoursesPage({ searchParams }) {
             <div className="mt-12 flex justify-center items-center space-x-4">
               <Link
                 href={`/courses?page=${page - 1}`}
-                className={`px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md ${
-                  page === 1 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
-                }`}
+                className={`px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md ${page === 1 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                  }`}
                 aria-disabled={page === 1}
               >
                 Previous
@@ -92,9 +91,8 @@ export default async function CoursesPage({ searchParams }) {
               <span className="text-gray-300">Page {page} of {totalPages}</span>
               <Link
                 href={`/courses?page=${page + 1}`}
-                className={`px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md ${
-                  page === totalPages ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
-                }`}
+                className={`px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md ${page === totalPages ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                  }`}
                 aria-disabled={page === totalPages}
               >
                 Next

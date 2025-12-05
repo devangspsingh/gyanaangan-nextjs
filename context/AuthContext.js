@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
           // Ensure cookie is also set (in case it was cleared but localStorage persists)
           document.cookie = `access_token=${currentAccessToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-          console.log('🍪 [Init] Cookie synced from localStorage');
+          // console.log('🍪 [Init] Cookie synced from localStorage');
 
           // Fetch fresh user profile data from API
           try {
@@ -61,14 +61,14 @@ export const AuthProvider = ({ children }) => {
 
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
-            console.log('✅ [Init] User profile fetched from API');
+            // console.log('✅ [Init] User profile fetched from API');
           } catch (profileError) {
             console.error('❌ [Init] Failed to fetch user profile:', profileError);
             // If profile fetch fails, try to use stored user data as fallback
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
               setUser(JSON.parse(storedUser));
-              console.log('⚠️ [Init] Using cached user data');
+              // console.log('⚠️ [Init] Using cached user data');
             } else {
               // If no cached user, we might want to clear auth or just stay logged in with token only
               // For now, let's keep the token but maybe retry later?
@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }) => {
 
     // ALSO store access token in cookie (for server-side)
     document.cookie = `access_token=${access}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-    console.log('🍪 [Login] Cookie set:', `access_token=${access.substring(0, 20)}...`);
+    // console.log('🍪 [Login] Cookie set:', `access_token=${access.substring(0, 20)}...`);
 
     setTokens({ access, refresh });
     api.defaults.headers.Authorization = `Bearer ${access}`;
@@ -172,7 +172,7 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('user', JSON.stringify(freshUserData));
       setUser(freshUserData);
-      console.log('✅ [Login] User profile fetched from API');
+      // console.log('✅ [Login] User profile fetched from API');
     } catch (error) {
       console.error('❌ [Login] Failed to fetch profile, using login data:', error);
       // Fallback to login response data
@@ -210,7 +210,7 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
-      console.log('✅ [RefreshProfile] User profile refreshed');
+      // console.log('✅ [RefreshProfile] User profile refreshed');
       return userData;
     } catch (error) {
       console.error('❌ [RefreshProfile] Failed to refresh profile:', error);
@@ -224,7 +224,7 @@ export const AuthProvider = ({ children }) => {
 
     // ALSO remove the cookie
     document.cookie = 'access_token=; path=/; max-age=0';
-    console.log('🍪 [Logout] Cookie cleared');
+    // console.log('🍪 [Logout] Cookie cleared');
 
     setUser(null);
     setTokens(null);

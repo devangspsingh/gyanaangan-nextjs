@@ -25,7 +25,7 @@ export default function CategoriesManagementPage() {
       const data = await getCategories();
       // Handle paginated response - extract results array
       const categoriesArray = data.results || data;
-      console.log('Categories:', categoriesArray);
+      // console.log('Categories:', categoriesArray);
       setCategories(categoriesArray);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -62,7 +62,7 @@ export default function CategoriesManagementPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingCategory) {
         await updateCategory(editingCategory.slug, formData);
@@ -71,7 +71,7 @@ export default function CategoriesManagementPage() {
         await createCategory(formData);
         alert('Category created successfully!');
       }
-      
+
       handleCloseModal();
       fetchCategories();
     } catch (error) {

@@ -21,8 +21,7 @@ import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
-
-
+import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
 
 export default function RootLayout({ children }) {
   return (
@@ -44,6 +43,7 @@ export default function RootLayout({ children }) {
       <body className="bg-[#010717]">
         <Providers>
           <DynamicBackground /> {/* Use the client component for dynamic background */}
+          <AnalyticsTracker />
           <Header />
           {/* <GoogleAdSense publisherId="ca-pub-3792754105959046" /> */}
           {/* <AdSenseComponent/> */}

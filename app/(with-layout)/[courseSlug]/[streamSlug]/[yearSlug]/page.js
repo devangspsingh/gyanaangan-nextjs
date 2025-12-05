@@ -14,8 +14,8 @@ import {
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
   // console.log('📄 [Year Page] Generating metadata for:', params);
-  
-  const { courseSlug, streamSlug, yearSlug } =await params;
+
+  const { courseSlug, streamSlug, yearSlug } = await params;
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
   console.log(response.data)
   if (response.error || !response.data) {
@@ -26,11 +26,11 @@ export async function generateMetadata({ params }) {
   }
 
   const pageData = response.data;
-  const pageTitle = pageData.name 
-    ? `${pageData.name} - Gyan Aangan` 
+  const pageTitle = pageData.name
+    ? `${pageData.name} - Gyan Aangan`
     : `${pageData.course?.name} - ${pageData.stream?.name} ${pageData.year?.name} - Gyan Aangan`;
-  const pageDescription = pageData.meta_description 
-    || pageData.description 
+  const pageDescription = pageData.meta_description
+    || pageData.description
     || `Subjects and resources for ${pageData.course?.name}, ${pageData.stream?.name}, ${pageData.year?.name}.`;
 
   return {
@@ -52,16 +52,16 @@ export async function generateMetadata({ params }) {
 
 export default async function SpecialPage({ params }) {
   // console.log('📄 [Year Page] Fetching data for:', params);
-  
+
   const { courseSlug, streamSlug, yearSlug } = await params;
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
-  console.log(response.data)
+  // console.log(response.data)
   // console.log('📄 [Year Page] Response status:', response.error ? 'Error' : 'Success');
-  
+
   if (response.error || !response.data) {
     const errorMessage = response.data?.detail || 'Unknown error';
     // console.error('❌ [Year Page] Error fetching data:', errorMessage);
-    
+
     return (
       <main className="container mx-auto py-8 px-4 text-center text-red-400">
         <p>Failed to load page data: {errorMessage}</p>
@@ -119,8 +119,8 @@ export default async function SpecialPage({ params }) {
               For {pageData.year?.name ? `${pageData.year.name} Subjects` : `Year ${pageData.year?.year} Students`}
             </p>
           </div>
-          <SubscribeButton 
-            specialPageId={pageData.id} 
+          <SubscribeButton
+            specialPageId={pageData.id}
             isSubscribed={pageData.is_subscribed}
           />
         </div>
