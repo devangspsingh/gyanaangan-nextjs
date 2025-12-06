@@ -7,7 +7,14 @@ const GoogleDocsViewer = ({ resourceViewUrl }) => {
   if (!resourceViewUrl) {
     return <p className="text-center text-gray-400 py-10">Google Viewer: Resource URL not available.</p>;
   }
-  const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resourceViewUrl)}&embedded=true`;
+  let viewerUrl = resourceViewUrl;
+  if (resourceViewUrl.startsWith("https://drive.google.com")) {
+
+    viewerUrl = resourceViewUrl;
+  }
+  else {
+    viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resourceViewUrl)}&embedded=true`;
+  }
 
   // Note: Hiding specific elements (like one with class 'ndfHFb-c4YZDc-Wrql6b')
   // inside the cross-origin Google Docs iframe is not possible due to browser security policies.
@@ -19,7 +26,7 @@ const GoogleDocsViewer = ({ resourceViewUrl }) => {
         frameBorder="0"
         className="w-full h-full min-h-[80vh] md:min-h-[90vh]"
         allowFullScreen
-        sandbox="allow-scripts allow-same-origin" 
+        sandbox="allow-scripts allow-same-origin"
       ></iframe>
     </div>
   );
@@ -53,12 +60,11 @@ export default function Viewer({ resource }) {
   }
 
   const canView = resource.privacy?.includes('view');
+  let primaryViewer = null;
 
-  if (resource.resource_type !== 'video' && canView) {
-    if (!resource.view_url) {
-      return <p className="text-center text-gray-400 py-10">PDF preview URL is not available.</p>;
-    }
-    return (
+  // Priority 1: File upload (PDF, images, etc.) - Use file URL
+  if (resource.file && resource.view_url && resource.resource_type !== 'video' && canView) {
+    primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
         <GoogleDocsViewer resourceViewUrl={resource.view_url} />
@@ -66,9 +72,9 @@ export default function Viewer({ resource }) {
       </section>
     );
   }
-
-  if (resource.resource_type === 'video' && resource.embed_link && canView) {
-    return (
+  // Priority 2: YouTube embed link (for videos)
+  else if (resource.resource_type === 'video' && resource.embed_link && canView) {
+    primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Video Preview</h2>
         <div className="aspect-video bg-stone-800 rounded-lg overflow-hidden shadow">
@@ -81,9 +87,37 @@ export default function Viewer({ resource }) {
             className="w-full h-full"
           ></iframe>
         </div>
-        {/* <IPWatermark /> */}
-        
       </section>
+    );
+  }
+  // Priority 3: Resource link (external PDF/document link) - Use Google Docs viewer
+  else if (resource.resource_link && canView) {
+    primaryViewer = (
+      <section className="mb-8 relative">
+        <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
+        <GoogleDocsViewer resourceViewUrl={resource.resource_link} />
+        <IPWatermark />
+      </section>
+    );
+  }
+
+  // Render primary viewer (if exists) + content (always if available)
+  if (primaryViewer || resource.content) {
+    return (
+      <>
+        {primaryViewer}
+
+        {/* Content section - always rendered if available */}
+        {resource.content && canView && (
+          <section className="mb-8">
+            {/* <h2 className="text-xl font-semibold text-white mb-3">Content</h2> */}
+            <article
+              className="prose prose-invert prose-sm lg:prose-lg max-w-none bg-slate-950 rounded-lg"
+              dangerouslySetInnerHTML={{ __html: resource.content }}
+            />
+          </section>
+        )}
+      </>
     );
   }
 
