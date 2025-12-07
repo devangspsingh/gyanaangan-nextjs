@@ -1,5 +1,5 @@
 # 0. Base image
-FROM node:20-slim AS base
+FROM node:20-alpine AS base
 
 # Common base env
 ENV NODE_ENV=development
@@ -23,7 +23,8 @@ RUN \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install --frozen-lockfile; \
   else echo "Lockfile not found." && exit 1; \
   fi
-
+RUN npm install lightningcss-linux-x64-gnu
+  
 # 2. Build layer
 FROM base AS builder
 
@@ -44,7 +45,7 @@ ENV PORT=3000
 RUN npm run build
 
 # 3. Runtime image
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
