@@ -2,7 +2,7 @@
 FROM node:18-alpine AS base
 
 # Common base env
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # 1. Dependencies layer
