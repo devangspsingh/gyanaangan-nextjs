@@ -1,5 +1,5 @@
 # 0. Base image
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
 # Common base env
 ENV NODE_ENV=development
@@ -45,7 +45,7 @@ ENV PORT=3000
 RUN npm run build
 
 # 3. Runtime image
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
