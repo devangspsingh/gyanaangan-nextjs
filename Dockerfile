@@ -1,5 +1,5 @@
 # 0. Base image
-FROM node:18-alpine AS base
+FROM node:20-slim AS base
 
 # Common base env
 ENV NODE_ENV=development
@@ -9,7 +9,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 FROM base AS deps
 
 # libc6-compat sometimes needed for native deps
-RUN apk add --no-cache libc6-compat
+# RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
