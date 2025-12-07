@@ -23,7 +23,7 @@ RUN \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install --frozen-lockfile; \
   else echo "Lockfile not found." && exit 1; \
   fi
-RUN npm install lightningcss-linux-x64-gnu
+RUN npm install lightningcss-linux-arm64-gnu
   
 # 2. Build layer
 FROM base AS builder
