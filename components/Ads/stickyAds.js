@@ -6,54 +6,72 @@ import { AdUnit } from '@/components/blog/AdUnit';
 
 export default function StickyAd() {
   const [isVisible, setIsVisible] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
   const pathname = usePathname();
 
-  // 2. Reset visibility to TRUE whenever the user navigates to a new page
+  // Check for desktop screen size to prevent AdSense errors on mobile (availableWidth=0)
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 768); // 768px is standard md breakpoint
+    //   setIsDesktop(true); // 768px is standard md breakpoint
+    };
+    
+    // Initial check
+    checkScreenSize();
+    
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Reset visibility to TRUE whenever the user navigates to a new page
   useEffect(() => {
     setIsVisible(true);
   }, [pathname]);
 
-  // 3. Trigger the AdSense push command whenever the path changes (after render)
+  // Trigger the AdSense push command whenever the path changes (after render)
   useEffect(() => {
-    if (isVisible) {
+    if (isVisible && isDesktop) {
       try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        }, 100);
       } catch (err) {
         console.error('AdSense push error:', err);
       }
     }
-  }, [pathname, isVisible]);
+  }, [pathname, isVisible, isDesktop]);
 
-  if (!isVisible) return null;
+  // Don't render anything if closed or not on desktop
+  if (!isVisible || !isDesktop) return null;
 
   return (
-    // CONTAINER WRAPPER
-    // Mobile: bottom-[64px] (Sits above your footer nav which is roughly 60px height)
-    // Desktop: bottom-0 (Sits at the very bottom since nav is on the left)
-    <div className="fixed left-0 right-0 z-30 transition-all duration-300 ease-in-out bottom-[56px] md:bottom-0">
+    // FIXED HEIGHT WRAPPER
+    <div className="fixed left-0 right-0 bottom-0 z-30 h-24 overflow-hidden">
       
-      {/* Visual Container */}
-      <div className="relative mx-auto w-full max-w-7xl border-t border-slate-800 bg-slate-950 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      {/* Visual Container - Compact with strict height limit */}
+      <div className="relative mx-auto w-full h-24 border-t border-slate-800/50 bg-slate-950/95 backdrop-blur-sm overflow-hidden">
         
-        {/* Close Button */}
+        {/* Close Button - More subtle */}
         <button 
           onClick={() => setIsVisible(false)}
-          className="absolute -top-6 right-0 md:right-4 bg-slate-950 text-white-600 px-3 py-1 text-xs font-bold rounded-t-md hover:bg-red-500 hover:text-white transition-colors shadow-sm"
+          className="absolute top-1 right-2 text-gray-500 hover:text-red-400 text-xs transition-colors z-10"
           aria-label="Close Ad"
         >
-        X
+          ✕
         </button>
 
         {/* Ad Area - key={pathname} forces a complete re-render on route change */}
         <div 
           key={pathname} 
-          className="flex justify-center items-center min-h-[60px] md:min-h-[90px] overflow-hidden bg-slate-950"
+          className="flex justify-center items-center h-24 overflow-hidden"
         >
-          {/* We wrap the AdUnit to control width/height explicitly if needed */}
-          <div className="w-full text-center">
+          {/* Horizontal ad unit - Wrapper with strict height control */}
+          <div className="w-full h-full flex items-center justify-center">
             <AdUnit 
-               data-ad-slot="1937256059" // Make sure this slot ID is correct for a Display Ad
-               style={{ display: 'inline-block', width: '100%', maxWidth: '970px', height: 'auto', minHeight: '50px' }}
+              type="horizontal"
+              data-ad-slot="3516444227"
+              style={{ display: 'inline', width: '728px', maxHeight: '90px' }}
             />
           </div>
         </div>
