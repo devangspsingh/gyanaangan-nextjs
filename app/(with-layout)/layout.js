@@ -58,7 +58,7 @@ export default function RootLayout({ children }) {
             <p>🚫 Oops! This page does not like printers. 😊<br />Please enjoy it online!</p>
           </div>
           <Footer />
-          <StickyAd />
+          {/* <StickyAd /> */}
           <ProfileCompleteAlert />
           <FooterNavigation />
         </Providers>

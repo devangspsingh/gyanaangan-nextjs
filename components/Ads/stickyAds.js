@@ -38,21 +38,22 @@ export default function StickyAd() {
         {/* Close Button */}
         <button 
           onClick={() => setIsVisible(false)}
-          className="absolute -top-6 right-0 md:right-4 bg-slate-50 text-gray-600 px-3 py-1 text-xs font-bold rounded-t-md hover:bg-red-500 hover:text-white transition-colors shadow-sm"
+          className="absolute -top-6 right-0 md:right-4 bg-slate-950 text-white-600 px-3 py-1 text-xs font-bold rounded-t-md hover:bg-red-500 hover:text-white transition-colors shadow-sm"
           aria-label="Close Ad"
         >
         X
         </button>
 
-        {/* Ad Area - key={pathname} forces a complete re-render on route change */}
-        <div 
-          key={pathname} 
-          className="flex justify-center items-center min-h-[60px] md:min-h-[90px] overflow-hidden bg-slate-950"
-        >
-          {/* We wrap the AdUnit to control width/height explicitly if needed */}
-          <div className="w-full text-center">
-            <AdUnit 
-               data-ad-slot="1937256059" // Make sure this slot ID is correct for a Display Ad
+            <div 
+              key={pathname} 
+              className="flex justify-center items-center min-h-[60px] md:min-h-[90px] overflow-hidden bg-slate-950"
+            >
+              {/* We wrap the AdUnit to control width/height explicitly if needed */}
+              <div className="w-full text-center">
+                <AdUnit 
+                  data-ad-slot="1937256059"
+                  data-ad-format="horizontal"
+                />
                style={{ display: 'inline-block', width: '100%', maxWidth: '970px', height: 'auto', minHeight: '50px' }}
             />
           </div>
