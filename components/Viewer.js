@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { ArrowsPointingOutIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { AdUnit } from '@/components/blog/AdUnit';
+import { trackEvent } from '@/services/analyticsService';
 
 // IP Watermark Component
 const IPWatermark = () => {
@@ -56,7 +57,7 @@ const DocsIframe = ({ viewerUrl, className }) => {
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-800 z-20 backdrop-blur-sm">
           <div className="relative w-16 h-16 mb-6">
             <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-400 border-r-purple-400 animate-spin"></div>
-            <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-pink-400 animate-spin" style={{animationDirection: 'reverse'}}></div>
+            <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-pink-400 animate-spin" style={{ animationDirection: 'reverse' }}></div>
           </div>
           <p className="text-gray-200 font-semibold text-lg">Loading Document...</p>
           {retryCount > 3 && (
@@ -82,7 +83,7 @@ const DocsIframe = ({ viewerUrl, className }) => {
 };
 
 // Google Docs Viewer Component
-const GoogleDocsViewer = ({ resourceViewUrl }) => {
+const GoogleDocsViewer = ({ resourceViewUrl, resource }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   // States: 'mobile' (<768), 'mid' (768-1280), 'large' (>=1280)
   const [screenSize, setScreenSize] = useState('mobile');
@@ -99,10 +100,10 @@ const GoogleDocsViewer = ({ resourceViewUrl }) => {
         setScreenSize('mobile');
       }
     };
-    
+
     // Initial check
     checkScreenSize();
-    
+
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
@@ -147,76 +148,80 @@ const GoogleDocsViewer = ({ resourceViewUrl }) => {
     <div className="aspect-w-16 aspect-h-9 bg-stone-800 rounded-lg overflow-hidden md:min-h-[90vh] min-h-[80vh] relative group">
       {/* Default Inline View */}
       <DocsIframe viewerUrl={viewerUrl} className="w-full h-full min-h-[80vh] md:min-h-[90vh]" />
-      
+
       {/* Full Screen Trigger */}
       <div className="absolute top-4 right-4 z-30 transition-opacity duration-300">
         <Dialog open={isFullScreen} onOpenChange={setIsFullScreen}>
           <DialogTrigger asChild>
-            <button 
-              className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-all transform hover:scale-110" 
+            <button
+              className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-all transform hover:scale-110"
               title="Full Screen View"
+              onClick={() => {
+                if (resource) {
+                  trackEvent('click', {
+                    resource_name: resource.name,
+                    click_target: "Full Screen Viewer",
+                    resource_slug: resource.slug
+                  }, resource.slug);
+                }
+              }}
             >
               <ArrowsPointingOutIcon className="w-5 h-5" />
             </button>
           </DialogTrigger>
-          
+
           <DialogContent className="max-w-[100vw] w-screen p-0 bg-stone-900 border-none rounded-none overflow-hidden [&>[data-slot=dialog-close]]:hidden">
             <DialogTitle className="sr-only">Full Screen PDF Viewer</DialogTitle>
-            
+
             {/* Full Screen Layout Wrapper 
               Using h-[100dvh] for mobile browser compatibility (address bar)
             */}
-            <div className="w-screen !h-[100dvh] flex flex-col md:flex-row overflow-hidden">
+            <div className="!w-screen !h-screen flex flex-col md:flex-row">
 
               {/* Left Ad - Only for Large Screens (>1280px) */}
               {screenSize === 'large' && (
-                <div className="hidden xl:flex w-[300px] h-full flex-col justify-center items-center bg-stone-950 border-r border-stone-800 shrink-0 z-40 overflow-hidden relative">
+                <div className="hidden xl:flex !w-[300px] !min-w-[300px] !max-w-[300px] h-full flex-col justify-center items-center bg-stone-950 border-r border-stone-800 shrink-0 z-40 overflow-hidden relative">
                   <div className="text-stone-500 text-xs mb-4 uppercase tracking-wider">Advertisement</div>
-                  <div className="w-[300px] h-full overflow-hidden flex items-center justify-center">
-                    <AdUnit type="vertical" />
+                  <div className="!w-[300px] !min-w-[300px] !max-w-[300px] h-full overflow-hidden flex items-center justify-center">
+                    <AdUnit type="vertical" data-ad-slot="3516444227" />
                   </div>
                 </div>
               )}
 
               {/* Main Content Area */}
-              <div className="flex-1 flex flex-col h-full relative min-w-0 bg-stone-900">
-                
+              <div className="flex-1 flex flex-col h-screen! relative min-w-0 bg-stone-900">
+
                 {/* Close Button - Overlay */}
                 <div className="absolute top-4 right-4 z-50">
                   <DialogClose className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-all hover:rotate-90 shadow-lg">
                     <XMarkIcon className="w-6 h-6" />
                   </DialogClose>
                 </div>
-                
+
                 {/* Iframe Container 
                   flex-1 + min-h-0 is CRITICAL here. 
                   It forces the container to take exactly the remaining height 
                   and allows the child absolute iframe to fill it. 
                 */}
-                <div className="flex-1 relative w-full min-h-0">
-                  <DocsIframe viewerUrl={viewerUrl} className="absolute inset-0 w-full h-full" />
+                <div className="relative w-full min-h-90vh h-[calc(100vh-90px)]">
+                  <DocsIframe viewerUrl={viewerUrl} className={"h-full! md:h-screen w-full"} />
                 </div>
-                
+
                 {/* Mobile Bottom Ad - Only for Mobile (<768px) 
                    - Added !h-[90px] !max-h-[90px] !min-h-[90px] to enforce strict height
                    - Added overflow-hidden to clip any expanding content
                    - Added z-index to ensure it sits on top if needed
                 */}
                 {screenSize === 'mobile' && (
-                  <div 
-                    className="!h-[90px] !max-h-[90px] !min-h-[90px] bg-stone-950 flex items-center justify-center shrink-0 border-t border-stone-800 w-full z-40 overflow-hidden relative"
-                    style={{ height: '90px', maxHeight: '90px', minHeight: '90px' }} // Inline styles as backup
+                  <div
+                  // className="!h-[90px] !max-h-[90px] !min-h-[90px] bg-stone-950 flex items-center justify-center shrink-0 border-t border-stone-800 !w-full z-40 overflow-hidden relative"
+                  // style={{ height: '90px', maxHeight: '90px', minHeight: '90px', width: '100%' }} // Inline styles as backup
                   >
-                    <div className="w-full !h-[90px] !max-h-[90px] flex items-center justify-center overflow-hidden">
-                      <AdUnit 
-                        type="horizontal" 
-                        style={{ 
-                          maxHeight: '90px', 
-                          height: '90px', 
-                          minHeight: '90px', 
-                          width: '100%',
-                          overflow: 'hidden' 
-                        }} 
+                    <div className="relative w-full h-full max-h-22.5! flex items-center justify-center overflow-hidden">
+                      <AdUnit
+                        type="horizontal"
+                        data-ad-slot="3516444227"
+                        style={{ display: 'inline', width: '728px', maxHeight: '90px' }}
                       />
                     </div>
                   </div>
@@ -225,10 +230,10 @@ const GoogleDocsViewer = ({ resourceViewUrl }) => {
 
               {/* Right Ad - For Mid (768px+) and Large Screens */}
               {(screenSize === 'mid' || screenSize === 'large') && (
-                <div className="hidden md:flex w-[300px] h-full flex-col justify-center items-center bg-stone-950 border-l border-stone-800 shrink-0 z-40 overflow-hidden relative">
+                <div className="hidden md:flex !w-[300px] !min-w-[300px] !max-w-[300px] h-full flex-col justify-center items-center bg-stone-950 border-l border-stone-800 shrink-0 z-40 overflow-hidden relative">
                   <div className="text-stone-500 text-xs mb-4 uppercase tracking-wider">Advertisement</div>
-                  <div className="w-[300px] h-full overflow-hidden flex items-center justify-center">
-                    <AdUnit type="vertical" />
+                  <div className="!w-[300px] !min-w-[300px] !max-w-[300px] h-full overflow-hidden flex items-center justify-center">
+                    <AdUnit type="vertical" data-ad-slot="3516444227" />
                   </div>
                 </div>
               )}
@@ -254,7 +259,7 @@ export default function Viewer({ resource }) {
     primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
-        <GoogleDocsViewer resourceViewUrl={resource.view_url} />
+        <GoogleDocsViewer resourceViewUrl={resource.view_url} resource={resource} />
       </section>
     );
   }
@@ -281,7 +286,7 @@ export default function Viewer({ resource }) {
     primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
-        <GoogleDocsViewer resourceViewUrl={resource.resource_link} />
+        <GoogleDocsViewer resourceViewUrl={resource.resource_link} resource={resource} />
       </section>
     );
   }
