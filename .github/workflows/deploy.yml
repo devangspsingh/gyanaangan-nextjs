@@ -19,12 +19,15 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script: |
-            # Navigate to the correct project directory
+            # 1. Stop execution immediately if any command fails
+            set -e
+            
+            # Navigate to directory
             cd /var/www/gyanaangan-nextjs
             
             echo "Current directory: $(pwd)"
             
-            # Pull latest changes from Git
+            # Pull latest changes
             echo "Pulling latest changes from Git..."
             git pull origin main
             
@@ -32,15 +35,15 @@ jobs:
             echo "Installing dependencies..."
             npm install
             
-            # Build the Next.js application (will use existing .env file)
+            # Build the application
             echo "Building Next.js application..."
             npm run build
             
-            # Restart application with PM2
+            # Restart application
             echo "Restarting application with PM2..."
-            pm2 restart gyanaangan-app --update-env || pm2 start npm --name "gyanaangan-app" -- start
+            pm2 restart gyanaangan --update-env || pm2 start npm --name "gyanaangan" -- start
             
-            # Save PM2 process list
+            # Save process list
             pm2 save
             
             echo "Deployment complete!"

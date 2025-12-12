@@ -30,6 +30,18 @@ export const AdUnit = ({
       format: 'horizontal',
       responsive: true
     },
+    vertical: {
+      className: 'adsbygoogle',
+      style: { display: 'block', width: '100%' },
+      format: 'vertical',
+      responsive: true
+    },
+    square: {
+      className: 'adsbygoogle',
+      style: { display: 'block' },
+      format: 'rectangle',
+      responsive: true
+    },
     multiplex: {
       className: 'adsbygoogle',
       style: { display: 'block' },

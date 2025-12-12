@@ -1,70 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-
-// Google Docs Viewer Component
-const GoogleDocsViewer = ({ resourceViewUrl }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [iframeKey, setIframeKey] = useState(0);
-  const [retryCount, setRetryCount] = useState(0);
-
-  // Reset state when URL changes
-  useEffect(() => {
-    setIframeKey(0);
-    setRetryCount(0);
-    setIsLoading(true);
-  }, [resourceViewUrl]);
-
-  // Auto-retry logic if loading takes too long
-  useEffect(() => {
-    let timer;
-    if (isLoading && retryCount < 4) { // Retry up to 4 times
-      timer = setTimeout(() => {
-        setRetryCount((prev) => prev + 1);
-        setIframeKey((prev) => prev + 1); // Force iframe reload
-      }, 5000); // 5 seconds timeout
-    }
-    return () => clearTimeout(timer);
-  }, [isLoading, retryCount, iframeKey]);
-
-  if (!resourceViewUrl) {
-    return <p className="text-center text-gray-400 py-10">Google Viewer: Resource URL not available.</p>;
-  }
-
-  let viewerUrl = resourceViewUrl;
-  if (resourceViewUrl.startsWith("https://drive.google.com")) {
-    viewerUrl = resourceViewUrl;
-  }
-  else {
-    viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resourceViewUrl)}&embedded=true`;
-  }
-
-  return (
-    <div className="aspect-w-16 aspect-h-9 bg-stone-800 rounded-lg overflow-hidden md:min-h-[90vh] min-h-[80vh] relative">
-      {isLoading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-800 z-20">
-          <div className="w-12 h-12 border-4 border-primary-light border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-300 font-medium">Loading Document...</p>
-          {retryCount > 0 && (
-            <p className="text-sm text-gray-500 mt-2 animate-pulse">
-              Taking longer than expected... (Retrying {retryCount}/4)
-            </p>
-          )}
-        </div>
-      )}
-      <iframe
-        key={iframeKey}
-        src={viewerUrl}
-        title="Google Docs PDF Viewer"
-        frameBorder="0"
-        className={`w-full h-full min-h-[80vh] md:min-h-[90vh] transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-        allowFullScreen
-        sandbox="allow-scripts allow-same-origin"
-        onLoad={() => setIsLoading(false)}
-      ></iframe>
-    </div>
-  );
-};
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { ArrowsPointingOutIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { AdUnit } from '@/components/blog/AdUnit';
 
 // IP Watermark Component
 const IPWatermark = () => {
@@ -77,13 +16,205 @@ const IPWatermark = () => {
   }, []);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-      <p className="text-primary-dark/20 text-3xl font-bold transform -rotate-12 select-none">
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 overflow-hidden">
+      <p className="text-stone-500/20 text-4xl md:text-6xl font-bold transform -rotate-12 select-none whitespace-nowrap">
         Gyan Aangan
       </p>
-      <p className="absolute bottom-5 right-5 text-primary-dark/20 text-xl font-bold transform select-none">
+      <p className="absolute bottom-2 right-2 md:bottom-5 md:right-5 text-stone-500/30 text-xl md:text-2xl font-mono select-none px-2 py-1 rounded">
         {ip}
       </p>
+    </div>
+  );
+};
+
+// Internal Iframe Component
+const DocsIframe = ({ viewerUrl, className }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [iframeKey, setIframeKey] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    setIframeKey(0);
+    setRetryCount(0);
+    setIsLoading(true);
+  }, [viewerUrl]);
+
+  useEffect(() => {
+    let timer;
+    if (isLoading && retryCount < 4) {
+      timer = setTimeout(() => {
+        setRetryCount((prev) => prev + 1);
+        setIframeKey((prev) => prev + 1);
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading, retryCount, iframeKey]);
+
+  return (
+    <div className="relative w-full h-full">
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-800 z-20 backdrop-blur-sm">
+          <div className="relative w-16 h-16 mb-6">
+            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-400 border-r-purple-400 animate-spin"></div>
+            <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-pink-400 animate-spin" style={{animationDirection: 'reverse'}}></div>
+          </div>
+          <p className="text-gray-200 font-semibold text-lg">Loading Document...</p>
+          {retryCount > 3 && (
+            <p className="text-sm text-gray-400 mt-3 animate-pulse">
+              Taking longer than expected... (Retrying {retryCount}/4)
+            </p>
+          )}
+        </div>
+      )}
+      <iframe
+        key={iframeKey}
+        src={viewerUrl}
+        title="Google Docs PDF Viewer"
+        frameBorder="0"
+        className={`${className} transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+        allowFullScreen
+        sandbox="allow-scripts allow-same-origin"
+        onLoad={() => setIsLoading(false)}
+      ></iframe>
+      <IPWatermark />
+    </div>
+  );
+};
+
+// Google Docs Viewer Component
+const GoogleDocsViewer = ({ resourceViewUrl }) => {
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  // States: 'mobile' (<768), 'mid' (768-1280), 'large' (>=1280)
+  const [screenSize, setScreenSize] = useState('mobile');
+
+  // Intelligent resize handler
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      if (width >= 1280) {
+        setScreenSize('large');
+      } else if (width >= 768) {
+        setScreenSize('mid');
+      } else {
+        setScreenSize('mobile');
+      }
+    };
+    
+    // Initial check
+    checkScreenSize();
+    
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Handle AdSense push based on visible slots
+  useEffect(() => {
+    if (isFullScreen) {
+      const pushAds = () => {
+        try {
+          // Determine how many ads are visible based on screen size
+          let adsToPush = 0;
+          if (screenSize === 'mobile') adsToPush = 1;      // Bottom ad
+          else if (screenSize === 'mid') adsToPush = 1;    // Right ad
+          else if (screenSize === 'large') adsToPush = 2;  // Left + Right ads
+
+          if (window.adsbygoogle) {
+            for (let i = 0; i < adsToPush; i++) {
+              (window.adsbygoogle = window.adsbygoogle || []).push({});
+            }
+          }
+        } catch (e) {
+          console.error("AdSense push error:", e);
+        }
+      };
+
+      // Slight delay to ensure Dialog DOM is fully mounted
+      const timer = setTimeout(pushAds, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isFullScreen, screenSize]);
+
+  if (!resourceViewUrl) {
+    return <p className="text-center text-gray-400 py-10">Google Viewer: Resource URL not available.</p>;
+  }
+
+  let viewerUrl = resourceViewUrl;
+  if (!resourceViewUrl.startsWith("https://drive.google.com")) {
+    viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resourceViewUrl)}&embedded=true`;
+  }
+
+  return (
+    <div className="aspect-w-16 aspect-h-9 bg-stone-800 rounded-lg overflow-hidden md:min-h-[90vh] min-h-[80vh] relative group">
+      {/* Default Inline View */}
+      <DocsIframe viewerUrl={viewerUrl} className="w-full h-full min-h-[80vh] md:min-h-[90vh]" />
+      
+      {/* Full Screen Trigger */}
+      <div className="absolute top-4 right-4 z-30 transition-opacity duration-300">
+        <Dialog open={isFullScreen} onOpenChange={setIsFullScreen}>
+          <DialogTrigger asChild>
+            <button 
+              className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-all transform hover:scale-110" 
+              title="Full Screen View"
+            >
+              <ArrowsPointingOutIcon className="w-5 h-5" />
+            </button>
+          </DialogTrigger>
+          
+          <DialogContent className="max-w-[100vw] w-screen p-0 bg-stone-900 border-none rounded-none overflow-hidden [&>[data-slot=dialog-close]]:hidden">
+            <DialogTitle className="sr-only">Full Screen PDF Viewer</DialogTitle>
+            
+            {/* Full Screen Layout Wrapper 
+              Using h-[100dvh] for mobile browser compatibility (address bar)
+            */}
+            <div className="w-screen h-[100dvh] flex flex-col md:flex-row overflow-hidden">
+
+              {/* Left Ad - Only for Large Screens (>1280px) */}
+              {screenSize === 'large' && (
+                <div className="hidden xl:flex w-[320px] h-full flex-col justify-center items-center bg-stone-950 border-r border-stone-800 shrink-0 z-40">
+                  <div className="text-stone-500 text-xs mb-4 uppercase tracking-wider">Advertisement</div>
+                  <AdUnit type="vertical" />
+                </div>
+              )}
+
+              {/* Main Content Area */}
+              <div className="flex-1 flex flex-col h-full relative min-w-0 bg-stone-900">
+                
+                {/* Close Button - Overlay */}
+                <div className="absolute top-4 right-4 z-50">
+                  <DialogClose className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-all hover:rotate-90 shadow-lg">
+                    <XMarkIcon className="w-6 h-6" />
+                  </DialogClose>
+                </div>
+                
+                {/* Iframe Container 
+                  flex-1 + min-h-0 is CRITICAL here. 
+                  It forces the container to take exactly the remaining height 
+                  and allows the child absolute iframe to fill it. 
+                */}
+                <div className="flex-1 relative w-full min-h-0">
+                  <DocsIframe viewerUrl={viewerUrl} className="absolute inset-0 w-full h-full" />
+                </div>
+                
+                {/* Mobile Bottom Ad - Only for Mobile (<768px) */}
+                {screenSize === 'mobile' && (
+                  <div className="h-[90px] bg-stone-950 flex items-center justify-center shrink-0 border-t border-stone-800 w-full z-40">
+                    <AdUnit type="horizontal" style={{ maxHeight: '90px', width: '100%' }} />
+                  </div>
+                )}
+              </div>
+
+              {/* Right Ad - For Mid (768px+) and Large Screens */}
+              {(screenSize === 'mid' || screenSize === 'large') && (
+                <div className="hidden md:flex w-[320px] h-full flex-col justify-center items-center bg-stone-950 border-l border-stone-800 shrink-0 z-40">
+                  <div className="text-stone-500 text-xs mb-4 uppercase tracking-wider">Advertisement</div>
+                  <AdUnit type="vertical" />
+                </div>
+              )}
+
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 };
@@ -96,17 +227,16 @@ export default function Viewer({ resource }) {
   const canView = resource.privacy?.includes('view');
   let primaryViewer = null;
 
-  // Priority 1: File upload (PDF, images, etc.) - Use file URL
+  // Priority 1: File upload
   if (resource.file && resource.view_url && resource.resource_type !== 'video' && canView) {
     primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
         <GoogleDocsViewer resourceViewUrl={resource.view_url} />
-        <IPWatermark />
       </section>
     );
   }
-  // Priority 2: YouTube embed link (for videos)
+  // Priority 2: YouTube embed
   else if (resource.resource_type === 'video' && resource.embed_link && canView) {
     primaryViewer = (
       <section className="mb-8 relative">
@@ -124,27 +254,22 @@ export default function Viewer({ resource }) {
       </section>
     );
   }
-  // Priority 3: Resource link (external PDF/document link) - Use Google Docs viewer
+  // Priority 3: External Link
   else if (resource.resource_link && canView) {
     primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
         <GoogleDocsViewer resourceViewUrl={resource.resource_link} />
-        <IPWatermark />
       </section>
     );
   }
 
-  // Render primary viewer (if exists) + content (always if available)
   if (primaryViewer || resource.content) {
     return (
       <>
         {primaryViewer}
-
-        {/* Content section - always rendered if available */}
         {resource.content && canView && (
           <section className="mb-8">
-            {/* <h2 className="text-xl font-semibold text-white mb-3">Content</h2> */}
             <article
               className="prose prose-invert prose-sm lg:prose-lg max-w-none bg-slate-950 rounded-lg"
               dangerouslySetInnerHTML={{ __html: resource.content }}
@@ -155,7 +280,6 @@ export default function Viewer({ resource }) {
     );
   }
 
-  // Fallback if no specific viewer is matched but view is allowed
   if (canView) {
     return <p className="text-center text-gray-400 py-10">Preview for this resource type is not currently supported, but viewing is permitted.</p>;
   }
