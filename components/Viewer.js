@@ -98,6 +98,7 @@ const GoogleDocsViewer = ({ resourceViewUrl, resource }) => {
         setScreenSize('mid');
       } else {
         setScreenSize('mobile');
+        setIsFullScreen(false);
       }
     };
 
@@ -150,7 +151,7 @@ const GoogleDocsViewer = ({ resourceViewUrl, resource }) => {
       <DocsIframe viewerUrl={viewerUrl} className="w-full h-full min-h-[80vh] md:min-h-[90vh]" />
 
       {/* Full Screen Trigger */}
-      <div className="absolute top-4 right-4 z-30 transition-opacity duration-300">
+      <div className="absolute top-4 right-4 z-30 transition-opacity duration-300 hidden md:block">
         <Dialog open={isFullScreen} onOpenChange={setIsFullScreen}>
           <DialogTrigger asChild>
             <button
