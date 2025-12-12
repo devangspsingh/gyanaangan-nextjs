@@ -20,7 +20,7 @@ jobs:
           port: ${{ secrets.SSH_PORT || 22 }}
           script: |
             # Navigate to the correct project directory
-            cd /var/www/app.gyanaangan.in
+            cd /var/www/gyanaangan-nextjs
             
             echo "Current directory: $(pwd)"
             

@@ -23,6 +23,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'sw
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
 import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
 import LoginNudge from '@/components/Auth/LoginNudge'; // Import LoginNudge
+import StickyAd from '@/components/Ads/stickyAds';
 
 export default function RootLayout({ children }) {
   return (
@@ -57,6 +58,7 @@ export default function RootLayout({ children }) {
             <p>🚫 Oops! This page does not like printers. 😊<br />Please enjoy it online!</p>
           </div>
           <Footer />
+          <StickyAd />
           <ProfileCompleteAlert />
           <FooterNavigation />
         </Providers>
