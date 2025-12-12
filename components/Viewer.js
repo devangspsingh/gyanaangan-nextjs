@@ -203,7 +203,7 @@ const GoogleDocsViewer = ({ resourceViewUrl, resource }) => {
                   It forces the container to take exactly the remaining height 
                   and allows the child absolute iframe to fill it. 
                 */}
-                <div className="relative w-full min-h-90vh h-[calc(100vh-90px)]">
+                <div className="relative w-full min-h-90vh h-[calc(100vh-90px)] md:h-screen">
                   <DocsIframe viewerUrl={viewerUrl} className={"h-full! md:h-screen w-full"} />
                 </div>
 
