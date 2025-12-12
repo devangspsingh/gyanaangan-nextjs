@@ -4,29 +4,63 @@ import React, { useState, useEffect } from 'react';
 
 // Google Docs Viewer Component
 const GoogleDocsViewer = ({ resourceViewUrl }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [iframeKey, setIframeKey] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+
+  // Reset state when URL changes
+  useEffect(() => {
+    setIframeKey(0);
+    setRetryCount(0);
+    setIsLoading(true);
+  }, [resourceViewUrl]);
+
+  // Auto-retry logic if loading takes too long
+  useEffect(() => {
+    let timer;
+    if (isLoading && retryCount < 4) { // Retry up to 4 times
+      timer = setTimeout(() => {
+        setRetryCount((prev) => prev + 1);
+        setIframeKey((prev) => prev + 1); // Force iframe reload
+      }, 5000); // 5 seconds timeout
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading, retryCount, iframeKey]);
+
   if (!resourceViewUrl) {
     return <p className="text-center text-gray-400 py-10">Google Viewer: Resource URL not available.</p>;
   }
+
   let viewerUrl = resourceViewUrl;
   if (resourceViewUrl.startsWith("https://drive.google.com")) {
-
     viewerUrl = resourceViewUrl;
   }
   else {
     viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resourceViewUrl)}&embedded=true`;
   }
 
-  // Note: Hiding specific elements (like one with class 'ndfHFb-c4YZDc-Wrql6b')
-  // inside the cross-origin Google Docs iframe is not possible due to browser security policies.
   return (
-    <div className="aspect-w-16 aspect-h-9 bg-stone-800 rounded-lg overflow-hidden md:min-h-[90vh] min-h-[80vh]">
+    <div className="aspect-w-16 aspect-h-9 bg-stone-800 rounded-lg overflow-hidden md:min-h-[90vh] min-h-[80vh] relative">
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-800 z-20">
+          <div className="w-12 h-12 border-4 border-primary-light border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-300 font-medium">Loading Document...</p>
+          {retryCount > 0 && (
+            <p className="text-sm text-gray-500 mt-2 animate-pulse">
+              Taking longer than expected... (Retrying {retryCount}/4)
+            </p>
+          )}
+        </div>
+      )}
       <iframe
+        key={iframeKey}
         src={viewerUrl}
         title="Google Docs PDF Viewer"
         frameBorder="0"
-        className="w-full h-full min-h-[80vh] md:min-h-[90vh]"
+        className={`w-full h-full min-h-[80vh] md:min-h-[90vh] transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
         allowFullScreen
         sandbox="allow-scripts allow-same-origin"
+        onLoad={() => setIsLoading(false)}
       ></iframe>
     </div>
   );
