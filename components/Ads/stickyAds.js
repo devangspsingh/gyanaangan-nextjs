@@ -44,16 +44,15 @@ export default function StickyAd() {
         X
         </button>
 
-            <div 
-              key={pathname} 
-              className="flex justify-center items-center min-h-[60px] md:min-h-[90px] overflow-hidden bg-slate-950"
-            >
-              {/* We wrap the AdUnit to control width/height explicitly if needed */}
-              <div className="w-full text-center">
-                <AdUnit 
-                  data-ad-slot="1937256059"
-                  data-ad-format="horizontal"
-                />
+        {/* Ad Area - key={pathname} forces a complete re-render on route change */}
+        <div 
+          key={pathname} 
+          className="flex justify-center items-center min-h-[60px] md:min-h-[90px] overflow-hidden bg-slate-950"
+        >
+          {/* We wrap the AdUnit to control width/height explicitly if needed */}
+          <div className="w-full text-center">
+            <AdUnit 
+               data-ad-slot="1937256059" // Make sure this slot ID is correct for a Display Ad
                style={{ display: 'inline-block', width: '100%', maxWidth: '970px', height: 'auto', minHeight: '50px' }}
             />
           </div>
