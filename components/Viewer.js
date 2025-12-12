@@ -221,7 +221,7 @@ const GoogleDocsViewer = ({ resourceViewUrl, resource }) => {
                       <AdUnit
                         type="horizontal"
                         data-ad-slot="3516444227"
-                        style={{ display: 'inline', width: '728px', maxHeight: '90px' }}
+                        style={{ display: 'inline', maxHeight: '90px' }}
                       />
                     </div>
                   </div>
