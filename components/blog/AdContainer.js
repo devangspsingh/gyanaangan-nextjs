@@ -8,8 +8,8 @@ export const AdContainer = ({ children }) => {
 
     useEffect(() => {
         try {
-            // Check if window exists to prevent server-side errors
             if (typeof window !== 'undefined') {
+                // Trigger the ad request after the component mounts/updates
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
             }
         } catch (err) {
@@ -19,13 +19,16 @@ export const AdContainer = ({ children }) => {
 
     return (
         <div 
-            className='bg-slate-900 rounded-lg overflow-hidden my-6 min-h-[100px]' 
-            key={pathname} // <--- This forces the refresh
+            className='bg-slate-900/50 rounded-lg overflow-hidden my-6 flex justify-center items-center' 
+            key={pathname}
         >
-            <div className='text-[10px] text-gray-500 uppercase tracking-widest text-center py-1'>
-                Advertisement
-            </div>
-            <div className='flex justify-center items-center'>
+            <div className='relative w-full flex flex-col items-center p-4'>
+                <div className='text-[10px] text-gray-400 uppercase tracking-widest mb-2'>
+                    Advertisement
+                </div>
+                {/* We do NOT enforce width here. 
+                   We let the child (AdUnit) define its exact pixel width via CSS/Tailwind 
+                */}
                 {children}
             </div>
         </div>

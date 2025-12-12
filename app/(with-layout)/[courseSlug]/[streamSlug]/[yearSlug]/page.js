@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
 
   const { courseSlug, streamSlug, yearSlug } = await params;
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
-  console.log(response.data)
+  // console.log(response.data)
   if (response.error || !response.data) {
     return {
       title: 'Page Not Found - Gyan Aangan',

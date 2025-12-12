@@ -130,7 +130,7 @@ export default function ResourceActionsClient({ resource }) {
             )}
             {isSaving ? 'Saving...' : (currentIsSaved ? 'Unsave Resource' : 'Save Resource')}
           </Button>
-          {console.log(resource)}
+          {/* {console.log(resource)} */}
           {resource?.privacy?.includes('download') && (
             <Button
               onClick={handleDownload}
