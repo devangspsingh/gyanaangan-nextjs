@@ -166,13 +166,15 @@ const GoogleDocsViewer = ({ resourceViewUrl }) => {
             {/* Full Screen Layout Wrapper 
               Using h-[100dvh] for mobile browser compatibility (address bar)
             */}
-            <div className="w-screen h-[100dvh] flex flex-col md:flex-row overflow-hidden">
+            <div className="w-screen !h-[100dvh] flex flex-col md:flex-row overflow-hidden">
 
               {/* Left Ad - Only for Large Screens (>1280px) */}
               {screenSize === 'large' && (
-                <div className="hidden xl:flex w-[320px] h-full flex-col justify-center items-center bg-stone-950 border-r border-stone-800 shrink-0 z-40">
+                <div className="hidden xl:flex w-[300px] h-full flex-col justify-center items-center bg-stone-950 border-r border-stone-800 shrink-0 z-40 overflow-hidden relative">
                   <div className="text-stone-500 text-xs mb-4 uppercase tracking-wider">Advertisement</div>
-                  <AdUnit type="vertical" />
+                  <div className="w-[300px] h-full overflow-hidden flex items-center justify-center">
+                    <AdUnit type="vertical" />
+                  </div>
                 </div>
               )}
 
@@ -195,19 +197,39 @@ const GoogleDocsViewer = ({ resourceViewUrl }) => {
                   <DocsIframe viewerUrl={viewerUrl} className="absolute inset-0 w-full h-full" />
                 </div>
                 
-                {/* Mobile Bottom Ad - Only for Mobile (<768px) */}
+                {/* Mobile Bottom Ad - Only for Mobile (<768px) 
+                   - Added !h-[90px] !max-h-[90px] !min-h-[90px] to enforce strict height
+                   - Added overflow-hidden to clip any expanding content
+                   - Added z-index to ensure it sits on top if needed
+                */}
                 {screenSize === 'mobile' && (
-                  <div className="h-[90px] bg-stone-950 flex items-center justify-center shrink-0 border-t border-stone-800 w-full z-40">
-                    <AdUnit type="horizontal" style={{ maxHeight: '90px', width: '100%' }} />
+                  <div 
+                    className="!h-[90px] !max-h-[90px] !min-h-[90px] bg-stone-950 flex items-center justify-center shrink-0 border-t border-stone-800 w-full z-40 overflow-hidden relative"
+                    style={{ height: '90px', maxHeight: '90px', minHeight: '90px' }} // Inline styles as backup
+                  >
+                    <div className="w-full !h-[90px] !max-h-[90px] flex items-center justify-center overflow-hidden">
+                      <AdUnit 
+                        type="horizontal" 
+                        style={{ 
+                          maxHeight: '90px', 
+                          height: '90px', 
+                          minHeight: '90px', 
+                          width: '100%',
+                          overflow: 'hidden' 
+                        }} 
+                      />
+                    </div>
                   </div>
                 )}
               </div>
 
               {/* Right Ad - For Mid (768px+) and Large Screens */}
               {(screenSize === 'mid' || screenSize === 'large') && (
-                <div className="hidden md:flex w-[320px] h-full flex-col justify-center items-center bg-stone-950 border-l border-stone-800 shrink-0 z-40">
+                <div className="hidden md:flex w-[300px] h-full flex-col justify-center items-center bg-stone-950 border-l border-stone-800 shrink-0 z-40 overflow-hidden relative">
                   <div className="text-stone-500 text-xs mb-4 uppercase tracking-wider">Advertisement</div>
-                  <AdUnit type="vertical" />
+                  <div className="w-[300px] h-full overflow-hidden flex items-center justify-center">
+                    <AdUnit type="vertical" />
+                  </div>
                 </div>
               )}
 
