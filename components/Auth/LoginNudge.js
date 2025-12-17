@@ -93,10 +93,11 @@ export default function LoginNudge() {
         };
     }, [isAuthenticated, loading, pathname, router]);
     const handleGoogleSuccess = async (credentialResponse) => {
+        const toastId = toast.loading('Verifying account...');
         try {
             const idToken = credentialResponse.credential;
             if (!idToken) {
-                toast.error("Google login failed: No ID token received.");
+                toast.error("Google login failed: No ID token received.", { id: toastId });
                 return;
             }
 
@@ -106,7 +107,7 @@ export default function LoginNudge() {
 
             const { user, access, refresh } = backendResponse.data;
             login(user, access, refresh);
-            toast.success('Welcome back!');
+            toast.success('Welcome back!', { id: toastId });
             setOpen(false);
 
             // No redirect needed, we are already on the page!
@@ -116,7 +117,7 @@ export default function LoginNudge() {
         } catch (error) {
             console.error('Nudge Login failed:', error);
             const errorMessage = error.response?.data?.detail || 'Login failed. Please try again.';
-            toast.error(errorMessage);
+            toast.error(errorMessage, { id: toastId, duration: 5000 });
         }
     };
 
