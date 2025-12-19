@@ -19,7 +19,8 @@ export async function generateMetadata({ searchParams }) {
   let totalPages = 1;
   try {
     const response = await getBlogPosts(page, 9);
-    totalPages = response.data?.count || 1;
+    const totalCount = response.data?.count || 0;
+    totalPages = Math.ceil(totalCount / 9);
   } catch (error) {
     console.error('Error fetching metadata:', error);
   }
@@ -80,7 +81,10 @@ export default async function BlogPage({ searchParams }) {
   const initialPosts = postsResponse.error ? [] : postsResponse.data.results;
   const categories = categoriesResponse.error ? [] : categoriesResponse.data;
   const featuredPosts = featuredResponse.error ? [] : featuredResponse.data;
-  const totalPages = postsResponse.data?.count || 1;
+  
+  // Calculate total pages from count and page size
+  const totalCount = postsResponse.data?.count || 0;
+  const totalPages = Math.ceil(totalCount / postsPerPage);
 
   // If requested page is beyond total pages, redirect to last valid page or home
   if (currentPage > totalPages && totalPages > 0) {
