@@ -1,73 +1,146 @@
 import { getBlogPosts, getBlogCategories, getFeaturedPosts } from '@/services/apiService';
 import BlogPostCard from '@/components/blog/BlogPostCard';
-// import BlogSidebar from '@/components/blog/BlogSidebar';
-import BlogInfiniteScroll from '@/components/blog/BlogInfiniteScroll';
+import BlogPostsGrid from '@/components/blog/BlogPostsGrid';
 import { Suspense } from 'react';
 import BlogSidebar from '@/components/blog/BlogSidebar';
+import { generateBlogListSchema } from '@/lib/schemas/blogSchemas';
+import BlogPagination from '@/components/blog/BlogPagination';
 
-export const metadata = {
-  title: 'Blog - GyanAangan',
-  description: 'Explore our latest articles, tutorials, and educational content.',
-};
+export async function generateMetadata({ searchParams }) {
+  const params = await searchParams;
+  const page = parseInt(params?.page) || 1;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 
-export default async function BlogPage() {
+  const title = page > 1 ? `Blog - Page ${page} | GyanAangan` : 'Blog - GyanAangan';
+  const description = 'Explore our latest articles, tutorials, and educational content.';
+  const canonicalUrl = page > 1 ? `${siteUrl}/blog?page=${page}` : `${siteUrl}/blog`;
+
+  // Fetch total pages for prev/next links
+  let totalPages = 1;
+  try {
+    const response = await getBlogPosts(page, 9);
+    totalPages = response.data?.total_pages || 1;
+  } catch (error) {
+    console.error('Error fetching metadata:', error);
+  }
+
+  const metadata = {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+
+  // Add other alternate links for pagination
+  if (page > 1 || page < totalPages) {
+    metadata.other = {};
+
+    if (page > 1) {
+      const prevUrl = page === 2 ? `${siteUrl}/blog` : `${siteUrl}/blog?page=${page - 1}`;
+      metadata.other.prev = prevUrl;
+    }
+
+    if (page < totalPages) {
+      metadata.other.next = `${siteUrl}/blog?page=${page + 1}`;
+    }
+  }
+
+  return metadata;
+}
+
+export default async function BlogPage({ searchParams }) {
+  const params = await searchParams;
+  const currentPage = parseInt(params?.page) || 1;
+  const postsPerPage = 9; // Adjust as needed
+
   // Fetch initial data
   const [postsResponse, categoriesResponse, featuredResponse] = await Promise.all([
-    getBlogPosts(1, 150),
+    getBlogPosts(currentPage, postsPerPage),
     getBlogCategories(),
-    getFeaturedPosts()
+    currentPage === 1 ? getFeaturedPosts() : Promise.resolve({ data: [] })
   ]);
 
   const initialPosts = postsResponse.error ? [] : postsResponse.data.results;
   const categories = categoriesResponse.error ? [] : categoriesResponse.data;
   const featuredPosts = featuredResponse.error ? [] : featuredResponse.data;
-  const totalPages = postsResponse.data?.total_pages || 1;
+  const totalPages = postsResponse.data?.count || 1;
+
+  // Generate structured data for SEO
+  const blogListSchema = generateBlogListSchema(initialPosts, currentPage, totalPages);
 
   return (
-    <main className="container mx-auto py-8 px-4">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Main Content Area */}
-        <div className="lg:col-span-12 xl:col-span-12">
-          <h1 className="text-4xl font-bold text-white mb-8">Blog</h1>
+    <>
+      {/* Add JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
+      />
 
-          {/* Featured Posts Carousel/Grid - Only on first page */}
-          {featuredPosts.length > 0 && (
-            <section className="mb-12">
-              <h2 className="text-2xl font-semibold text-white mb-6">Featured Posts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
-                {featuredPosts.map(post => (
-                  <BlogPostCard
-                    key={post.slug}
-                    post={post}
-                    featured={true}
-                  />
-                ))}
-              </div>
+      <main className="container mx-auto py-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Main Content Area */}
+          <div className="lg:col-span-12 xl:col-span-12">
+            <h1 className="text-4xl font-bold text-white mb-8">
+              {currentPage > 1 ? `Blog - Page ${currentPage}` : 'Blog'}
+            </h1>
+
+            {/* Featured Posts Carousel/Grid - Only on first page */}
+            {currentPage === 1 && featuredPosts.length > 0 && (
+              <section className="mb-12">
+                <h2 className="text-2xl font-semibold text-white mb-6">Featured Posts</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
+                  {featuredPosts.map(post => (
+                    <BlogPostCard
+                      key={post.slug}
+                      post={post}
+                      featured={true}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Blog Posts Grid with Pagination */}
+            <section>
+              <h2 className="text-2xl font-semibold text-white mb-6">
+                {currentPage === 1 ? 'Latest Posts' : `Posts - Page ${currentPage}`}
+              </h2>
+              <Suspense fallback={<BlogPostsSkeleton />}>
+                <BlogPostsGrid
+                  initialPosts={initialPosts}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  enableLoadMore={false} // Set to true for hybrid approach
+                />
+              </Suspense>
             </section>
-          )}
+            {/* <BlogPagination currentPage={currentPage}  totalPages={totalPages}/> */}
+          </div>
 
-          {/* Blog Posts Grid with Infinite Scroll */}
-          <section>
-            <h2 className="text-2xl font-semibold text-white mb-6">Latest Posts</h2>
-            <Suspense fallback={<BlogPostsSkeleton />}>
-              <BlogInfiniteScroll
-                initialPosts={initialPosts}
-                totalPages={totalPages}
+
+          {/* Sidebar */}
+          {true &&
+            <aside className="lg:col-span-4 xl:col-span-3">
+              <BlogSidebar
+                categories={categories}
+                featuredPosts={currentPage === 1 ? featuredPosts.slice(0, 3) : []}
               />
-            </Suspense>
-          </section>
+            </aside>}
         </div>
-
-        {/* Sidebar */}
-        {true &&
-          <aside className="lg:col-span-4 xl:col-span-3">
-            <BlogSidebar 
-            categories={categories}
-            featuredPosts={featuredPosts.slice(0, 3)}
-          />
-          </aside>}
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 
@@ -82,6 +155,7 @@ function BlogPostsSkeleton() {
         </div>
       ))}
     </div>
+
   );
 }
 

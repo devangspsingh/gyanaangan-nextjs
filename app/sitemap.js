@@ -135,6 +135,7 @@ export default async function sitemap() {
 
     // Fetch all blog posts
     let blogPages = [];
+    let blogPaginationPages = [];
     try {
       const posts = await fetchAllPages(getBlogPosts);
       blogPages = posts.map((post) => ({
@@ -143,6 +144,20 @@ export default async function sitemap() {
         changeFrequency: 'weekly',
         priority: 0.7,
       }));
+
+      // Add pagination pages for blog
+      // Assuming 9 posts per page
+      const postsPerPage = 9;
+      const totalBlogPages = Math.ceil(posts.length / postsPerPage);
+      
+      for (let page = 2; page <= totalBlogPages; page++) {
+        blogPaginationPages.push({
+          url: `${SITE_URL}/blog?page=${page}`,
+          lastModified: new Date(),
+          changeFrequency: 'daily',
+          priority: 0.6,
+        });
+      }
     } catch (error) {
       console.error('❌ [Sitemap] Error fetching blog posts:', error);
     }
@@ -154,6 +169,7 @@ export default async function sitemap() {
       ...subjectPages,
       ...resourcePages,
       ...blogPages,
+      ...blogPaginationPages,
     ];
 
 
