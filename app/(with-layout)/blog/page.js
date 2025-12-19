@@ -19,7 +19,7 @@ export async function generateMetadata({ searchParams }) {
   let totalPages = 1;
   try {
     const response = await getBlogPosts(page, 9);
-    totalPages = response.data?.total_pages || 1;
+    totalPages = response.data?.count || 1;
   } catch (error) {
     console.error('Error fetching metadata:', error);
   }
