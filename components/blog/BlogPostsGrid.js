@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BlogPostCard from './BlogPostCard';
 import BlogPagination from './BlogPagination';
 import { getBlogPosts } from '@/services/apiService';
@@ -14,6 +14,12 @@ export default function BlogPostsGrid({
   const [posts, setPosts] = useState(initialPosts);
   const [loading, setLoading] = useState(false);
   const [loadedPages, setLoadedPages] = useState(new Set([currentPage]));
+
+  // Sync state when initialPosts change (for page navigation)
+  useEffect(() => {
+    setPosts(initialPosts);
+    setLoadedPages(new Set([currentPage]));
+  }, [initialPosts, currentPage]);
 
   const loadMorePosts = async () => {
     if (loading) return;

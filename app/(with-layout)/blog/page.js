@@ -4,7 +4,7 @@ import BlogPostsGrid from '@/components/blog/BlogPostsGrid';
 import { Suspense } from 'react';
 import BlogSidebar from '@/components/blog/BlogSidebar';
 import { generateBlogListSchema } from '@/lib/schemas/blogSchemas';
-import BlogPagination from '@/components/blog/BlogPagination';
+import { redirect } from 'next/navigation';
 
 export async function generateMetadata({ searchParams }) {
   const params = await searchParams;
@@ -65,6 +65,11 @@ export default async function BlogPage({ searchParams }) {
   const currentPage = parseInt(params?.page) || 1;
   const postsPerPage = 9; // Adjust as needed
 
+  // Validate page number - must be positive integer
+  if (currentPage < 1 || !Number.isInteger(currentPage)) {
+    redirect('/blog');
+  }
+
   // Fetch initial data
   const [postsResponse, categoriesResponse, featuredResponse] = await Promise.all([
     getBlogPosts(currentPage, postsPerPage),
@@ -76,6 +81,17 @@ export default async function BlogPage({ searchParams }) {
   const categories = categoriesResponse.error ? [] : categoriesResponse.data;
   const featuredPosts = featuredResponse.error ? [] : featuredResponse.data;
   const totalPages = postsResponse.data?.count || 1;
+
+  // If requested page is beyond total pages, redirect to last valid page or home
+  if (currentPage > totalPages && totalPages > 0) {
+    redirect(totalPages === 1 ? '/blog' : `/blog?page=${totalPages}`);
+  }
+
+  // If no posts found on page 1, show empty state
+  // If no posts found on other pages, redirect to page 1
+  if (initialPosts.length === 0 && currentPage > 1) {
+    redirect('/blog');
+  }
 
   // Generate structured data for SEO
   const blogListSchema = generateBlogListSchema(initialPosts, currentPage, totalPages);
@@ -117,16 +133,17 @@ export default async function BlogPage({ searchParams }) {
               <h2 className="text-2xl font-semibold text-white mb-6">
                 {currentPage === 1 ? 'Latest Posts' : `Posts - Page ${currentPage}`}
               </h2>
+
               <Suspense fallback={<BlogPostsSkeleton />}>
                 <BlogPostsGrid
+                  key={currentPage}
                   initialPosts={initialPosts}
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  enableLoadMore={false} // Set to true for hybrid approach
+                  enableLoadMore={false}
                 />
               </Suspense>
             </section>
-            {/* <BlogPagination currentPage={currentPage}  totalPages={totalPages}/> */}
           </div>
 
 
