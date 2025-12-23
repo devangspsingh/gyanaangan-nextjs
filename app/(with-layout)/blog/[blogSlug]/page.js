@@ -74,12 +74,14 @@ export default async function BlogPostPage({ params }) {
         <article className="lg:col-span-8 xl:col-span-9">
           {/* Header */}
           <header className="mb-8">
-            <div className="relative mb-6 rounded-lg overflow-hidden">
+            <div className="relative mb-6 rounded-lg overflow-hidden aspect-video">
               {post.featured_image ? (
-                <img
+                <Image
                   src={post.featured_image}
                   alt={post.title}
-                  className="object-cover w-full h-full"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  className="object-cover"
                   priority
                 />
               ) : (
