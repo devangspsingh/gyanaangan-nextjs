@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { trackBannerView, trackBannerClick } from '@/services/apiService';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { trackBannerClick } from '@/services/apiService';
 import BannerContent from './BannerContent';
 
 export default function BannerSlider({ banners: initialBanners }) {
@@ -22,13 +22,6 @@ export default function BannerSlider({ banners: initialBanners }) {
 
     return () => clearInterval(interval);
   }, [banners.length, isPaused, isVisible]);
-
-  // Track view when banner changes
-  useEffect(() => {
-    if (banners.length && banners[currentIndex] && isVisible) {
-      trackBannerView(banners[currentIndex].id);
-    }
-  }, [currentIndex, banners, isVisible]);
 
   const goToNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
@@ -66,15 +59,15 @@ export default function BannerSlider({ banners: initialBanners }) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Banner Content - Dynamic height based on screen size and image type */}
+      {/* Banner Content - Single render with responsive images handled in BannerContent */}
       <div className="relative w-full">
         {/* Desktop aspect ratio */}
         <div className="hidden md:block" style={{ aspectRatio: '1600/324' }}>
           {banners.map((banner, index) => (
             <div
-              key={`desktop-${banner.id}`}
+              key={`banner-${banner.id}`}
               className={`absolute inset-0 transition-opacity duration-700 ${
-                index === currentIndex ? 'opacity-100' : 'opacity-0'
+                index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
             >
               {banner.link_url ? (
@@ -83,17 +76,16 @@ export default function BannerSlider({ banners: initialBanners }) {
                   onClick={() => handleBannerClick(banner)}
                   className="block w-full h-full"
                 >
-                  <BannerContent banner={banner} isMobile={false} />
+                  <BannerContent banner={banner} />
                 </Link>
               ) : (
                 <div className="block w-full h-full">
-                  <BannerContent banner={banner} isMobile={false} />
+                  <BannerContent banner={banner} />
                 </div>
               )}
             </div>
           ))}
         </div>
-        
 
         {/* Mobile aspect ratio */}
         <div 
@@ -102,9 +94,9 @@ export default function BannerSlider({ banners: initialBanners }) {
         >
           {banners.map((banner, index) => (
             <div
-              key={`mobile-${banner.id}`}
+              key={`banner-mobile-${banner.id}`}
               className={`absolute inset-0 transition-opacity duration-700 ${
-                index === currentIndex ? 'opacity-100' : 'opacity-0'
+                index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
             >
               {banner.link_url ? (
@@ -113,11 +105,11 @@ export default function BannerSlider({ banners: initialBanners }) {
                   onClick={() => handleBannerClick(banner)}
                   className="block w-full h-full"
                 >
-                  <BannerContent banner={banner} isMobile={true} />
+                  <BannerContent banner={banner} />
                 </Link>
               ) : (
                 <div className="block w-full h-full">
-                  <BannerContent banner={banner} isMobile={true} />
+                  <BannerContent banner={banner} />
                 </div>
               )}
             </div>
