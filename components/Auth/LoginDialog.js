@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Dialog,
@@ -19,13 +20,16 @@ const LoginDialogContentInner = ({ title, description, children, showBenefits, o
 
         {/* --- 1. Logo and Brand Name (Moved to top) --- */}
         <div className="mb-6 flex flex-col items-center content-center justify-center">
-          <img
-            className="h-22 w-auto" // Adjusted size
-            src="/images/logo white.png" // Assuming this is the tree/book logo
+          <Image
+            src="/images/logo white.png"
             alt="Gyan Aangan Logo"
+            width={88}
+            height={88}
+            className="h-22 w-auto"
+            priority
           />
           <div className="self-center text-2xl font-semibold whitespace-nowrap text-white">
-            GyanAangan {/* Added space, removed font-mono */}
+            GyanAangan
           </div>
         </div>
 

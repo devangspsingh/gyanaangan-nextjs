@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { Bars3Icon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -95,10 +96,13 @@ export default function Header() {
           
           <div className="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
             <Link href="/" className="flex flex-shrink-0 items-center">
-              <img
-                className="h-10 w-auto"
+              <Image
                 src="/images/logo white.png"
                 alt="Gyan Aangan Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto"
+                priority
               />
               <span className="ml-2 self-center font-mono text-xl font-semibold whitespace-nowrap text-white">
                 GyanAangan
