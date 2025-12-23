@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 const Loading = () => {
   return (
@@ -11,12 +12,12 @@ const Loading = () => {
       textAlign: 'center'
     }}>
       {/* You might need to adjust the path and dimensions for your logo */}
-      <img 
-        src="/images/logo white.png" // Example path, adjust as needed
+      <Image 
+        src="/images/logo white.png"
         alt="Gyan Aangan Logo" 
-        width={150} // Example width
-        height={150} // Example height
-        priority={1}// Preleroad the logo if it's critical for LCP
+        width={150}
+        height={150}
+        priority
       />
   
     </div>

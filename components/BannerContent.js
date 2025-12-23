@@ -1,52 +1,39 @@
+'use client';
 
-import { getImageProps } from 'next/image';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export default function BannerContent({ banner }) {
   const desktopImage = banner.image_url;
   const mobileImage = banner.mobile_image_url || banner.image_url;
-  const altText = banner.description || banner.title || 'Banner';
+  const hasMobileImage = banner.mobile_image_url && banner.mobile_image_url !== banner.image_url;
 
-  // Use getImageProps for art direction - browser only downloads the matching image
-  const common = { 
-    alt: altText, 
-    sizes: '100vw',
-    quality: 85,
-    priority: true,
-  };
 
-  const {
-    props: { srcSet: desktopSrcSet, src: desktopSrc, ...desktopRest },
-  } = getImageProps({ 
-    ...common, 
-    width: 1600, 
-    height: 324, 
-    src: desktopImage 
-  });
 
-  const {
-    props: { srcSet: mobileSrcSet, src: mobileSrc, ...mobileRest },
-  } = getImageProps({ 
-    ...common, 
-    width: 1600, 
-    height: 648, 
-    src: mobileImage 
-  });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <div className="relative w-full h-full">
-      <picture>
-        {/* Desktop image - loads only on md+ screens */}
-        <source media="(min-width: 768px)" srcSet={desktopSrcSet} />
-        {/* Mobile image - loads only on smaller screens */}
-        <source media="(max-width: 767px)" srcSet={mobileSrcSet} />
-        <img
-          src={desktopSrc}
-          alt={altText}
-          className="w-full h-full object-cover"
-          fetchPriority="high"
-          decoding="async"
-        />
-      </picture>
+      <Image
+        src={isMobile ? mobileImage : desktopImage}
+        alt={banner.description || banner.title || 'Banner'}
+        fill
+        sizes="100vw"
+        className="object-cover"
+        priority
+        quality={85}
+      />
     </div>
   );
 }
