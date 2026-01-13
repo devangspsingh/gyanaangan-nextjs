@@ -6,17 +6,32 @@ const FooterNavigation = () => {
 
   return (
     <div className="relative bg-gray-950/50 backdrop-blur-sm border-t border-gray-700/50 text-gray-400 text-sm overflow-hidden">
-      
+
       {/* Stylized Background Text */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-        <span className="text-[18vw] md:text-[12vw] font-black text-white/40 tracking-tighter leading-none whitespace-nowrap font-heading-main">
-          GyanAangan.in
-        </span>
-      </div>
+
+ <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+  <span className="
+    text-[18vw] md:text-[12vw]
+    font-black
+    leading-none
+    whitespace-nowrap
+    tracking-tighter
+    text-transparent
+    bg-clip-text
+    bg-gradient-to-b
+    from-white/60
+    via-white/30
+    to-white/5
+    font-heading-main
+  ">
+    GyanAangan.in
+  </span>
+</div> 
+
 
       <div className="relative z-10 max-w-7xl mx-auto pb-52 pt-12 md:pb-42 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <div className="flex items-center">
-          <FaRegCopyright className="mr-2" /> 
+          <FaRegCopyright className="mr-2" />
           <span>{currentYear} GyanAangan.in All rights reserved.</span>
         </div>
         <nav className="flex space-x-6">

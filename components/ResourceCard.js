@@ -140,7 +140,7 @@ export default function ResourceCard({ resource, variant = 'default', customHref
                                 <ResourceTypeIcon type={resource.resource_type} name={resource.name} />
                             </div>
                             {/* Resource Name & Subject (conditional for 'detailed' variant) */}
-                            <div className="ml-1 flex-grow bg-secondary text-primary-dark font-semibold text-sm sm:text-base rounded-l-full pl-4 pr-5 py-3"> {/* Adjusted py */}
+                            <div className="ml-1 flex-grow bg-secondary text-primary-dark font-semibold text-sm rounded-l-full pl-4 pr-5 py-3"> {/* Adjusted py */}
                                 {resource.name}
                                 {variant === 'detailed' && resource.subject_name && (
                                     <div className="text-xs font-normal text-primary-dark/80 mt-1">{resource.subject_name}</div>
