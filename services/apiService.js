@@ -140,10 +140,23 @@ export const getLatestNotification = async () => {
   }
 };
 
-export const searchSite = async (query, page = 1, pageSize = 10) => {
+
+export const searchSite = async (query, filters = {}, page = 1, pageSize = 10) => {
   try {
-    // Ensure params are spread correctly for search as well, if it supports pagination
-    const response = await api.get(getFullUrl('/search/'), { params: { q: query, page, page_size: pageSize } });
+    const params = { 
+        q: query || '', 
+        page, 
+        page_size: pageSize,
+        // Add filters to params
+        course: filters.course || '',
+        stream: filters.stream || '',
+        year: filters.year || ''
+    };
+    
+    // Remove empty keys to keep URL clean
+    Object.keys(params).forEach(key => (params[key] === '' || params[key] == null) && delete params[key]);
+
+    const response = await api.get('/search/', { params });
     return { data: response.data, error: false, fullResponse: response };
   } catch (error) {
     console.error('Error during search:', error);
