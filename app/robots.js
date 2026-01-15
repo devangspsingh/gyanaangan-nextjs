@@ -13,10 +13,7 @@ export default function robots() {
           '/profile/',
           '/event/',
           '/organization/',
-          '/_next/',
-          '/static/',
-          '/api.gyanaangan.in', // Disallow API subdomain
-        ],
+             ],
       },
     //   // Explicitly block API subdomain
     //   {
@@ -25,7 +22,6 @@ export default function robots() {
     //     // This rule applies to api.gyanaangan.in if crawlers check it
     //   },
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL, // Specify the primary domain
+    sitemap: `${SITE_URL}/sitemap.xml`
   };
 }
