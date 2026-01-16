@@ -185,7 +185,9 @@ export default async function NestedResourceDetailPage({ params }) {
         <header className="mb-8">
           <h1 className="text-2xl md:text-3xl font-heading-section font-extrabold text-white mb-3">{resource.name}</h1>
         </header>
-
+        <AdContainer>
+          <AdUnit />
+        </AdContainer>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 xl:col-span-9">
             <Viewer resource={resource} />
@@ -226,6 +228,10 @@ export default async function NestedResourceDetailPage({ params }) {
 
           <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
             <ResourceActionsClient resource={resource} />
+            
+            <AdContainer>
+              <AdUnit />
+            </AdContainer>
 
             {resource.tags && resource.tags.length > 0 && (
               <div className="p-6 bg-stone-800 rounded-lg shadow">
