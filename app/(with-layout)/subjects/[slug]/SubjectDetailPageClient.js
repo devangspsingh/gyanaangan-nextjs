@@ -63,7 +63,7 @@ export default function SubjectDetailPageClient({ subject, resources = [] }) {
             </header>
 
             <AdContainer>
-                <AdUnit data-ad-client='7707469085' />
+                <AdUnit data-ad-slot='7707469085' />
             </AdContainer>
 
             <section>
@@ -123,7 +123,7 @@ export default function SubjectDetailPageClient({ subject, resources = [] }) {
             </section>
 
             <AdContainer>
-                <AdUnit data-ad-client='7707469085' />
+                <AdUnit data-ad-slot='7707469085' />
             </AdContainer>
         </main>
     );
