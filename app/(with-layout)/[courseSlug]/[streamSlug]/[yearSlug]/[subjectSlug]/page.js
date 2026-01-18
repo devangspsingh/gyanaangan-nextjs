@@ -161,7 +161,7 @@ export default async function NestedSubjectDetailPage({ params }) {
           {subject.description && <p className="text-gray-300 mt-2 leading-relaxed">{subject.description}</p>}
         </header>
         <AdContainer>
-          <AdUnit data-ad-client='7707469085' />
+          <AdUnit data-ad-slot='7707469085' />
         </AdContainer>
         <section>
           <SubjectResourcesClient
@@ -173,7 +173,7 @@ export default async function NestedSubjectDetailPage({ params }) {
           />
         </section>
         <AdContainer>
-          <AdUnit data-ad-client='7707469085' />
+          <AdUnit data-ad-slot='7707469085' />
         </AdContainer>
       </main>
     );
