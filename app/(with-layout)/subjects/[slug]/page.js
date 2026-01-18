@@ -1,15 +1,18 @@
-import React, { Suspense } from 'react';
-import { getSubjectBySlug } from '@/services/apiService'; // getResources removed from here
+import Link from 'next/link';
+import { getSubjectBySlug, getResources } from '@/services/apiService';
 import SubjectDetailPageClient from './SubjectDetailPageClient';
-import ResourceCardSkeleton from '@/components/ResourceCardSkeleton'; // Used by client as fallback
-// import ResourceCard from '@/components/ResourceCard';
 
+// Constants for Metadata
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 
+export const dynamic = 'force-dynamic'; // Ensure fresh data on every request
+
 export async function generateMetadata({ params }) {
-  const { slug } = params; // Removed await, params is not a promise
+  const { slug } = await params;
+  
+  // Only fetch subject info for metadata, no need for resources here
   const subjectResponse = await getSubjectBySlug(slug);
 
   if (!subjectResponse.error && subjectResponse.data) {
@@ -22,16 +25,14 @@ export async function generateMetadata({ params }) {
     return {
       title: pageTitle,
       description: pageDescription,
-      alternates: {
-        canonical: canonicalUrl,
-      },
+      alternates: { canonical: canonicalUrl },
       openGraph: {
         title: pageTitle,
         description: pageDescription,
         url: canonicalUrl,
         siteName: SITE_NAME,
         images: [{ url: ogImageUrl, width: 1200, height: 630 }],
-        type: 'article', // Or 'object' if more appropriate for a subject
+        type: 'article',
       },
       twitter: {
         card: 'summary_large_image',
@@ -48,54 +49,59 @@ export async function generateMetadata({ params }) {
   };
 }
 
-// Skeleton for the subject detail page content
-const SubjectDetailContentSkeleton = () => (
-  <div className="container mx-auto py-8 px-4 text-gray-100">
-    <div className="animate-pulse">
-      {/* Breadcrumb Skeleton */}
-      <div className="h-6 bg-gray-700 rounded w-1/2 mb-6"></div>
-      {/* Back Button Skeleton */}
-      <div className="h-8 bg-gray-700 rounded w-24 mb-6"></div>
-      {/* Header Skeleton */}
-      <div className="h-10 bg-gray-700 rounded w-3/4 mb-2"></div>
-      <div className="h-6 bg-gray-700 rounded w-1/2 mb-4"></div>
-      <div className="h-4 bg-gray-700 rounded w-full mb-8"></div>
-      {/* Filters/Search Skeleton */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="h-8 bg-gray-700 rounded w-1/3"></div>
-        <div className="h-10 bg-gray-700 rounded w-1/4"></div>
-      </div>
-      <div className="h-10 bg-gray-700 rounded w-full mb-6"></div> {/* Tabs Skeleton */}
-    </div>
-    {/* Resource list skeleton will be handled by SubjectDetailPageClient's Suspense or internal loading state */}
-    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <ResourceCardSkeleton key={index} />
-      ))}
-    </div>
-  </div>
-);
+export default async function SubjectDetailPageServer({ params }) {
+  const { slug } = params;
 
-async function SubjectDataFetcher({ slug }) {
-  const subjectResponse = await getSubjectBySlug(slug);
-  // Resources are no longer fetched here.
+  try {
+    // 1. Fetch Subject and Resources in parallel for maximum speed
+    const [subjectResponse, resourcesResponse] = await Promise.all([
+      getSubjectBySlug(slug),
+      getResources(1, 100, { subject_slug: slug })
+    ]);
 
-  if (!subjectResponse.error && subjectResponse.data) {
+    // 2. Handle Subject 404/Error
+    if (subjectResponse.error || !subjectResponse.data) {
+      const errorMessage = subjectResponse.data?.detail || 'Subject data could not be loaded.';
+      console.error(`[SubjectPage] Error loading subject ${slug}:`, errorMessage);
+
+      return (
+        <main className="container mx-auto py-8 px-4 text-gray-100">
+           <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 text-red-400 bg-red-900/20 p-6 rounded-lg">
+             <h2 className="text-xl font-bold mb-2">Subject Not Found</h2>
+             <p>{errorMessage}</p>
+             <Link href="/subjects" className="mt-4 text-primary-light hover:underline">Return to Subjects</Link>
+           </div>
+        </main>
+      );
+    }
+
     const subject = subjectResponse.data;
-    // Pass the fetched subject to the client component.
-    // The client component will then fetch its own resources.
-    return <SubjectDetailPageClient slug={slug} initialSubject={subject} />;
-  }
-  
-  // Handle error or subject not found case - Client component will show its error state
-  return <SubjectDetailPageClient slug={slug} initialSubject={null} />;
-}
 
-export default async function SubjectDetailPageServer({ params }) { 
-  const { slug } = params; // Removed await
-  return (
-    <Suspense fallback={<SubjectDetailContentSkeleton />}>
-      <SubjectDataFetcher slug={slug} />
-    </Suspense>
-  );
+    // 3. Process Resources
+    let resources = [];
+    if (!resourcesResponse.error && resourcesResponse.data?.results) {
+      // Sort resources: newest updated first
+      resources = resourcesResponse.data.results.sort((a, b) => 
+        new Date(b.updated_at_iso || b.updated_at) - new Date(a.updated_at_iso || a.updated_at)
+      );
+    } else {
+        console.warn(`[SubjectPage] Failed to load resources for ${slug}`);
+    }
+
+    // 4. Render Client Component with pre-fetched data
+    return (
+      <SubjectDetailPageClient 
+        subject={subject} 
+        resources={resources} 
+      />
+    );
+
+  } catch (error) {
+    console.error('[SubjectPage] Critical error:', error);
+    return (
+      <div className="container mx-auto py-8 px-4 text-gray-100 text-center">
+        <p className="text-red-500">An unexpected error occurred. Please try again later.</p>
+      </div>
+    );
+  }
 }

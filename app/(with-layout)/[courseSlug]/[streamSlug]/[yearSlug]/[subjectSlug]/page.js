@@ -9,12 +9,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { AdContainer } from '@/components/blog/AdContainer';
+import { AdUnit } from '@/components/blog/AdUnit';
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
-  
+
   const { courseSlug, streamSlug, yearSlug, subjectSlug } = params;
-  
+
   try {
     const [subjectResponse, parentDataResponse] = await Promise.all([
       getSubjectBySlug(subjectSlug),
@@ -30,8 +32,8 @@ export async function generateMetadata({ params }) {
 
     const subject = subjectResponse.data;
     const parentData = parentDataResponse.data || {};
-    const pageTitle = subject.name 
-      ? `${subject.name} - ${parentData.course?.name || ''} - Gyan Aangan` 
+    const pageTitle = subject.name
+      ? `${subject.name} - ${parentData.course?.name || ''} - Gyan Aangan`
       : "Subject Details - Gyan Aangan";
     const pageDescription = subject.meta_description || subject.description || "Subject details and resources on Gyan Aangan";
 
@@ -58,7 +60,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function NestedSubjectDetailPage({ params }) {
-  
+
   const { courseSlug, streamSlug, yearSlug, subjectSlug } = params;
 
   try {
@@ -74,7 +76,7 @@ export default async function NestedSubjectDetailPage({ params }) {
     if (subjectResponse.error || !subjectResponse.data) {
       const errorMessage = subjectResponse.data?.detail || 'Unknown error';
       console.error('❌ [Subject Page] Failed to load subject:', errorMessage);
-      
+
       return (
         <div className="container mx-auto py-8 px-4 text-gray-100">
           <p className="text-red-500">Error: Failed to load subject: {errorMessage}</p>
@@ -158,9 +160,11 @@ export default async function NestedSubjectDetailPage({ params }) {
           {subject.common_name && <p className="text-lg text-gray-400 mb-1">({subject.common_name})</p>}
           {subject.description && <p className="text-gray-300 mt-2 leading-relaxed">{subject.description}</p>}
         </header>
-
+        <AdContainer>
+          <AdUnit data-ad-client='7707469085' />
+        </AdContainer>
         <section>
-          <SubjectResourcesClient 
+          <SubjectResourcesClient
             allResources={allResources}
             courseSlug={courseSlug}
             streamSlug={streamSlug}
@@ -168,6 +172,9 @@ export default async function NestedSubjectDetailPage({ params }) {
             subjectSlug={subjectSlug}
           />
         </section>
+        <AdContainer>
+          <AdUnit data-ad-client='7707469085' />
+        </AdContainer>
       </main>
     );
   } catch (error) {
