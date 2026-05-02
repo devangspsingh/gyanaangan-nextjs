@@ -3,6 +3,7 @@ import { Providers } from '@/components/Providers'; // Adjust path
 import '../globals.css';
 import DynamicBackground from '@/app/dynamicBackgroud';
 import './dashboard.css'
+import StickyNotification from '@/components/mine/ui/StickyNotification';
 export const metadata = {
   metadataBase: new URL('https://gyanaangan.in'),
   title: 'Gyan Aangan | Explore courses, resources, and subjects....',
@@ -27,9 +28,9 @@ export default function RootLayout({ children }) {
 
       <body className="bg-[#010717]">
         <Providers>
-          
-            {children}
-         
+          <DynamicBackground />
+          <StickyNotification />
+          {children}
         </Providers>
       </body>
       <GoogleAnalytics gaId="G-P37HBDS10M" />

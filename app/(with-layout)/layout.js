@@ -24,6 +24,7 @@ const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-m
 import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
 import LoginNudge from '@/components/Auth/LoginNudge'; // Import LoginNudge
 import StickyAd from '@/components/Ads/stickyAds';
+import StickyNotification from '@/components/mine/ui/StickyNotification';
 
 export default function RootLayout({ children }) {
   return (
@@ -52,6 +53,7 @@ export default function RootLayout({ children }) {
           <Header />
           {/* <GoogleAdSense publisherId="ca-pub-3792754105959046" /> */}
           {/* <AdSenseComponent/> */}
+          <StickyNotification />
           <div className="relative container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">
             {children}
           </div>
