@@ -126,13 +126,15 @@ export default function AdminContentDashboard() {
                     </div>
                   </div>
                   {/* For simplicity we use a slug for edit although it doesn't exist yet */}
-                  <Link
-                    href={`/admin-m/content/edit/${resource.slug}`}
-                    className="ml-4 text-blue-600 dark:text-blue-400 hover:underline flex items-center text-sm"
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    Edit
-                  </Link>
+                  {resource.can_edit && (
+                    <Link
+                      href={`/admin-m/content/edit/${resource.slug}`}
+                      className="ml-4 text-blue-600 dark:text-blue-400 hover:underline flex items-center text-sm"
+                    >
+                      <Edit className="w-4 h-4 mr-1" />
+                      Edit
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}

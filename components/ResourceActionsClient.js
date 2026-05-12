@@ -132,7 +132,7 @@ export default function ResourceActionsClient({ resource }) {
             {isSaving ? 'Saving...' : (currentIsSaved ? 'Unsave Resource' : 'Save Resource')}
           </Button>
           
-          {user?.hasContentManagement && (
+          {user?.hasContentManagement && resource?.can_edit && (
             <Button
               asChild
               variant="outline"

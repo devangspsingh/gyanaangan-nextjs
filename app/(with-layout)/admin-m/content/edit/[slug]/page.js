@@ -13,14 +13,14 @@ import ResourceMetadataForm from '@/components/admin/ResourceMetadataForm';
 export default function EditContentPage() {
   const router = useRouter();
   const { slug } = useParams();
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   // Data for dropdowns
   const [allSubjects, setAllSubjects] = useState([]);
   const [educationalYears, setEducationalYears] = useState([]);
-  
+
   // Resource state
   const [resource, setResource] = useState({
     name: '',
@@ -43,8 +43,13 @@ export default function EditContentPage() {
         axiosInstance.get('/admin/content/subjects/'),
         axiosInstance.get('/admin/content/educational-years/'),
       ]);
-      
+
       const resData = resourceRes.data;
+      if (!resData.can_edit) {
+        alert('You are not authorized to edit this resource.');
+        router.back();
+        return;
+      }
       setResource({
         name: resData.name || '',
         description: resData.description || '',
@@ -54,10 +59,10 @@ export default function EditContentPage() {
         educational_year: resData.educational_year?.id || resData.educational_year || '',
         keywords: resData.keywords || '',
       });
-      
+
       setAllSubjects(subjectsRes.data.results || subjectsRes.data || []);
       setEducationalYears(eduYearsRes.data.results || eduYearsRes.data || []);
-      
+
       setLoading(false);
     } catch (error) {
       console.error("Failed to load resource data", error);
@@ -80,7 +85,7 @@ export default function EditContentPage() {
         status: resource.status,
         keywords: resource.keywords,
       };
-      
+
       if (resource.subject) payload.subject = resource.subject;
       if (resource.educational_year) payload.educational_year_id = resource.educational_year;
 
