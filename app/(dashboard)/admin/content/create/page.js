@@ -232,7 +232,7 @@ export default function CreateContentPage() {
       formData.append('meta_description', resource.meta_description);
       formData.append('keywords', resource.keywords);
       if (resource.subject) formData.append('subject', resource.subject);
-      if (resource.educational_year) formData.append('educational_year', resource.educational_year);
+      if (resource.educational_year) formData.append('educational_year_id', resource.educational_year);
       if (globalUploadedById) formData.append('uploaded_by_id', globalUploadedById);
       
       // Privacy is multiselect
@@ -505,16 +505,6 @@ export default function CreateContentPage() {
                     className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
-                  <textarea
-                    value={resource.description}
-                    onChange={(e) => updateResourceData(index, 'description', e.target.value)}
-                    disabled={resource.isSaved}
-                    rows={4}
-                    className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  />
-                </div>
               </div>
 
               <div className="space-y-4">
@@ -620,6 +610,17 @@ export default function CreateContentPage() {
                   />
                 </div>
               </div>
+            </div>
+            
+            <div className="px-6 pb-6">
+              <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
+              <textarea
+                value={resource.description}
+                onChange={(e) => updateResourceData(index, 'description', e.target.value)}
+                disabled={resource.isSaved}
+                rows={10}
+                className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              />
             </div>
           </div>
         )})}

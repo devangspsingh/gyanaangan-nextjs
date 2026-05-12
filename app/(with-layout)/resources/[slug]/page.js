@@ -234,7 +234,7 @@ export default async function ResourceDetailPageServer({ params }) {
                   </div>
                 )}
                 <div>
-                  <p className="text-white font-medium text-sm md:text-base">Uploaded by {resource.uploaded_by_user.name}</p>
+                  <p className="text-white font-medium text-sm md:text-base">Contributed by {resource.uploaded_by_user.name}</p>
                   {(resource.uploaded_by_user.branch || resource.uploaded_by_user.year) && (
                     <p className="text-xs md:text-sm text-gray-400 mt-0.5">
                       {[resource.uploaded_by_user.year, resource.uploaded_by_user.branch].filter(Boolean).join(' • ')}
