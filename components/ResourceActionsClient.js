@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { BookmarkIcon as BookmarkOutlineIcon, ShareIcon, ArrowDownIcon as DownloadIconHero } from 'lucide-react';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '@/context/AuthContext';
+import { Edit } from 'lucide-react';
 import LoginDialog from '@/components/Auth/LoginDialog';
 import { GoogleLogin } from '@react-oauth/google';
 import api_client from '@/lib/axiosInstance';
@@ -15,7 +16,7 @@ import Link from 'next/link';
 import { trackEvent } from '@/services/analyticsService';
 
 export default function ResourceActionsClient({ resource }) {
-  const { isAuthenticated, login: setAuthState } = useAuth();
+  const { isAuthenticated, login: setAuthState, user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [currentIsSaved, setCurrentIsSaved] = useState(resource?.is_saved || false);
@@ -130,6 +131,20 @@ export default function ResourceActionsClient({ resource }) {
             )}
             {isSaving ? 'Saving...' : (currentIsSaved ? 'Unsave Resource' : 'Save Resource')}
           </Button>
+          
+          {user?.hasContentManagement && (
+            <Button
+              asChild
+              variant="outline"
+              className="w-full justify-start text-blue-400 hover:bg-stone-700 hover:text-blue-300 border-stone-600"
+            >
+              <Link href={`/admin-m/content/edit/${resource?.slug}`}>
+                <Edit className="w-5 h-5 mr-2" />
+                Edit Resource
+              </Link>
+            </Button>
+          )}
+
           {/* {console.log(resource)} */}
           {resource?.privacy?.includes('download') && (
             <Button

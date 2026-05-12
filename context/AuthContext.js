@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }) => {
               picture: profileData.profile_pic_url || profileData.img_google_url,
               is_staff: profileData.user.is_staff,
               is_superuser: profileData.user.is_superuser,
+              hasContentManagement: profileData.user.has_content_management_permission,
               bio: profileData.bio,
               emoji_tag: profileData.emoji_tag,
             };
@@ -166,6 +167,7 @@ export const AuthProvider = ({ children }) => {
         picture: profileData.profile_pic_url || profileData.img_google_url,
         is_staff: profileData.user.is_staff,
         is_superuser: profileData.user.is_superuser,
+        hasContentManagement: profileData.user.has_content_management_permission,
         bio: profileData.bio,
         emoji_tag: profileData.emoji_tag,
       };
@@ -204,6 +206,7 @@ export const AuthProvider = ({ children }) => {
         picture: profileData.profile_pic_url || profileData.img_google_url,
         is_staff: profileData.user.is_staff,
         is_superuser: profileData.user.is_superuser,
+        hasContentManagement: profileData.user.has_content_management_permission,
         bio: profileData.bio,
         emoji_tag: profileData.emoji_tag,
       };

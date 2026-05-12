@@ -78,6 +78,17 @@ export default function Header() {
                     </button>
                   </SheetClose>
                   
+                  {user?.hasContentManagement && (
+                    <SheetClose asChild>
+                      <Link
+                        href="/admin-m/content"
+                        className="text-blue-400 hover:bg-gray-700 hover:text-blue-300 block rounded-md px-3 py-2 text-base font-medium"
+                      >
+                        Manage Content
+                      </Link>
+                    </SheetClose>
+                  )}
+                  
                   {/* My Certificates remains in Mobile Menu */}
                   {/* {isAuthenticated && (
                     <SheetClose asChild>
@@ -126,6 +137,15 @@ export default function Header() {
           
           <div className="absolute inset-y-0 right-0 flex items-center gap-2 pr-2 md:static md:inset-auto md:ml-6 md:pr-0">
             
+            {user?.hasContentManagement && (
+              <Link
+                href="/admin-m/content"
+                className="hidden md:block text-blue-400 hover:bg-gray-700 hover:text-blue-300 rounded-md px-3 py-2 text-sm font-medium"
+              >
+                Manage Content
+              </Link>
+            )}
+
             <button
               onClick={navigateToSearchPage}
               title="Search"
