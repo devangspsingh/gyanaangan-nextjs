@@ -33,6 +33,7 @@ const navigation = [
     { name: 'Dashboard', href: '/admin', icon: Home },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart2 },
     { name: 'Blog Posts', href: '/admin/blog', icon: FileText },
+    { name: 'Content Manager', href: '/admin/content', icon: FileText },
 ];
 
 function AppSidebar({ user }) {

@@ -223,12 +223,32 @@ export default async function NestedResourceDetailPage({ params }) {
               </section>
             )}
 
+            {resource?.uploaded_by_user && (
+              <div className="mt-6 p-4 bg-gray-800/50 border border-gray-700 rounded-lg flex items-center gap-4">
+                {resource.uploaded_by_user.profile_pic ? (
+                  <img src={resource.uploaded_by_user.profile_pic} alt={resource.uploaded_by_user.name} className="w-12 h-12 rounded-full object-cover" />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-lg font-bold text-gray-300">
+                    {resource.uploaded_by_user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p className="text-white font-medium text-sm md:text-base">Uploaded by {resource.uploaded_by_user.name}</p>
+                  {(resource.uploaded_by_user.branch || resource.uploaded_by_user.year) && (
+                    <p className="text-xs md:text-sm text-gray-400 mt-0.5">
+                      {[resource.uploaded_by_user.year, resource.uploaded_by_user.branch].filter(Boolean).join(' • ')}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
 
           </div>
 
           <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
             <ResourceActionsClient resource={resource} />
-            
+
             <AdContainer>
               <AdUnit />
             </AdContainer>
