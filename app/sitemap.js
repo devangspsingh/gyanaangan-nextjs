@@ -5,6 +5,9 @@ import {
   getBlogPosts 
 } from '@/services/apiService';
 
+// Force dynamic generation on every request so new blog posts & resources are immediately reflected
+export const dynamic = 'force-dynamic';
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 
 // Helper function to fetch all pages of paginated data
