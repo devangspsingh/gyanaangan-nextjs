@@ -6,9 +6,13 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
+    poweredByHeader: false,
+    compress: true,
 
-    // 2. Keep your existing image configuration
+    // 2. Keep your existing image configuration with AVIF/WebP optimization
     images: {
+        formats: ['image/avif', 'image/webp'],
+        minimumCacheTTL: 31536000,
         remotePatterns: [
             {
                 protocol: "https",
@@ -21,7 +25,37 @@ const nextConfig = {
         ],
     },
 
-    // output: 'standalone',
+    async headers() {
+        return [
+            {
+                source: '/svg/:path*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                ],
+            },
+            {
+                source: '/images/:path*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                ],
+            },
+            {
+                source: '/favicon.ico',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 export default nextConfig;

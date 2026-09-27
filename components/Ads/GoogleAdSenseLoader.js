@@ -45,9 +45,9 @@ export default function GoogleAdSenseLoader() {
     let idleId;
     let timerId;
     if ('requestIdleCallback' in window) {
-      idleId = window.requestIdleCallback(loadScript, { timeout: 3500 });
+      idleId = window.requestIdleCallback(loadScript, { timeout: 5000 });
     } else {
-      timerId = setTimeout(loadScript, 2500);
+      timerId = setTimeout(loadScript, 4500);
     }
 
     return () => {

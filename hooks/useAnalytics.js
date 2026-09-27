@@ -23,9 +23,9 @@ export const useAnalytics = () => {
         };
 
         if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-            window.requestIdleCallback(track, { timeout: 3500 });
+            window.requestIdleCallback(track, { timeout: 4000 });
         } else {
-            setTimeout(track, 2000);
+            setTimeout(track, 3000);
         }
     }, [pathname, searchParams]);
 
