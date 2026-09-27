@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { getResourceBySlugServerSide, getResources } from '@/services/apiService';
+import { getResourceBySlug, getResources } from '@/services/apiService';
 import Viewer from '@/components/Viewer';
 import ResourceCard from '@/components/ResourceCard';
 import ResourceActionsClient from '@/components/ResourceActionsClient';
@@ -24,7 +24,7 @@ const SITE_NAME = 'Gyan Aangan';
 export async function generateMetadata({ params }) {
 
   const { slug } = params;
-  const resourceResponse = await getResourceBySlugServerSide(slug);
+  const resourceResponse = await getResourceBySlug(slug);
 
   if (!resourceResponse.error && resourceResponse.data) {
     const resource = resourceResponse.data;
@@ -71,8 +71,8 @@ export default async function ResourceDetailPageServer({ params }) {
   const { slug } = params;
 
   try {
-    // Fetch resource using server-side API with authentication
-    const resourceResponse = await getResourceBySlugServerSide(slug);
+    // Fetch resource using public cached API
+    const resourceResponse = await getResourceBySlug(slug);
 
 
 
@@ -310,4 +310,6 @@ export default async function ResourceDetailPageServer({ params }) {
   }
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const dynamicParams = true;
+export const revalidate = false;

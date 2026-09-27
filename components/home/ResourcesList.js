@@ -1,13 +1,9 @@
-// Server Component - With Authentication Support!
-import { getResourcesServerSide } from '@/services/apiService';
+// Server Component - Public preview for home page
+import { getResources } from '@/services/apiService';
 import ResourceCard from '@/components/ResourceCard';
 
 export default async function ResourcesList() {
-  // console.log('🏠 [ResourcesList] Starting to fetch resources...');
-
-  // This function automatically reads cookies from the request
-  // So the user's authentication token is included!
-  const response = await getResourcesServerSide(1, 6); // Fetch first 6 resources
+  const response = await getResources(1, 6); // Fetch first 6 resources
 
 
 
@@ -30,6 +26,7 @@ export default async function ResourcesList() {
         <ResourceCard
           key={resource.id || resource.slug}
           resource={resource}
+          showSaveButton={false}
         />
       ))}
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { getResourceBySlugServerSide, getSpecialPageData, getResources, getResourcesServerSide } from '@/services/apiService';
+import { getResourceBySlug, getSpecialPageData, getResources } from '@/services/apiService';
 import Viewer from '@/components/Viewer';
 import ResourceCard from '@/components/ResourceCard';
 import ResourceActionsClient from '@/components/ResourceActionsClient';
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }) {
 
   const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = params;
 
-  const resourceResponse = await getResourceBySlugServerSide(resourceSlug);
+  const resourceResponse = await getResourceBySlug(resourceSlug);
 
   if (!resourceResponse.error && resourceResponse.data) {
     const resource = resourceResponse.data;
@@ -76,7 +76,7 @@ export default async function NestedResourceDetailPage({ params }) {
   try {
     // Fetch resource and parent data in parallel
     const [resourceResponse, parentDataResponse] = await Promise.all([
-      getResourceBySlugServerSide(resourceSlug),
+      getResourceBySlug(resourceSlug),
       getSpecialPageData(courseSlug, streamSlug, yearSlug)
     ]);
 
@@ -128,7 +128,7 @@ export default async function NestedResourceDetailPage({ params }) {
     // Fetch related resources
     let relatedResources = [];
     if (resource.subject_slug) {
-      const relatedResponse = await getResourcesServerSide(1, 7, { subject_slug: resource.subject_slug });
+      const relatedResponse = await getResources(1, 7, { subject_slug: resource.subject_slug });
       if (!relatedResponse.error && relatedResponse.data?.results) {
         relatedResources = relatedResponse.data.results.filter(r => r.slug !== resourceSlug).slice(0, 6);
       }
@@ -303,4 +303,6 @@ export default async function NestedResourceDetailPage({ params }) {
   }
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const dynamicParams = true;
+export const revalidate = false;

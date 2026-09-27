@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 import { BookmarkIcon as BookmarkSolidIcon, ClockIcon, BookOpenIcon, BeakerIcon, PlayCircleIcon, PhotoIcon, DocumentTextIcon } from '@heroicons/react/24/solid'; // Added more icons
 import toast from 'react-hot-toast';
 import { toggleSaveResource } from '../services/apiService';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 import {
@@ -55,13 +55,19 @@ const ResourceTypeIcon = ({ type, name }) => {
 };
 
 
-export default function ResourceCard({ resource, variant = 'default', customHref }) { // Added customHref
-    const { isAuthenticated, login: setAuthState } = useAuth(); // Renamed login to setAuthState
+export default function ResourceCard({ resource, variant = 'default', customHref, showSaveButton = true }) { // Added customHref
+    const { isAuthenticated, login: setAuthState, isResourceSaved, setResourceSaved } = useAuth(); // Renamed login to setAuthState
     const router = useRouter(); // Initialize router
-    const [isSaved, setIsSaved] = useState(resource.is_saved);
+    const [isSaved, setIsSaved] = useState(resource?.is_saved || false);
     const [isSaving, setIsSaving] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State for drawer
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State for login modal
+
+    useEffect(() => {
+        if (showSaveButton && isAuthenticated && resource?.slug && isResourceSaved) {
+            setIsSaved(isResourceSaved(resource.slug));
+        }
+    }, [showSaveButton, isAuthenticated, isResourceSaved, resource?.slug]);
 
     const canDownload = resource.privacy && resource.privacy.includes('download');
 
@@ -78,6 +84,7 @@ export default function ResourceCard({ resource, variant = 'default', customHref
         const response = await toggleSaveResource(resource.slug);
         if (!response.error) {
             setIsSaved(response.data.saved);
+            setResourceSaved?.(resource.slug, response.data.saved);
             toast.success(response.data.saved ? 'Resource saved!' : 'Resource unsaved.');
         } else {
             toast.error('Failed to update save status.');
@@ -172,19 +179,21 @@ export default function ResourceCard({ resource, variant = 'default', customHref
                                         <ArrowDownTrayIcon className="size-6" />
                                     </Link>
                                 )} */}
-                                <button
-                                    onClick={handleSaveToggle}
-                                    disabled={isSaving}
-                                    className="p-1.5 text-white/80 hover:text-primary transition rounded-full hover:bg-white/10"
-                                    aria-label={isSaved ? "Unsave resource" : "Save resource"}
-                                    title={isSaved ? "Unsave" : "Save"}
-                                >
-                                    {isSaved ? (
-                                        <BookmarkSolidIcon className="size-6 text-primary" />
-                                    ) : (
-                                        <BookmarkOutlineIcon className="size-6" />
-                                    )}
-                                </button>
+                                {showSaveButton && (
+                                    <button
+                                        onClick={handleSaveToggle}
+                                        disabled={isSaving}
+                                        className="p-1.5 text-white/80 hover:text-primary transition rounded-full hover:bg-white/10"
+                                        aria-label={isSaved ? "Unsave resource" : "Save resource"}
+                                        title={isSaved ? "Unsave" : "Save"}
+                                    >
+                                        {isSaved ? (
+                                            <BookmarkSolidIcon className="size-6 text-primary" />
+                                        ) : (
+                                            <BookmarkOutlineIcon className="size-6" />
+                                        )}
+                                    </button>
+                                )}
                                 <DrawerTrigger asChild>
                                     <button
                                         onClick={(e) => {

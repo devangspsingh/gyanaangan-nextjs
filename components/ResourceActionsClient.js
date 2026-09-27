@@ -16,16 +16,57 @@ import Link from 'next/link';
 import { trackEvent } from '@/services/analyticsService';
 
 export default function ResourceActionsClient({ resource }) {
-  const { isAuthenticated, login: setAuthState, user } = useAuth();
+  const { isAuthenticated, login: setAuthState, user, isResourceSaved, setResourceSaved } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [currentIsSaved, setCurrentIsSaved] = useState(resource?.is_saved || false);
+  const [canEdit, setCanEdit] = useState(Boolean(resource?.can_edit));
+  const [downloadUrl, setDownloadUrl] = useState(resource?.download_url || null);
 
   useEffect(() => {
-    if (resource) {
-      setCurrentIsSaved(resource.is_saved);
+    // Check if current user has edit permission on client
+    if (user) {
+      const isStaffOrAdmin = Boolean(user.is_staff || user.is_superuser || user.hasContentManagement);
+      const isOwner = Boolean(
+        resource?.uploaded_by_user &&
+        (String(user.id) === String(resource.uploaded_by_user.id) ||
+         (user.username && resource.uploaded_by_user.username && user.username === resource.uploaded_by_user.username) ||
+         (user.email && resource.uploaded_by_user.email && user.email === resource.uploaded_by_user.email))
+      );
+      if (isStaffOrAdmin || isOwner || resource?.can_edit) {
+        setCanEdit(true);
+      }
+    } else {
+      setCanEdit(false);
     }
-  }, [resource, isAuthenticated]);
+
+    // Sync saved status from AuthContext if available
+    if (isAuthenticated && resource?.slug && isResourceSaved) {
+      if (isResourceSaved(resource.slug)) {
+        setCurrentIsSaved(true);
+      }
+    }
+
+    // When authenticated, check fresh saved, edit, and download status from backend
+    if (isAuthenticated && resource?.slug) {
+      api_client.get(`/resources/${resource.slug}/`)
+        .then((res) => {
+          if (res.data) {
+            if (typeof res.data.is_saved === 'boolean') {
+              setCurrentIsSaved(res.data.is_saved);
+              setResourceSaved?.(resource.slug, res.data.is_saved);
+            }
+            if (res.data.can_edit) {
+              setCanEdit(true);
+            }
+            if (res.data.download_url) {
+              setDownloadUrl(res.data.download_url);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [resource?.slug, isAuthenticated, user, isResourceSaved, setResourceSaved]);
 
   const handleSaveToggle = async () => {
     if (!isAuthenticated) {
@@ -38,6 +79,7 @@ export default function ResourceActionsClient({ resource }) {
     const response = await toggleSaveResource(resource.slug);
     if (!response.error) {
       setCurrentIsSaved(response.data.saved);
+      setResourceSaved?.(resource.slug, response.data.saved);
       toast.success(response.data.saved ? 'Resource saved!' : 'Resource unsaved.');
     } else {
       toast.error(response.data?.detail || 'Failed to update save status.');
@@ -62,23 +104,37 @@ export default function ResourceActionsClient({ resource }) {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!isAuthenticated) {
       setIsLoginModalOpen(true);
       toast.error('Please login to download resources');
       return;
     }
 
-    // If authenticated, open the download URL
-    if (resource?.download_url) {
-      // Track the download event
-      trackEvent('download', {
-        resource_name: resource.name,
-        resource_type: resource.resource_type,
-        resource_slug: resource.slug
-      }, resource.slug);
+    trackEvent('download', {
+      resource_name: resource?.name,
+      resource_type: resource?.resource_type,
+      resource_slug: resource?.slug
+    }, resource?.slug);
 
-      window.open(resource.download_url, '_blank');
+    const targetUrl = downloadUrl || resource?.download_url;
+    if (targetUrl) {
+      window.open(targetUrl, '_blank');
+      return;
+    }
+
+    // If download_url wasn't statically present, fetch it directly
+    try {
+      const res = await api_client.get(`/resources/${resource.slug}/`);
+      if (res.data?.download_url) {
+        setDownloadUrl(res.data.download_url);
+        window.open(res.data.download_url, '_blank');
+      } else {
+        const backendBase = process.env.NEXT_PUBLIC_API_URL || 'https://gyanaangan.in/api';
+        window.open(`${backendBase}/resources/${resource.slug}/download/`, '_blank');
+      }
+    } catch {
+      toast.error('Failed to initiate download.');
     }
   };
 
@@ -132,7 +188,7 @@ export default function ResourceActionsClient({ resource }) {
             {isSaving ? 'Saving...' : (currentIsSaved ? 'Unsave Resource' : 'Save Resource')}
           </Button>
           
-          {user?.hasContentManagement && resource?.can_edit && (
+          {canEdit && (
             <Button
               asChild
               variant="outline"

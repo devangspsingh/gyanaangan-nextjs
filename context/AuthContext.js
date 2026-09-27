@@ -11,7 +11,35 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [tokens, setTokens] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [savedResourceSlugs, setSavedResourceSlugs] = useState(new Set());
   const router = useRouter();
+
+  const fetchSavedResources = useCallback(async () => {
+    try {
+      const res = await api.get('/saved-resources/?page_size=100');
+      const list = res.data?.results || (Array.isArray(res.data) ? res.data : []);
+      const slugs = new Set(list.map((r) => r.slug).filter(Boolean));
+      setSavedResourceSlugs(slugs);
+    } catch {
+      // Ignore background fetch error
+    }
+  }, []);
+
+  const isResourceSaved = useCallback((slug) => {
+    return savedResourceSlugs.has(slug);
+  }, [savedResourceSlugs]);
+
+  const setResourceSaved = useCallback((slug, saved) => {
+    setSavedResourceSlugs((prev) => {
+      const next = new Set(prev);
+      if (saved) {
+        next.add(slug);
+      } else {
+        next.delete(slug);
+      }
+      return next;
+    });
+  }, []);
 
   const initializeAuth = useCallback(async () => { // Make initializeAuth async
     setLoading(true);
@@ -62,6 +90,7 @@ export const AuthProvider = ({ children }) => {
 
             setUser(userData);
             localStorage.setItem('user', JSON.stringify(userData));
+            fetchSavedResources();
             // console.log('✅ [Init] User profile fetched from API');
           } catch (profileError) {
             console.error('❌ [Init] Failed to fetch user profile:', profileError);
@@ -69,6 +98,7 @@ export const AuthProvider = ({ children }) => {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
               setUser(JSON.parse(storedUser));
+              fetchSavedResources();
               // console.log('⚠️ [Init] Using cached user data');
             } else {
               // If no cached user, we might want to clear auth or just stay logged in with token only
@@ -174,12 +204,14 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('user', JSON.stringify(freshUserData));
       setUser(freshUserData);
+      fetchSavedResources();
       // console.log('✅ [Login] User profile fetched from API');
     } catch (error) {
       console.error('❌ [Login] Failed to fetch profile, using login data:', error);
       // Fallback to login response data
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
+      fetchSavedResources();
     }
   };
 
@@ -231,6 +263,7 @@ export const AuthProvider = ({ children }) => {
 
     setUser(null);
     setTokens(null);
+    setSavedResourceSlugs(new Set());
     delete api.defaults.headers.Authorization;
   }
 
@@ -242,7 +275,10 @@ export const AuthProvider = ({ children }) => {
       logout,
       refreshUserProfile,
       loading,
-      isAuthenticated: !!user
+      isAuthenticated: !!user,
+      isResourceSaved,
+      setResourceSaved,
+      savedResourceSlugs
     }}>
       {children}
     </AuthContext.Provider>

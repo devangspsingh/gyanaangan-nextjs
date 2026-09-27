@@ -18,7 +18,7 @@ function validateSecret(request, bodySecret) {
   return providedSecret === serverSecret;
 }
 
-function performRevalidation({ slug, path, tag, type }) {
+function performRevalidation({ slug, path, paths, tag, type }) {
   const revalidated = [];
 
   if (slug) {
@@ -31,14 +31,19 @@ function performRevalidation({ slug, path, tag, type }) {
     revalidated.push('/blog');
   }
 
-  if (path) {
+  const allPaths = [];
+  if (path) allPaths.push(path);
+  if (Array.isArray(paths)) allPaths.push(...paths);
+
+  for (const p of allPaths) {
     if (type) {
-      revalidatePath(path, type);
+      revalidatePath(p, type);
     } else {
-      revalidatePath(path);
+      revalidatePath(p);
+      revalidatePath(p, 'page');
     }
-    if (!revalidated.includes(path)) {
-      revalidated.push(path);
+    if (!revalidated.includes(p)) {
+      revalidated.push(p);
     }
   }
 
@@ -70,17 +75,18 @@ export async function POST(request) {
     const { searchParams } = new URL(request.url);
     const slug = body.slug || searchParams.get('slug');
     const path = body.path || searchParams.get('path');
+    const paths = body.paths || (searchParams.get('paths') ? searchParams.get('paths').split(',') : null);
     const tag = body.tag || searchParams.get('tag');
     const type = body.type || searchParams.get('type');
 
-    if (!slug && !path && !tag) {
+    if (!slug && !path && !paths && !tag) {
       return NextResponse.json(
-        { success: false, message: 'Please provide a slug, path, or tag to revalidate' },
+        { success: false, message: 'Please provide a slug, path, paths, or tag to revalidate' },
         { status: 400 }
       );
     }
 
-    const revalidated = performRevalidation({ slug, path, tag, type });
+    const revalidated = performRevalidation({ slug, path, paths, tag, type });
 
     return NextResponse.json({
       success: true,
@@ -108,17 +114,18 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get('slug');
     const path = searchParams.get('path');
+    const paths = searchParams.get('paths') ? searchParams.get('paths').split(',') : null;
     const tag = searchParams.get('tag');
     const type = searchParams.get('type');
 
-    if (!slug && !path && !tag) {
+    if (!slug && !path && !paths && !tag) {
       return NextResponse.json(
-        { success: false, message: 'Please provide a slug, path, or tag to revalidate' },
+        { success: false, message: 'Please provide a slug, path, paths, or tag to revalidate' },
         { status: 400 }
       );
     }
 
-    const revalidated = performRevalidation({ slug, path, tag, type });
+    const revalidated = performRevalidation({ slug, path, paths, tag, type });
 
     return NextResponse.json({
       success: true,

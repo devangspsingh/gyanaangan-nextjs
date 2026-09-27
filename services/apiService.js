@@ -20,9 +20,9 @@ const handleApiResponse = async (request) => {
 };
 
 // Modified functions to support pagination
-export const getCourses = async (page = 1, pageSize = 10) => {
+export const getCourses = cache(async (page = 1, pageSize = 10) => {
   return handleApiResponse(api.get(getFullUrl('/courses/'), { params: { page, page_size: pageSize } }));
-};
+});
 
 export const getCourseBySlug = async (slug) => {
   try {
@@ -44,9 +44,9 @@ export const getStreamBySlug = async (slug) => {
   }
 };
 
-export const getSubjects = async (page = 1, pageSize = 9, params = {}) => { 
+export const getSubjects = cache(async (page = 1, pageSize = 9, params = {}) => { 
   return handleApiResponse(api.get(getFullUrl('/subjects/'), { params: { page, page_size: pageSize, ...params } }));
-};
+});
 
 export const getSubjectBySlug = cache(async (slug) => {
   try {
@@ -58,10 +58,10 @@ export const getSubjectBySlug = cache(async (slug) => {
   }
 });
 
-export const getResources = async (page = 1, pageSize = 9, params = {}) => { 
+export const getResources = cache(async (page = 1, pageSize = 9, params = {}) => { 
   // Ensure params are spread correctly, not nested.
   return handleApiResponse(api.get(getFullUrl('/resources/'), { params: { page, page_size: pageSize, ...params } }));
-};
+});
 
 // Server-side version of getResources (with authentication via cookies)
 export const getResourcesServerSide = async (page = 1, pageSize = 9, params = {}) => {
