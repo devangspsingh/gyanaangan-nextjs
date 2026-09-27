@@ -113,7 +113,7 @@ export default function Header() {
                 width={40}
                 height={40}
                 sizes="40px"
-                quality={80}
+                quality={70}
                 className="h-10 w-auto"
                 priority
               />

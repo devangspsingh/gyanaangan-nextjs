@@ -1,24 +1,19 @@
 'use client';
 
 import { AuthProvider } from '../context/AuthContext';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from '../context/ThemeContext';
-import { NotificationProvider } from '../context/NotificationContext'; // Import NotificationProvider
+import { NotificationProvider } from '../context/NotificationContext';
+import { Toaster } from 'react-hot-toast';
 
 export function Providers({ children }) {
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-
   return (
-    <GoogleOAuthProvider clientId={googleClientId || ""}>
-      <AuthProvider>
-        <ThemeProvider>
-          <NotificationProvider> {/* Add NotificationProvider here */}
-            {children}
-            <Toaster position="top-right" />
-          </NotificationProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <NotificationProvider> {/* Add NotificationProvider here */}
+          {children}
+          <Toaster position="top-right" />
+        </NotificationProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
