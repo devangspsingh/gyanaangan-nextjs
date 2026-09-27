@@ -13,8 +13,7 @@ export const metadata = {
   description: 'Explore a variety of courses and resources to enhance your knowledge at Gyan Aangan.',
 }
 
-import { GoogleAnalytics } from '@next/third-parties/google'
-import Script from 'next/script';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 // After (in files like layout.js)
 // import AdSenseComponent from '@/components/blog/AdSenseComponent';
@@ -23,6 +22,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'sw
 const barlow = Barlow({ weight: ['600', '700', '800'], subsets: ['latin'], variable: '--font-barlow', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
 import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
+import GoogleAdSenseLoader from '@/components/Ads/GoogleAdSenseLoader';
 import LoginNudge from '@/components/Auth/LoginNudge'; // Import LoginNudge
 import StickyAd from '@/components/Ads/stickyAds';
 import StickyNotification from '@/components/mine/ui/StickyNotification';
@@ -31,28 +31,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${barlow.variable} ${roboto_mono.variable}`}>
 
-
-      {/* <head> */}
-      <Script
-        async
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3792754105959046`}
-        crossOrigin="anonymous"
-        strategy="lazyOnload"
-      />
-
-
-          
-      {/* <script
-      async
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3792754105959046`}
-      crossOrigin="anonymous"
-    ></script> */}
-      {/* </head> */}
-
       <body className="bg-[#010717]">
         <Providers>
           <DynamicBackground /> {/* Use the client component for dynamic background */}
           <AnalyticsTracker />
+          <GoogleAdSenseLoader />
           <LoginNudge />
           <Header />
           {/* <GoogleAdSense publisherId="ca-pub-3792754105959046" /> */}

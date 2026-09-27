@@ -22,26 +22,42 @@ jobs:
             # 1. Stop execution immediately if any command fails
             set -e
             
+            # Ensure Bun and Node binaries are in PATH
+            export PATH="/home/ubuntu/.bun/bin:/usr/local/bin:$PATH"
+            
             # Navigate to directory
             cd /var/www/gyanaangan-nextjs
             
             echo "Current directory: $(pwd)"
+            echo "Bun version: $(bun --version)"
+            echo "Node version: $(node --version)"
             
             # Pull latest changes
             echo "Pulling latest changes from Git..."
             git pull origin main
             
-            # Install dependencies
-            echo "Installing dependencies..."
-            npm install
+            # Install dependencies fast using Bun
+            echo "Installing dependencies with Bun..."
+            bun install
             
-            # Build the application
-            echo "Building Next.js application..."
-            npm run build
+            # Check and report Next.js build cache
+            if [ -d ".next/cache" ]; then
+              echo "Reusing Next.js build cache ($(du -sh .next/cache | cut -f1))"
+            else
+              echo "Initial build: .next/cache will be created"
+            fi
             
-            # Restart application
-            echo "Restarting application with PM2..."
-            pm2 restart gyanaangan --update-env || pm2 start npm --name "gyanaangan" -- start
+            # Build the application with Bun
+            echo "Building Next.js application with Bun..."
+            bun run build
+            
+            if [ -d ".next/cache" ]; then
+              echo "Updated build cache size: $(du -sh .next/cache | cut -f1)"
+            fi
+            
+            # Gracefully reload application with PM2 (zero downtime)
+            echo "Reloading application with PM2..."
+            pm2 reload gyanaangan --update-env || pm2 restart gyanaangan --update-env || pm2 start npm --name "gyanaangan" -- start
             
             # Save process list
             pm2 save
