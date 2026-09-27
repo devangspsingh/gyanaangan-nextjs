@@ -19,7 +19,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 // import AdSenseComponent from '@/components/blog/AdSenseComponent';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const barlow = Barlow({ weight: ['600', '700', '800'], subsets: ['latin'], variable: '--font-barlow', display: 'swap' });
+const barlow = Barlow({ weight: ['700'], subsets: ['latin'], variable: '--font-barlow', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
 import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
 import GoogleAdSenseLoader from '@/components/Ads/GoogleAdSenseLoader';

@@ -1,5 +1,3 @@
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'; // Adjust as needed
 const TRACKING_ENDPOINT = `${API_BASE_URL}/tracking/track/`;
 
@@ -7,11 +5,11 @@ const TRACKING_ENDPOINT = `${API_BASE_URL}/tracking/track/`;
 let visitorIdPromise = null;
 
 /**
- * Initializes FingerprintJS and returns the visitor ID.
+ * Initializes FingerprintJS lazily and returns the visitor ID.
  * Caches the promise to avoid re-initializing.
  */
-const getVisitorId = () => {
-    if (typeof window === 'undefined') return Promise.resolve(null);
+const getVisitorId = async () => {
+    if (typeof window === 'undefined') return null;
 
     // Helper to get/create a persistent random ID for this browser context (LocalStorage)
     // This ensures Incognito vs Normal tabs have different IDs (because LS is not shared)
@@ -25,36 +23,38 @@ const getVisitorId = () => {
     };
 
     if (!visitorIdPromise) {
-        visitorIdPromise = FingerprintJS.load()
-            .then(fp => fp.get())
-            .then(result => {
+        visitorIdPromise = (async () => {
+            try {
+                const FingerprintJS = (await import('@fingerprintjs/fingerprintjs')).default;
+                const fp = await FingerprintJS.load();
+                const result = await fp.get();
                 const fpId = result.visitorId;
                 const ctxId = getContextId();
-                // Composite ID: Fingerprint + Context
                 return `${fpId}_${ctxId}`;
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error("Analytics: Failed to get visitor ID", error);
                 const ctxId = getContextId();
-                return 'unknown_' + ctxId; // Fallback
-            });
+                return 'unknown_' + ctxId;
+            }
+        })();
     }
     return visitorIdPromise;
 };
 
 /**
- * Gathers detailed device/browser information.
+ * Gathers detailed device/browser information dynamically.
  */
-import { UAParser } from 'ua-parser-js';
-
-/**
- * Gathers detailed device/browser information.
- */
-const getDeviceInfo = () => {
+const getDeviceInfo = async () => {
     if (typeof window === 'undefined') return {};
 
-    const parser = new UAParser();
-    const result = parser.getResult();
+    let result = {};
+    try {
+        const { UAParser } = await import('ua-parser-js');
+        const parser = new UAParser();
+        result = parser.getResult();
+    } catch (e) {
+        console.warn("Analytics: Failed to load UAParser", e);
+    }
 
     return {
         userAgent: navigator.userAgent,
@@ -99,7 +99,7 @@ export const trackEvent = async (eventType, metadata = {}, targetResource = '') 
 
     try {
         const visitorId = await getVisitorId();
-        const deviceInfo = getDeviceInfo();
+        const deviceInfo = await getDeviceInfo();
 
         // Encode the sensitive/detailed info as requested
         const encodedDeviceInfo = encodeData(deviceInfo);
