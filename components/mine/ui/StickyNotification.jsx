@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { X, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-const PAYMENT_BUTTON_URL = "https://razorpay.com/payment-button/pl_SkRvaNApeOAmRk/view/";
 const RESET_AFTER_VIEWS = 3; // Re-show after 3 pages if dismissed
 
 const StickyNotification = ({ className }) => {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(true);
   const lastScrollY = useRef(0);
@@ -57,6 +59,11 @@ const StickyNotification = ({ className }) => {
     localStorage.setItem('support_dismissed_at', currentViews);
   };
 
+  // Do not show sticky notification if user is already on the support page
+  if (pathname === '/support') {
+    return null;
+  }
+
   return (
     <AnimatePresence>
       {isVisible && isScrollingUp && (
@@ -66,10 +73,8 @@ const StickyNotification = ({ className }) => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 40, scale: 0.95, transition: { duration: 0.2 } }}
         >
-          <a
-            href={PAYMENT_BUTTON_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/support"
             className="group relative flex items-center justify-between overflow-hidden border border-white/20 bg-slate-950/95 p-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl rounded-2xl md:rounded-full transition-all hover:bg-slate-900"
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(251,146,60,0.15),transparent_70%)]" />
@@ -83,7 +88,6 @@ const StickyNotification = ({ className }) => {
                 <p className="text-[13px] font-semibold tracking-tight text-white">
                   Support GyanAangan
                 </p>
-                
               </div>
             </div>
 
@@ -103,7 +107,7 @@ const StickyNotification = ({ className }) => {
                 <X size={16} />
               </button>
             </div>
-          </a>
+          </Link>
         </motion.div>
       )}
     </AnimatePresence>

@@ -35,6 +35,9 @@ const FooterNavigation = () => {
           <span suppressHydrationWarning>{currentYear} GyanAangan.in All rights reserved.</span>
         </div>
         <nav className="flex space-x-6">
+          <Link href="/support" className="hover:text-orange-400 transition-colors">
+            Support Us
+          </Link>
           <Link href="/terms-and-conditions" className="hover:text-primary-light transition-colors">
             Terms & Conditions
           </Link>
