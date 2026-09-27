@@ -106,9 +106,13 @@ export default async function BlogPostPage({ params }) {
                   <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.5),transparent)]"></div>
                   
                   {/* Title watermark */}
-                  <div className="relative z-10 text-white/30 font-bold text-5xl text-center px-12 line-clamp-4">
+                  <div 
+                    aria-hidden="true" 
+                    className="relative z-10 text-white/30 font-bold text-5xl text-center px-12 line-clamp-4 select-none pointer-events-none"
+                  >
                     {post.title}
                   </div>
+
                 </div>
               )}
             </div>

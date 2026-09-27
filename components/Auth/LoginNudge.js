@@ -145,17 +145,19 @@ export default function LoginNudge() {
                 isPage={false}
             >
                 <div className="flex justify-center w-full">
-                    <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={() => {
-                            console.error('Google Login Failed');
-                            toast.error('Google login failed.');
-                        }}
-                        theme="outline" // Matches the dark theme better or 'outline'
-                        shape="rectangular"
-                    // size="large"
-                    // width="100%"
-                    />
+                    {open && (
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => {
+                                console.error('Google Login Failed');
+                                toast.error('Google login failed.');
+                            }}
+                            theme="outline" // Matches the dark theme better or 'outline'
+                            shape="rectangular"
+                        // size="large"
+                        // width="100%"
+                        />
+                    )}
                 </div>
                 {/* "Maybe Later" button removed as per request. Close via 'X' or backdrop. */}
             </LoginDialog>

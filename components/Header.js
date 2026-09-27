@@ -112,9 +112,12 @@ export default function Header() {
                 alt="Gyan Aangan Logo"
                 width={40}
                 height={40}
+                sizes="40px"
+                quality={80}
                 className="h-10 w-auto"
                 priority
               />
+
               <span className="ml-2 self-center font-mono text-xl font-semibold whitespace-nowrap text-white">
                 GyanAangan
               </span>

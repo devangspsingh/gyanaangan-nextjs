@@ -1,5 +1,5 @@
 {
-  "specVersion": "1.0.0",
+  "specVersion": "1.0",
   "host": {
     "displayName": "Gyan Aangan",
     "identifier": "https://gyanaangan.in",
@@ -9,24 +9,34 @@
     {
       "identifier": "urn:air:gyanaangan.in:service:study-resources",
       "displayName": "Gyan Aangan Engineering Study Resources",
-      "type": "application/json",
+      "type": "application/ai-catalog+json",
       "data": {
         "name": "gyanaangan-resources",
         "description": "Structured repository of engineering question papers, syllabus, and study notes",
         "url": "https://gyanaangan.in/resources"
       },
-      "description": "Access engineering courses, subjects, previous year papers, and notes."
+      "description": "Access engineering courses, subjects, previous year papers, and notes.",
+      "representativeQueries": [
+        "BTech syllabus and previous year questions",
+        "Engineering study resources and lecture notes",
+        "AKTU semester exam question papers"
+      ]
     },
     {
       "identifier": "urn:air:gyanaangan.in:service:blog",
       "displayName": "Gyan Aangan Knowledge Blog",
-      "type": "application/json",
+      "type": "application/ai-catalog+json",
       "data": {
         "name": "gyanaangan-blog",
         "description": "Articles covering modern AI agents, software engineering, and university topics",
         "url": "https://gyanaangan.in/blog"
       },
-      "description": "Educational blog posts and guides on engineering, coding agents, and academic curriculum."
+      "description": "Educational blog posts and guides on engineering, coding agents, and academic curriculum.",
+      "representativeQueries": [
+        "Cline CLI and coding agent tutorials",
+        "Software engineering and AI automation guides",
+        "Computer science educational articles"
+      ]
     }
   ]
 }
