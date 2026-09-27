@@ -12,6 +12,7 @@ const nextConfig = {
     // 2. Keep your existing image configuration with AVIF/WebP optimization
     images: {
         formats: ['image/avif', 'image/webp'],
+        qualities: [70, 75, 80, 85, 90],
         minimumCacheTTL: 31536000,
         remotePatterns: [
             {
