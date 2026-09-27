@@ -57,7 +57,7 @@ jobs:
             
             # Gracefully reload application with PM2 (zero downtime)
             echo "Reloading application with PM2..."
-            pm2 reload gyanaangan --update-env || pm2 restart gyanaangan --update-env || pm2 start npm --name "gyanaangan" -- start
+            pm2 reload gyanaangan --update-env || pm2 restart gyanaangan --update-env || pm2 start bun --name "gyanaangan" -- run start
             
             # Save process list
             pm2 save
