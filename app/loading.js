@@ -17,7 +17,6 @@ const Loading = () => {
         alt="Gyan Aangan Logo" 
         width={150}
         height={150}
-        priority
       />
   
     </div>
