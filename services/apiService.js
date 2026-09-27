@@ -209,7 +209,7 @@ export const getBlogPosts = async (page = 1, pageSize = 100, params = {}) => {
   }));
 };
 
-export const getBlogPostBySlug = async (slug) => {
+export const getBlogPostBySlug = cache(async (slug) => {
   if (typeof window === 'undefined') {
     // Server-side fetch
     try {
@@ -222,7 +222,8 @@ export const getBlogPostBySlug = async (slug) => {
   }
   // Client-side fetch
   return handleApiResponse(api.get(getFullUrl(`/blog/posts/${slug}/`)));
-};
+});
+
 
 export const getBlogCategories = async () => {
   return handleApiResponse(api.get(getFullUrl('/blog/categories/')));

@@ -12,6 +12,10 @@ import { AdUnit } from '@/components/blog/AdUnit';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 
+// Revalidate blog reading page every 7 days (7 * 24 * 60 * 60 seconds)
+export const revalidate = 604800;
+
+
 // Generate static metadata for SEO
 export async function generateMetadata({ params }) {
   const { blogSlug } = await params;
