@@ -86,7 +86,7 @@ export const getResourcesServerSide = async (page = 1, pageSize = 9, params = {}
 };
 
 // Server-side version of getResourceBySlug with authentication
-export const getResourceBySlugServerSide = async (slug) => {
+export const getResourceBySlugServerSide = cache(async (slug) => {
   // This function can ONLY be called from Server Components
   // It reads cookies using Next.js cookies() function for authentication
   console.log('📚 [getResourceBySlugServerSide] Called with slug:', slug);
@@ -101,10 +101,10 @@ export const getResourceBySlugServerSide = async (slug) => {
   });
 
   return result;
-};
+});
 
 // Example: getResourceBySlug
-export const getResourceBySlug = async (slug) => { // Removed accessToken parameter as it's not used effectively here
+export const getResourceBySlug = cache(async (slug) => { // Removed accessToken parameter as it's not used effectively here
   // Check if running on the server or client
   if (typeof window === 'undefined') {
     // Server-side context (e.g., for generateMetadata)
@@ -122,7 +122,7 @@ export const getResourceBySlug = async (slug) => { // Removed accessToken parame
     // This uses the global `api` instance which includes auth interceptors.
     return handleApiResponse(api.get(getFullUrl(`/resources/${slug}/`)));
   }
-};
+});
 
 export const getLatestNotification = async () => {
   // This typically fetches one or few items, pagination might not be critical
@@ -169,7 +169,7 @@ export const searchSite = async (query, filters = {}, page = 1, pageSize = 10) =
   }
 };
 
-export const getSpecialPageData = async (courseSlug, streamSlug, yearSlug) => {
+export const getSpecialPageData = cache(async (courseSlug, streamSlug, yearSlug) => {
   try {
     // Check if we're on server-side
     if (typeof window === 'undefined') {
@@ -185,7 +185,7 @@ export const getSpecialPageData = async (courseSlug, streamSlug, yearSlug) => {
     console.error(`Error fetching special page for ${courseSlug}/${streamSlug}/${yearSlug}:`, error);
     return { data: null, error: true };
   }
-};
+});
 
 export const toggleSaveResource = async (resourceSlug) => {
   // Assumes your API instance (api) handles authentication tokens
