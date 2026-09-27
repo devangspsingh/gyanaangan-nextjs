@@ -4,17 +4,17 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { formatDate } from '@/components/blog/utils';
 import BlogSidebar from '@/components/blog/BlogSidebar';
-import ShareButtons from '@/components/blog/ShareButtons';
-import { Metadata } from 'next';
 import { getGradientForSlug } from '@/components/blog/gradients';
 import { AdContainer } from '@/components/blog/AdContainer';
 import { AdUnit } from '@/components/blog/AdUnit';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 
-// Revalidate blog reading page every 7 days (7 * 24 * 60 * 60 seconds)
-export const revalidate = 604800;
 
+// On-demand static generation: Render on first request and cache forever
+export const dynamic = 'force-static';
+export const dynamicParams = true;
+export const revalidate = false;
 
 // Generate static metadata for SEO
 export async function generateMetadata({ params }) {
@@ -24,6 +24,7 @@ export async function generateMetadata({ params }) {
 
   if (!post) {
     return {
+      metadataBase: new URL(SITE_URL),
       title: 'Post Not Found - GyanAangan Blog',
       description: 'The requested blog post could not be found.',
     };
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }) {
     `${SITE_URL}/api/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent((post.excerpt || post.meta_description || '').slice(0, 150))}&type=blog`;
 
   return {
+    metadataBase: new URL(SITE_URL),
     title: `${post.title} - GyanAangan Blog`,
     description: post.excerpt || post.meta_description,
     openGraph: {
@@ -43,7 +45,14 @@ export async function generateMetadata({ params }) {
       authors: [post.author_name],
       publishedTime: post.publish_date,
       modifiedTime: post.updated_at,
-      images: [ogImageUrl],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        }
+      ],
     },
     twitter: {
       card: 'summary_large_image',
@@ -108,7 +117,7 @@ export default async function BlogPostPage({ params }) {
               {post.author_name && (
                 <span>By {post.author_name}</span>
               )}
-              <time dateTime={post.publish_date}>
+              <time dateTime={post.publish_date} suppressHydrationWarning>
                 {formatDate(post.publish_date)}
               </time>
               {post.category && (

@@ -1,14 +1,30 @@
 import { ImageResponse } from 'next/og';
+import fs from 'fs';
+import path from 'path';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
+
+// Read local logo once to avoid external network requests/timeouts in Satori
+let logoBase64 = '';
+try {
+  const logoPath = path.join(process.cwd(), 'public/images/logo white.png');
+  if (fs.existsSync(logoPath)) {
+    const logoBuffer = fs.readFileSync(logoPath);
+    logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+  }
+} catch (e) {
+  console.warn('OG Route: Could not read local logo file:', e.message);
+}
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     
     // Get parameters from URL
-    const title = searchParams.get('title') || 'Gyan Aangan';
-    const description = searchParams.get('description') || 'Browse a variety of courses, subjects, and resources';
+    const rawTitle = searchParams.get('title') || 'Gyan Aangan';
+    const title = rawTitle.length > 120 ? rawTitle.slice(0, 117) + '...' : rawTitle;
+    const rawDesc = searchParams.get('description') || 'Browse a variety of courses, subjects, and resources';
+    const description = rawDesc.length > 200 ? rawDesc.slice(0, 197) + '...' : rawDesc;
     const type = searchParams.get('type') || 'resource'; // resource, course, subject, blog
     
     return new ImageResponse(
@@ -69,7 +85,7 @@ export async function GET(request) {
                 }}
               >
                 <img
-                  src="https://gyanaangan.in/images/logo white.png" 
+                  src={logoBase64 || "https://gyanaangan.in/images/logo%20white.png"} 
                   width={70}
                   height={70}
                   style={{
@@ -295,6 +311,9 @@ export async function GET(request) {
       {
         width: 1200,
         height: 630,
+        headers: {
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
       }
     );
   } catch (error) {

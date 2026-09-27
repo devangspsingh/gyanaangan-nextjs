@@ -9,11 +9,6 @@ import { NotificationProvider } from '../context/NotificationContext'; // Import
 export function Providers({ children }) {
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-  if (!googleClientId) {
-    console.error("Google Client ID is not configured.");
-    // Potentially render an error message or a fallback UI
-  }
-
   return (
     <GoogleOAuthProvider clientId={googleClientId || ""}>
       <AuthProvider>

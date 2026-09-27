@@ -123,7 +123,11 @@ const Footer = () => {
       setAuthState(loggedInUser, access, refresh);
       toast.success('Logged in successfully!');
       setIsLoginModalOpen(false);
-      router.push(loginRedirectPath || '/profile');
+      if (loginRedirectPath && loginRedirectPath !== pathname && loginRedirectPath !== '/profile') {
+        router.push(loginRedirectPath);
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       console.error('Login failed:', error);
       const errorMessage = error.response?.data?.detail || error.response?.data?.error || error.message || 'Login failed. Please try again.';
@@ -157,6 +161,7 @@ const Footer = () => {
           isDesktop && "w-full justify-start"
         ),
         onClick: handleClick,
+        'aria-label': item.label,
       };
 
       const listItemKey = item.label;
@@ -193,7 +198,7 @@ const Footer = () => {
   const handleProfileClick = (e) => {
     if (!isAuthenticated) {
       e.preventDefault();
-      setLoginRedirectPath('/profile');
+      setLoginRedirectPath(pathname);
       setIsLoginModalOpen(true);
     }
     // If authenticated, the DropdownMenuTrigger handles the click automatically
@@ -251,7 +256,7 @@ const Footer = () => {
         {isAuthenticated ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="outline-none">
+              <button aria-label="Open profile menu" className="outline-none">
                 <ProfileButtonContent isDesktop={false} />
               </button>
             </DropdownMenuTrigger>
@@ -313,7 +318,7 @@ const Footer = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <button onClick={handleProfileClick}>
+          <button aria-label="Sign in or view profile" onClick={handleProfileClick}>
             <ProfileButtonContent isDesktop={false} />
           </button>
         )}
@@ -330,7 +335,7 @@ const Footer = () => {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="outline-none w-full">
+                <button aria-label="Open profile menu" className="outline-none w-full">
                   <ProfileButtonContent isDesktop={true} />
                 </button>
               </DropdownMenuTrigger>
@@ -392,7 +397,7 @@ const Footer = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <button onClick={handleProfileClick} className="w-full">
+            <button aria-label="Sign in or view profile" onClick={handleProfileClick} className="w-full">
               <ProfileButtonContent isDesktop={true} />
             </button>
           )}

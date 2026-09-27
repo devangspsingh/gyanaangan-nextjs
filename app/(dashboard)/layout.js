@@ -1,4 +1,4 @@
-import { Inter, Roboto_Mono } from 'next/font/google';
+import { Inter, Barlow, Roboto_Mono } from 'next/font/google';
 import { Providers } from '@/components/Providers'; // Adjust path
 import '../globals.css';
 import DynamicBackground from '@/app/dynamicBackgroud';
@@ -17,13 +17,14 @@ import Script from 'next/script';
 // import AdSenseComponent from '@/components/blog/AdSenseComponent';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+const barlow = Barlow({ weight: ['600', '700', '800'], subsets: ['latin'], variable: '--font-barlow', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
-
-
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${roboto_mono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${barlow.variable} ${roboto_mono.variable}`}>
+
+
     
 
       <body className="bg-[#010717]">

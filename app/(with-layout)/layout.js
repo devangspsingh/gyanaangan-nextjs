@@ -1,4 +1,4 @@
-import { Inter, Roboto_Mono } from 'next/font/google';
+import { Inter, Barlow, Roboto_Mono } from 'next/font/google';
 import { Providers } from '../../components/Providers'; // Adjust path
 import '@/app/globals.css';
 import Header from '@/components/Header';
@@ -20,6 +20,7 @@ import Script from 'next/script';
 // import AdSenseComponent from '@/components/blog/AdSenseComponent';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+const barlow = Barlow({ weight: ['600', '700', '800'], subsets: ['latin'], variable: '--font-barlow', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
 import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
 import LoginNudge from '@/components/Auth/LoginNudge'; // Import LoginNudge
@@ -28,7 +29,9 @@ import StickyNotification from '@/components/mine/ui/StickyNotification';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${roboto_mono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${barlow.variable} ${roboto_mono.variable}`}>
+
+
       {/* <head> */}
       <Script
         async

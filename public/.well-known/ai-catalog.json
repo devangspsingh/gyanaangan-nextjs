@@ -1,0 +1,32 @@
+{
+  "specVersion": "1.0.0",
+  "host": {
+    "displayName": "Gyan Aangan",
+    "identifier": "https://gyanaangan.in",
+    "documentationUrl": "https://gyanaangan.in/about"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:gyanaangan.in:service:study-resources",
+      "displayName": "Gyan Aangan Engineering Study Resources",
+      "type": "application/json",
+      "data": {
+        "name": "gyanaangan-resources",
+        "description": "Structured repository of engineering question papers, syllabus, and study notes",
+        "url": "https://gyanaangan.in/resources"
+      },
+      "description": "Access engineering courses, subjects, previous year papers, and notes."
+    },
+    {
+      "identifier": "urn:air:gyanaangan.in:service:blog",
+      "displayName": "Gyan Aangan Knowledge Blog",
+      "type": "application/json",
+      "data": {
+        "name": "gyanaangan-blog",
+        "description": "Articles covering modern AI agents, software engineering, and university topics",
+        "url": "https://gyanaangan.in/blog"
+      },
+      "description": "Educational blog posts and guides on engineering, coding agents, and academic curriculum."
+    }
+  ]
+}

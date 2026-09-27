@@ -15,10 +15,10 @@ function LoginPageContent() {
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      let nextUrl = searchParams.get('next');
-      // If nextUrl is not present, is the login page itself, or an invalid internal redirect, default to profile.
+      let nextUrl = searchParams.get('next') || searchParams.get('redirect');
+      // If nextUrl is not present, is the login page itself, or an invalid internal redirect, default to home (/).
       if (!nextUrl || nextUrl === '/login' || nextUrl.startsWith('/login?')) {
-        nextUrl = '/profile';
+        nextUrl = '/';
       }
       nextRedirect(nextUrl);
     }

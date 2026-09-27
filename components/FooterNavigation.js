@@ -32,7 +32,7 @@ const FooterNavigation = () => {
       <div className="relative z-10 max-w-7xl mx-auto pb-52 pt-12 md:pb-42 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <div className="flex items-center">
           <FaRegCopyright className="mr-2" />
-          <span>{currentYear} GyanAangan.in All rights reserved.</span>
+          <span suppressHydrationWarning>{currentYear} GyanAangan.in All rights reserved.</span>
         </div>
         <nav className="flex space-x-6">
           <Link href="/terms-and-conditions" className="hover:text-primary-light transition-colors">

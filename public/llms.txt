@@ -1,0 +1,11 @@
+# Gyan Aangan
+
+> Free, structured engineering study resources, syllabus, notes, and previous year question papers for college students.
+
+## Quick Links
+- [Home](https://gyanaangan.in/): Gyan Aangan homepage.
+- [Courses](https://gyanaangan.in/courses): Browse university engineering courses and branches.
+- [Subjects](https://gyanaangan.in/subjects): Explore subjects and syllabus.
+- [Resources](https://gyanaangan.in/resources): Download past year question papers (PYQs), handwritten notes, and solutions.
+- [Blog](https://gyanaangan.in/blog): Read articles on engineering, AI agents, technology, and developer guides.
+- [About Us](https://gyanaangan.in/about): Learn more about the Gyan Aangan mission and community.

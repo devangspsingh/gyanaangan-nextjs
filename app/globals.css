@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@700&family=Inter:wght@400;500;600;700&family=Roboto:wght@500;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -7,9 +6,9 @@
 /* Tailwind v4 specific import */
 
 :root {
-  --font-barlow: 'Barlow', sans-serif;
-  --font-roboto: 'Roboto', sans-serif;
-  --font-inter: 'Inter', sans-serif;
+  --font-barlow: var(--font-barlow, 'Barlow', sans-serif);
+  --font-roboto: var(--font-roboto, 'Roboto', sans-serif);
+  --font-inter: var(--font-inter, 'Inter', sans-serif);
 
   /* Default background/foreground for light/dark themes */
   --background-light: #ffffff;

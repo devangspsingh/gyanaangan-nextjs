@@ -95,7 +95,9 @@ const StickyNotification = ({ className }) => {
               <div className="h-5 w-[1px] bg-white/10 mx-0.5" />
 
               <button
+                type="button"
                 onClick={handleDismiss}
+                aria-label="Dismiss notification"
                 className="flex h-8 w-8 items-center justify-center rounded-full text-white/30 transition hover:bg-white/10 hover:text-white"
               >
                 <X size={16} />
