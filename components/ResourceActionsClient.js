@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 import { trackEvent } from '@/services/analyticsService';
+import { isUrlExpired } from '@/components/Viewer';
 
 export default function ResourceActionsClient({ resource }) {
   const { isAuthenticated, login: setAuthState, user, isResourceSaved, setResourceSaved } = useAuth();
@@ -24,6 +25,9 @@ export default function ResourceActionsClient({ resource }) {
   const [downloadUrl, setDownloadUrl] = useState(resource?.download_url || null);
 
   useEffect(() => {
+    setCurrentIsSaved(resource?.is_saved || false);
+    setDownloadUrl(resource?.download_url || null);
+
     // Check if current user has edit permission on client
     if (user) {
       const isStaffOrAdmin = Boolean(user.is_staff || user.is_superuser || user.hasContentManagement);
@@ -66,7 +70,7 @@ export default function ResourceActionsClient({ resource }) {
         })
         .catch(() => {});
     }
-  }, [resource?.slug, isAuthenticated, user, isResourceSaved, setResourceSaved]);
+  }, [resource?.slug, resource?.can_edit, resource?.uploaded_by_user, isAuthenticated, user, isResourceSaved, setResourceSaved]);
 
   const handleSaveToggle = async () => {
     if (!isAuthenticated) {
@@ -118,12 +122,12 @@ export default function ResourceActionsClient({ resource }) {
     }, resource?.slug);
 
     const targetUrl = downloadUrl || resource?.download_url;
-    if (targetUrl) {
+    if (targetUrl && !isUrlExpired(targetUrl)) {
       window.open(targetUrl, '_blank');
       return;
     }
 
-    // If download_url wasn't statically present, fetch it directly
+    // If download_url wasn't statically present or is expired, fetch it directly
     try {
       const res = await api_client.get(`/resources/${resource.slug}/`);
       if (res.data?.download_url) {

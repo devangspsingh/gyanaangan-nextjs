@@ -5,6 +5,38 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "
 import { ArrowsPointingOutIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { AdUnit } from '@/components/blog/AdUnit';
 import { trackEvent } from '@/services/analyticsService';
+import api from '@/lib/axiosInstance';
+
+// Check if an S3/MinIO presigned URL is expired or expiring within 10 minutes
+export const isUrlExpired = (url) => {
+  if (!url) return true;
+  try {
+    const parsed = new URL(url);
+    // S3 SigV2 (Expires=timestamp in seconds)
+    const expires = parsed.searchParams.get('Expires');
+    if (expires) {
+      const now = Math.floor(Date.now() / 1000);
+      return now >= (parseInt(expires, 10) - 600); // Expired or expiring within 10 minutes
+    }
+    // S3 SigV4 (X-Amz-Date + X-Amz-Expires)
+    const amzDate = parsed.searchParams.get('X-Amz-Date');
+    const amzExpires = parsed.searchParams.get('X-Amz-Expires');
+    if (amzDate && amzExpires) {
+      const year = amzDate.slice(0, 4);
+      const month = amzDate.slice(4, 6);
+      const day = amzDate.slice(6, 8);
+      const hour = amzDate.slice(9, 11);
+      const min = amzDate.slice(11, 13);
+      const sec = amzDate.slice(13, 15);
+      const createdMs = Date.UTC(year, month - 1, day, hour, min, sec);
+      const expiresMs = parseInt(amzExpires, 10) * 1000;
+      return Date.now() >= (createdMs + expiresMs - 600000);
+    }
+  } catch {
+    return false;
+  }
+  return false;
+};
 
 // IP Watermark Component
 const IPWatermark = () => {
@@ -248,6 +280,27 @@ const GoogleDocsViewer = ({ resourceViewUrl, resource }) => {
 };
 
 export default function Viewer({ resource }) {
+  const [currentViewUrl, setCurrentViewUrl] = useState(resource?.view_url);
+
+  useEffect(() => {
+    setCurrentViewUrl(resource?.view_url);
+  }, [resource?.view_url]);
+
+  useEffect(() => {
+    // If resource has an uploaded file and the current view_url is expired or missing, fetch a fresh one from backend
+    if (resource?.slug && resource?.file && (!currentViewUrl || isUrlExpired(currentViewUrl))) {
+      api.get(`/resources/${resource.slug}/`)
+        .then((res) => {
+          if (res.data?.view_url) {
+            setCurrentViewUrl(res.data.view_url);
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to refresh resource view URL:', err);
+        });
+    }
+  }, [resource?.slug, resource?.file, currentViewUrl]);
+
   if (!resource || !resource.privacy?.includes('view')) {
     return <p className="text-center text-gray-400 py-10">Preview not available for this resource.</p>;
   }
@@ -256,11 +309,11 @@ export default function Viewer({ resource }) {
   let primaryViewer = null;
 
   // Priority 1: File upload
-  if (resource.file && resource.view_url && resource.resource_type !== 'video' && canView) {
+  if (resource.file && currentViewUrl && resource.resource_type !== 'video' && canView) {
     primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
-        <GoogleDocsViewer resourceViewUrl={resource.view_url} resource={resource} />
+        <GoogleDocsViewer resourceViewUrl={currentViewUrl} resource={resource} />
       </section>
     );
   }
@@ -283,11 +336,11 @@ export default function Viewer({ resource }) {
     );
   }
   // Priority 3: External Link
-  else if (resource.resource_link && canView) {
+  else if ((currentViewUrl || resource.resource_link) && canView) {
     primaryViewer = (
       <section className="mb-8 relative">
         <h2 className="text-xl font-semibold text-white mb-3">Preview</h2>
-        <GoogleDocsViewer resourceViewUrl={resource.resource_link} resource={resource} />
+        <GoogleDocsViewer resourceViewUrl={currentViewUrl || resource.resource_link} resource={resource} />
       </section>
     );
   }
