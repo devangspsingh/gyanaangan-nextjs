@@ -25,9 +25,9 @@ const SectionContentSkeleton = ({ count = 3, CardSkeletonComponent }) => (
   </div>
 );
 
-// On-demand static generation: Cached until revalidated on demand via webhook
+// On-demand static generation with 5-day background revalidation safety net
 export const dynamic = 'force-static';
-export const revalidate = false;
+export const revalidate = 432000; // 5 days (5 * 24 * 60 * 60)
 export default async function HomePage() {
   // const notificationResponse = await getLatestNotification();
   // const notification = notificationResponse.error ? null : notificationResponse.data;

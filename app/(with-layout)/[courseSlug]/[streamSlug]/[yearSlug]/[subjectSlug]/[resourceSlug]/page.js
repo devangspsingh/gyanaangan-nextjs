@@ -305,4 +305,5 @@ export default async function NestedResourceDetailPage({ params }) {
 
 export const dynamic = 'force-static';
 export const dynamicParams = true;
-export const revalidate = false;
+export const revalidate = 432000; // 5 days (5 * 24 * 60 * 60)
+
