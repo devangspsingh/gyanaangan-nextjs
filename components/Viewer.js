@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { ArrowsPointingOutIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { AdUnit } from '@/components/blog/AdUnit';
@@ -281,6 +281,7 @@ const GoogleDocsViewer = ({ resourceViewUrl, resource }) => {
 
 export default function Viewer({ resource }) {
   const [currentViewUrl, setCurrentViewUrl] = useState(resource?.view_url);
+  const attemptedRefreshRef = useRef(null);
 
   useEffect(() => {
     setCurrentViewUrl(resource?.view_url);
@@ -289,6 +290,9 @@ export default function Viewer({ resource }) {
   useEffect(() => {
     // If resource has an uploaded file and the current view_url is expired or missing, fetch a fresh one from backend
     if (resource?.slug && resource?.file && (!currentViewUrl || isUrlExpired(currentViewUrl))) {
+      if (attemptedRefreshRef.current === resource.slug) return;
+      attemptedRefreshRef.current = resource.slug;
+
       api.get(`/resources/${resource.slug}/`)
         .then((res) => {
           if (res.data?.view_url) {

@@ -30,7 +30,12 @@ export const AuthProvider = ({ children }) => {
   }, [savedResourceSlugs]);
 
   const setResourceSaved = useCallback((slug, saved) => {
+    if (!slug) return;
     setSavedResourceSlugs((prev) => {
+      const exists = prev.has(slug);
+      if ((saved && exists) || (!saved && !exists)) {
+        return prev;
+      }
       const next = new Set(prev);
       if (saved) {
         next.add(slug);

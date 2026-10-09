@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toggleSaveResource } from '@/services/apiService';
 import toast from 'react-hot-toast';
 import { BookmarkIcon as BookmarkOutlineIcon, ShareIcon, ArrowDownIcon as DownloadIconHero } from 'lucide-react';
@@ -23,7 +23,9 @@ export default function ResourceActionsClient({ resource }) {
   const [currentIsSaved, setCurrentIsSaved] = useState(resource?.is_saved || false);
   const [canEdit, setCanEdit] = useState(Boolean(resource?.can_edit));
   const [downloadUrl, setDownloadUrl] = useState(resource?.download_url || null);
+  const fetchedResourceRef = useRef(null);
 
+  // Sync initial state and client-side permissions
   useEffect(() => {
     setCurrentIsSaved(resource?.is_saved || false);
     setDownloadUrl(resource?.download_url || null);
@@ -43,34 +45,46 @@ export default function ResourceActionsClient({ resource }) {
     } else {
       setCanEdit(false);
     }
+  }, [resource?.slug, resource?.is_saved, resource?.download_url, resource?.can_edit, resource?.uploaded_by_user, user]);
 
-    // Sync saved status from AuthContext if available
+  // Sync saved status from AuthContext if available
+  useEffect(() => {
     if (isAuthenticated && resource?.slug && isResourceSaved) {
       if (isResourceSaved(resource.slug)) {
         setCurrentIsSaved(true);
       }
     }
+  }, [isAuthenticated, resource?.slug, isResourceSaved]);
 
-    // When authenticated, check fresh saved, edit, and download status from backend
-    if (isAuthenticated && resource?.slug) {
-      api_client.get(`/resources/${resource.slug}/`)
-        .then((res) => {
-          if (res.data) {
-            if (typeof res.data.is_saved === 'boolean') {
-              setCurrentIsSaved(res.data.is_saved);
-              setResourceSaved?.(resource.slug, res.data.is_saved);
-            }
-            if (res.data.can_edit) {
-              setCanEdit(true);
-            }
-            if (res.data.download_url) {
-              setDownloadUrl(res.data.download_url);
-            }
-          }
-        })
-        .catch(() => {});
-    }
-  }, [resource?.slug, resource?.can_edit, resource?.uploaded_by_user, isAuthenticated, user, isResourceSaved, setResourceSaved]);
+  // When authenticated, check fresh saved, edit, and download status from backend once
+  useEffect(() => {
+    if (!isAuthenticated || !resource?.slug) return;
+
+    const fetchKey = `${user?.id || 'auth'}_${resource.slug}`;
+    if (fetchedResourceRef.current === fetchKey) return;
+    fetchedResourceRef.current = fetchKey;
+
+    let isMounted = true;
+    api_client.get(`/resources/${resource.slug}/`)
+      .then((res) => {
+        if (!isMounted || !res.data) return;
+        if (typeof res.data.is_saved === 'boolean') {
+          setCurrentIsSaved(res.data.is_saved);
+          setResourceSaved?.(resource.slug, res.data.is_saved);
+        }
+        if (res.data.can_edit) {
+          setCanEdit(true);
+        }
+        if (res.data.download_url) {
+          setDownloadUrl(res.data.download_url);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, resource?.slug, user?.id, setResourceSaved]);
 
   const handleSaveToggle = async () => {
     if (!isAuthenticated) {
