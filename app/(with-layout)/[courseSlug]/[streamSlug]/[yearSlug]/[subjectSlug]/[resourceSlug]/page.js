@@ -24,7 +24,7 @@ const SITE_NAME = 'Gyan Aangan';
 export async function generateMetadata({ params }) {
   // console.log('📄 [Resource Page] Generating metadata for:', params);
 
-  const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = params;
+  const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = await params;
 
   const resourceResponse = await getResourceBySlug(resourceSlug);
 
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }) {
 export default async function NestedResourceDetailPage({ params }) {
   // console.log('📄 [Resource Page] Fetching data for:', params);
 
-  const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = params;
+  const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = await params;
 
   try {
     // Fetch resource and parent data in parallel

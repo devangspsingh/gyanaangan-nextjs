@@ -50,7 +50,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function SubjectDetailPageServer({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
 
   try {
     // 1. Fetch Subject and Resources in parallel for maximum speed

@@ -6,8 +6,8 @@ export const metadata = {
   description: 'Edit your organization details',
 };
 
-const EditOrganizationPage = ({ params }) => {
-  const { slug } = params;
+const EditOrganizationPage = async ({ params }) => {
+  const { slug } = await params;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">

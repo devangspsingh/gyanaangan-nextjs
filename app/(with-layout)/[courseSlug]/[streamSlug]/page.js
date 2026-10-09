@@ -18,7 +18,7 @@ function formatCourseName(slug) {
 
 // Generate metadata on the server
 export async function generateMetadata({ params }) {
-  const { courseSlug, streamSlug } = params;
+  const { courseSlug, streamSlug } = await params;
 
   const response = await getStreamBySlug(streamSlug);
 
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }) {
 
 // The page component is now an async Server Component
 export default async function StreamDetailPage({ params }) {
-  const { courseSlug, streamSlug } = params;
+  const { courseSlug, streamSlug } = await params;
 
   let stream = null;
   let error = null;

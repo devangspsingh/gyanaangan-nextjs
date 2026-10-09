@@ -15,7 +15,7 @@ import { AdUnit } from '@/components/blog/AdUnit';
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
 
-  const { courseSlug, streamSlug, yearSlug, subjectSlug } = params;
+  const { courseSlug, streamSlug, yearSlug, subjectSlug } = await params;
 
   try {
     const [subjectResponse, parentDataResponse] = await Promise.all([
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }) {
 
 export default async function NestedSubjectDetailPage({ params }) {
 
-  const { courseSlug, streamSlug, yearSlug, subjectSlug } = params;
+  const { courseSlug, streamSlug, yearSlug, subjectSlug } = await params;
 
   try {
     // Fetch all data in parallel

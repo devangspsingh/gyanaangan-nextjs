@@ -23,7 +23,7 @@ const SITE_NAME = 'Gyan Aangan';
 
 export async function generateMetadata({ params }) {
 
-  const { slug } = params;
+  const { slug } = await params;
   const resourceResponse = await getResourceBySlug(slug);
 
   if (!resourceResponse.error && resourceResponse.data) {
@@ -68,7 +68,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ResourceDetailPageServer({ params }) {
 
-  const { slug } = params;
+  const { slug } = await params;
 
   try {
     // Fetch resource using public cached API

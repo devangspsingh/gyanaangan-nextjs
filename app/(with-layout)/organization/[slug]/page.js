@@ -3,7 +3,7 @@ import OrganizationDetailClient from '@/components/organization/OrganizationDeta
 import { getOrganizationBySlug } from '@/services/organizationService';
 
 export async function generateMetadata({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
   const { data, error } = await getOrganizationBySlug(slug);
 
   if (error || !data) {
