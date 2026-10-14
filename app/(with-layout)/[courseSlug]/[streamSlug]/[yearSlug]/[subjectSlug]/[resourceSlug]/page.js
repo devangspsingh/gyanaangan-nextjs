@@ -118,8 +118,64 @@ export default async function NestedResourceDetailPage({ params }) {
 
     const breadcrumbSubjectName = resource.subject_name || displayParentData.subjects?.find(s => s.slug === subjectSlug)?.name || subjectSlug;
 
+    // Generate BreadcrumbList Schema
+    const breadcrumbItems = [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Courses',
+        item: `${SITE_URL}/courses`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: displayParentData.course?.name || courseSlug,
+        item: `${SITE_URL}/${courseSlug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: displayParentData.stream?.name || streamSlug,
+        item: `${SITE_URL}/${courseSlug}/${streamSlug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: displayParentData.year?.name || yearSlug,
+        item: `${SITE_URL}/${courseSlug}/${streamSlug}/${yearSlug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 6,
+        name: breadcrumbSubjectName,
+        item: `${SITE_URL}/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 7,
+        name: resource.name,
+        item: `${SITE_URL}/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}/${resourceSlug}`,
+      },
+    ];
+
+    const breadcrumbSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbItems,
+    };
+
     return (
       <main className="container mx-auto py-8 px-4 text-gray-100">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
         <Breadcrumb className="mb-6 text-sm">
           <BreadcrumbList>
             <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>

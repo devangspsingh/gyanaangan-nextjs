@@ -124,8 +124,57 @@ export default async function NestedSubjectDetailPage({ params }) {
       console.warn('⚠️ [Subject Page] Using fallback breadcrumb data');
     }
 
+    const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
+
+    const breadcrumbSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: SITE_URL,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Courses',
+          item: `${SITE_URL}/courses`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: parentData.course?.name || courseSlug,
+          item: `${SITE_URL}/${courseSlug}`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 4,
+          name: parentData.stream?.name || streamSlug,
+          item: `${SITE_URL}/${courseSlug}/${streamSlug}`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 5,
+          name: parentData.year?.name || yearSlug,
+          item: `${SITE_URL}/${courseSlug}/${streamSlug}/${yearSlug}`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 6,
+          name: subject.name,
+          item: `${SITE_URL}/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}`,
+        },
+      ],
+    };
+
     return (
       <main className="container mx-auto py-8 px-4 text-gray-100">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
         <Breadcrumb className="mb-6 text-sm">
           <BreadcrumbList>
             <BreadcrumbItem>

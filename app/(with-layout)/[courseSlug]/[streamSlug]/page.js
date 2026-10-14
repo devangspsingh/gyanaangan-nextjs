@@ -98,9 +98,46 @@ export default async function StreamDetailPage({ params }) {
     );
   }
 
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Courses',
+        item: `${SITE_URL}/courses`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: parentCourseName,
+        item: `${SITE_URL}/${courseSlug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: stream.name,
+        item: `${SITE_URL}/${courseSlug}/${streamSlug}`,
+      },
+    ],
+  };
+
   // Render the page content
   return (
     <main className="container mx-auto py-8 px-4 text-gray-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>

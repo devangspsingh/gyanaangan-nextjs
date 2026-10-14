@@ -100,13 +100,75 @@ export default async function ResourceDetailPageServer({ params }) {
       }
     }
 
-    // console.log('✅ [Resource Page /resources/[slug]] Data loaded successfully:', {
-    //   resourceName: resource.name,
-    //   relatedResourcesCount: relatedResources.length
-    // });
+    // Generate BreadcrumbList Schema
+    const breadcrumbItems = [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: SITE_URL,
+      },
+    ];
+
+    if (resource.course_slug && resource.course_name) {
+      breadcrumbItems.push({
+        '@type': 'ListItem',
+        position: breadcrumbItems.length + 1,
+        name: resource.course_name,
+        item: `${SITE_URL}/${resource.course_slug}`,
+      });
+      if (resource.stream_slug && resource.stream_name) {
+        breadcrumbItems.push({
+          '@type': 'ListItem',
+          position: breadcrumbItems.length + 1,
+          name: resource.stream_name,
+          item: `${SITE_URL}/${resource.course_slug}/${resource.stream_slug}`,
+        });
+        if (resource.educational_year?.slug && resource.educational_year?.name) {
+          breadcrumbItems.push({
+            '@type': 'ListItem',
+            position: breadcrumbItems.length + 1,
+            name: resource.educational_year.name,
+            item: `${SITE_URL}/${resource.course_slug}/${resource.stream_slug}/${resource.educational_year.slug}`,
+          });
+          if (resource.subject_slug && resource.subject_name) {
+            breadcrumbItems.push({
+              '@type': 'ListItem',
+              position: breadcrumbItems.length + 1,
+              name: resource.subject_name,
+              item: `${SITE_URL}/${resource.course_slug}/${resource.stream_slug}/${resource.educational_year.slug}/${resource.subject_slug}`,
+            });
+          }
+        }
+      }
+    } else {
+      breadcrumbItems.push({
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Resources',
+        item: `${SITE_URL}/resources`,
+      });
+    }
+
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: breadcrumbItems.length + 1,
+      name: resource.name,
+      item: `${SITE_URL}/resources/${slug}`,
+    });
+
+    const breadcrumbSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbItems,
+    };
 
     return (
       <main className="container mx-auto py-8 px-4 text-gray-100">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
         <Breadcrumb className="mb-6 text-sm">
           <BreadcrumbList>
             <BreadcrumbItem>

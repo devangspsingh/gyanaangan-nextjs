@@ -88,12 +88,44 @@ export default async function SubjectDetailPageServer({ params }) {
         console.warn(`[SubjectPage] Failed to load resources for ${slug}`);
     }
 
+    // Generate BreadcrumbList Schema
+    const breadcrumbSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: SITE_URL,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Subjects',
+          item: `${SITE_URL}/subjects`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: subject.name,
+          item: `${SITE_URL}/subjects/${slug}`,
+        },
+      ],
+    };
+
     // 4. Render Client Component with pre-fetched data
     return (
-      <SubjectDetailPageClient 
-        subject={subject} 
-        resources={resources} 
-      />
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+        <SubjectDetailPageClient 
+          subject={subject} 
+          resources={resources} 
+        />
+      </>
     );
 
   } catch (error) {
