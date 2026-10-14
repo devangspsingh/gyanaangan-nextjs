@@ -37,19 +37,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  return {
-    title: "Course Not Found - Gyan Aangan",
-    description: "The requested course could not be found.",
-    robots: {
-      index: false,
-      follow: false,
-      nocache: true,
-      googleBot: {
-        index: false,
-        follow: false,
-      },
-    },
-  };
+  notFound();
 }
 
 export default async function CourseDetailPage({ params }) {

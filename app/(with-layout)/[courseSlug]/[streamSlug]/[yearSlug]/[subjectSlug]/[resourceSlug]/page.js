@@ -62,19 +62,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  return {
-    title: `Resource Not Found - ${SITE_NAME}`,
-    description: `The requested resource could not be found on ${SITE_NAME}.`,
-    robots: {
-      index: false,
-      follow: false,
-      nocache: true,
-      googleBot: {
-        index: false,
-        follow: false,
-      },
-    },
-  };
+  notFound();
 }
 
 export default async function NestedResourceDetailPage({ params }) {

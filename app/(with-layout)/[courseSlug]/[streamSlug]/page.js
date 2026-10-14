@@ -41,20 +41,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  // Fallback metadata
-  return {
-    title: "Stream Not Found - Gyan Aangan",
-    description: "The requested stream could not be found.",
-    robots: {
-      index: false,
-      follow: false,
-      nocache: true,
-      googleBot: {
-        index: false,
-        follow: false,
-      },
-    },
-  };
+  notFound();
 }
 
 // The page component is now an async Server Component

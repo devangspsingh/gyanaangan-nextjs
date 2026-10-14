@@ -8,7 +8,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 
-export const dynamic = 'force-dynamic'; // Ensure fresh data on every request
+export const revalidate = 86400; // 24 hours ISR
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -44,19 +44,7 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  return {
-    title: `Subject Not Found - ${SITE_NAME}`,
-    description: `The requested subject could not be found on ${SITE_NAME}.`,
-    robots: {
-      index: false,
-      follow: false,
-      nocache: true,
-      googleBot: {
-        index: false,
-        follow: false,
-      },
-    },
-  };
+  notFound();
 }
 
 export default async function SubjectDetailPageServer({ params }) {

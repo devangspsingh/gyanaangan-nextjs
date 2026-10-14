@@ -20,19 +20,7 @@ export async function generateMetadata({ params }) {
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
 
   if (response.error || !response.data) {
-    return {
-      title: 'Page Not Found - Gyan Aangan',
-      description: 'The requested page could not be found.',
-      robots: {
-        index: false,
-        follow: false,
-        nocache: true,
-        googleBot: {
-          index: false,
-          follow: false,
-        },
-      },
-    };
+    notFound();
   }
 
   const pageData = response.data;
@@ -180,5 +168,4 @@ export default async function SpecialPage({ params }) {
     </main>
   );
 }
-
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400; // 24 hours ISR

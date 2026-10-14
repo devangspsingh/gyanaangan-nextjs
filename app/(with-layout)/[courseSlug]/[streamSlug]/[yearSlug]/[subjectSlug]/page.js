@@ -25,19 +25,7 @@ export async function generateMetadata({ params }) {
     ]);
 
     if (subjectResponse.error || !subjectResponse.data) {
-      return {
-        title: 'Subject Not Found - Gyan Aangan',
-        description: 'The requested subject could not be found.',
-        robots: {
-          index: false,
-          follow: false,
-          nocache: true,
-          googleBot: {
-            index: false,
-            follow: false,
-          },
-        },
-      };
+      notFound();
     }
 
     const subject = subjectResponse.data;
@@ -61,20 +49,11 @@ export async function generateMetadata({ params }) {
       },
     };
   } catch (error) {
+    if (error?.digest?.startsWith('NEXT_')) {
+      throw error;
+    }
     console.error('❌ [Subject Page] Error generating metadata:', error);
-    return {
-      title: 'Subject Not Found - Gyan Aangan',
-      description: 'The requested subject could not be found.',
-      robots: {
-        index: false,
-        follow: false,
-        nocache: true,
-        googleBot: {
-          index: false,
-          follow: false,
-        },
-      },
-    };
+    notFound();
   }
 }
 
@@ -243,5 +222,4 @@ export default async function NestedSubjectDetailPage({ params }) {
     notFound();
   }
 }
-
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400; // 24 hours ISR
