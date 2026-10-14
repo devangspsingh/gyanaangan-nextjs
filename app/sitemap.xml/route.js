@@ -1,33 +1,33 @@
-import { SITE_URL, buildSitemapIndexXml, xmlResponse } from '@/lib/sitemapHelper';
+import { SITE_URL, buildSitemapIndexXml, xmlResponse, getLatestSectionTimestamps } from '@/lib/sitemapHelper';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 export async function GET() {
-  const now = new Date().toISOString();
+  const timestamps = await getLatestSectionTimestamps();
 
   const sitemaps = [
     {
       url: `${SITE_URL}/sitemap-static.xml`,
-      lastModified: now,
+      lastModified: timestamps.static,
     },
     {
       url: `${SITE_URL}/sitemap-courses.xml`,
-      lastModified: now,
+      lastModified: timestamps.courses,
     },
     {
       url: `${SITE_URL}/sitemap-subjects.xml`,
-      lastModified: now,
+      lastModified: timestamps.subjects,
     },
     {
       url: `${SITE_URL}/sitemap-blogs.xml`,
-      lastModified: now,
+      lastModified: timestamps.blogs,
     },
     {
       url: `${SITE_URL}/sitemap-resources.xml`,
-      lastModified: now,
+      lastModified: timestamps.resources,
     },
   ];
 
   const xml = buildSitemapIndexXml(sitemaps);
-  return xmlResponse(xml, 3600);
+  return xmlResponse(xml, 86400);
 }

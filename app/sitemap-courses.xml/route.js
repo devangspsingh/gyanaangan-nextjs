@@ -1,6 +1,6 @@
 import { SITE_URL, fetchSitemapData, buildUrlsetXml, xmlResponse } from '@/lib/sitemapHelper';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 export async function GET() {
   const courses = await fetchSitemapData('courses', '/courses/', {
@@ -14,7 +14,7 @@ export async function GET() {
   for (const course of courses) {
     if (!course.slug) continue;
 
-    const courseDate = course.updated_at || course.updated_at_iso || new Date();
+    const courseDate = course.updated_at || course.updated_at_iso || '2026-10-01T00:00:00.000Z';
 
     // Course main page: /course-slug
     routes.push({
@@ -52,5 +52,5 @@ export async function GET() {
   }
 
   const xml = buildUrlsetXml(routes);
-  return xmlResponse(xml, 3600);
+  return xmlResponse(xml, 86400);
 }

@@ -1,6 +1,6 @@
 import { SITE_URL, fetchSitemapData, buildUrlsetXml, xmlResponse } from '@/lib/sitemapHelper';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 export async function GET() {
   const posts = await fetchSitemapData('blogs', '/blog/posts/', {
@@ -10,13 +10,14 @@ export async function GET() {
   });
 
   const routes = [];
+  const latestBlogDate = posts[0]?.updated_at || posts[0]?.publish_date || '2026-10-14T05:14:13.000Z';
 
   // Individual blog posts
   for (const post of posts) {
     if (!post?.slug) continue;
     routes.push({
       url: `${SITE_URL}/blog/${post.slug}`,
-      lastModified: post.updated_at || post.publish_date || post.updated_at_iso || new Date(),
+      lastModified: post.updated_at || post.publish_date || post.updated_at_iso || '2026-10-01T00:00:00.000Z',
       changeFrequency: 'weekly',
       priority: 0.8,
     });
@@ -28,12 +29,12 @@ export async function GET() {
   for (let page = 2; page <= totalPages; page++) {
     routes.push({
       url: `${SITE_URL}/blog?page=${page}`,
-      lastModified: new Date(),
+      lastModified: latestBlogDate,
       changeFrequency: 'daily',
       priority: 0.6,
     });
   }
 
   const xml = buildUrlsetXml(routes);
-  return xmlResponse(xml, 3600);
+  return xmlResponse(xml, 86400);
 }

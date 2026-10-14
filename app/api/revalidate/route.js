@@ -26,14 +26,23 @@ function performRevalidation({ slug, path, paths, tag, type }) {
     revalidatePath(blogPath, 'page');
     revalidated.push(blogPath);
 
-    // Also revalidate the main blog directory / list
+    // Also revalidate the main blog directory / list and sitemaps
     revalidatePath('/blog', 'page');
     revalidated.push('/blog');
+
+    revalidatePath('/sitemap-blogs.xml');
+    revalidatePath('/sitemap.xml');
+    revalidatePath('/sitemap-all.xml');
+    revalidated.push('/sitemap-blogs.xml', '/sitemap.xml', '/sitemap-all.xml');
   }
 
   const allPaths = [];
   if (path) allPaths.push(path);
   if (Array.isArray(paths)) allPaths.push(...paths);
+
+  let hasResourcePath = false;
+  let hasSubjectPath = false;
+  let hasCoursePath = false;
 
   for (const p of allPaths) {
     if (type) {
@@ -45,6 +54,26 @@ function performRevalidation({ slug, path, paths, tag, type }) {
     if (!revalidated.includes(p)) {
       revalidated.push(p);
     }
+
+    if (p.startsWith('/resources')) hasResourcePath = true;
+    if (p.startsWith('/subjects')) hasSubjectPath = true;
+    if (p.startsWith('/courses') || p.startsWith('/')) hasCoursePath = true;
+  }
+
+  if (hasResourcePath) {
+    revalidatePath('/sitemap-resources.xml');
+    revalidatePath('/sitemap.xml');
+    revalidatePath('/sitemap-all.xml');
+  }
+  if (hasSubjectPath) {
+    revalidatePath('/sitemap-subjects.xml');
+    revalidatePath('/sitemap.xml');
+    revalidatePath('/sitemap-all.xml');
+  }
+  if (hasCoursePath) {
+    revalidatePath('/sitemap-courses.xml');
+    revalidatePath('/sitemap.xml');
+    revalidatePath('/sitemap-all.xml');
   }
 
   if (tag) {
