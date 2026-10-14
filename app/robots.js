@@ -22,6 +22,13 @@ export default function robots() {
     //     // This rule applies to api.gyanaangan.in if crawlers check it
     //   },
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`
+    sitemap: [
+      `${SITE_URL}/sitemap.xml`,
+      `${SITE_URL}/sitemap-blogs.xml`,
+      `${SITE_URL}/sitemap-resources.xml`,
+      `${SITE_URL}/sitemap-courses.xml`,
+      `${SITE_URL}/sitemap-subjects.xml`,
+      `${SITE_URL}/sitemap-static.xml`,
+    ],
   };
 }
