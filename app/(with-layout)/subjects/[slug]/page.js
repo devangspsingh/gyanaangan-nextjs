@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getSubjectBySlug, getResources } from '@/services/apiService';
 import SubjectDetailPageClient from './SubjectDetailPageClient';
 
@@ -46,6 +47,15 @@ export async function generateMetadata({ params }) {
   return {
     title: `Subject Not Found - ${SITE_NAME}`,
     description: `The requested subject could not be found on ${SITE_NAME}.`,
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
+    },
   };
 }
 
@@ -61,18 +71,8 @@ export default async function SubjectDetailPageServer({ params }) {
 
     // 2. Handle Subject 404/Error
     if (subjectResponse.error || !subjectResponse.data) {
-      const errorMessage = subjectResponse.data?.detail || 'Subject data could not be loaded.';
-      console.error(`[SubjectPage] Error loading subject ${slug}:`, errorMessage);
-
-      return (
-        <main className="container mx-auto py-8 px-4 text-gray-100">
-           <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 text-red-400 bg-red-900/20 p-6 rounded-lg">
-             <h2 className="text-xl font-bold mb-2">Subject Not Found</h2>
-             <p>{errorMessage}</p>
-             <Link href="/subjects" className="mt-4 text-primary-light hover:underline">Return to Subjects</Link>
-           </div>
-        </main>
-      );
+      console.warn(`[SubjectPage] Subject not found: ${slug}`);
+      notFound();
     }
 
     const subject = subjectResponse.data;
@@ -97,11 +97,10 @@ export default async function SubjectDetailPageServer({ params }) {
     );
 
   } catch (error) {
+    if (error?.digest?.startsWith('NEXT_')) {
+      throw error;
+    }
     console.error('[SubjectPage] Critical error:', error);
-    return (
-      <div className="container mx-auto py-8 px-4 text-gray-100 text-center">
-        <p className="text-red-500">An unexpected error occurred. Please try again later.</p>
-      </div>
-    );
+    notFound();
   }
 }

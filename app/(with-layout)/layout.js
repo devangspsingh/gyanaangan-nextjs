@@ -27,36 +27,26 @@ import LoginNudge from '@/components/Auth/LoginNudge'; // Import LoginNudge
 import StickyAd from '@/components/Ads/stickyAds';
 import StickyNotification from '@/components/mine/ui/StickyNotification';
 
-export default function RootLayout({ children }) {
+export default function WithLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${barlow.variable} ${roboto_mono.variable}`}>
+    <>
+      <DynamicBackground />
+      <AnalyticsTracker />
+      <GoogleAdSenseLoader />
+      <LoginNudge />
+      <Header />
+      <StickyNotification />
+      <div className="relative container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">
+        {children}
+      </div>
 
-      <body className="bg-[#010717]">
-        <Providers>
-          <DynamicBackground /> {/* Use the client component for dynamic background */}
-          <AnalyticsTracker />
-          <GoogleAdSenseLoader />
-          <LoginNudge />
-          <Header />
-          {/* <GoogleAdSense publisherId="ca-pub-3792754105959046" /> */}
-          {/* <AdSenseComponent/> */}
-          <StickyNotification />
-          <div className="relative container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">
-            {children}
-          </div>
-
-          <div className="printable-message hidden">
-            <p>🚫 Oops! This page does not like printers. 😊<br />Please enjoy it online!</p>
-          </div>
-          <Footer />
-          <StickyAd />
-          <ProfileCompleteAlert />
-          <FooterNavigation />
-        </Providers>
-      </body>
-      {process.env.NEXT_PUBLIC_DEV ? "" :
-        <GoogleAnalytics gaId="G-P37HBDS10M" />
-      }
-    </html>
+      <div className="printable-message hidden">
+        <p>🚫 Oops! This page does not like printers. 😊<br />Please enjoy it online!</p>
+      </div>
+      <Footer />
+      <StickyAd />
+      <ProfileCompleteAlert />
+      <FooterNavigation />
+    </>
   );
 }

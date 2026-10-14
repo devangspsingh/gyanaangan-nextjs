@@ -1,5 +1,5 @@
-import React from 'react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getResourceBySlug, getSpecialPageData, getResources } from '@/services/apiService';
 import Viewer from '@/components/Viewer';
 import ResourceCard from '@/components/ResourceCard';
@@ -65,12 +65,19 @@ export async function generateMetadata({ params }) {
   return {
     title: `Resource Not Found - ${SITE_NAME}`,
     description: `The requested resource could not be found on ${SITE_NAME}.`,
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
+    },
   };
 }
 
 export default async function NestedResourceDetailPage({ params }) {
-  // console.log('📄 [Resource Page] Fetching data for:', params);
-
   const { courseSlug, streamSlug, yearSlug, subjectSlug, resourceSlug } = await params;
 
   try {
@@ -80,47 +87,10 @@ export default async function NestedResourceDetailPage({ params }) {
       getSpecialPageData(courseSlug, streamSlug, yearSlug)
     ]);
 
-    // console.log('📄 [Resource Page] Responses received:', {
-    //   resource: resourceResponse.error ? 'Error' : 'Success',
-    //   parentData: parentDataResponse.error ? 'Error' : 'Success'
-    // });
-
-    // Handle resource error
+    // Handle resource error -> 404
     if (resourceResponse.error || !resourceResponse.data) {
-      const errorMessage = resourceResponse.data?.detail || 'Failed to load resource.';
-      console.error('❌ [Resource Page] Failed to load resource:', errorMessage);
-
-      const displayErrorParentData = parentDataResponse.data || {
-        course: { name: courseSlug || "Course", slug: courseSlug },
-        stream: { name: streamSlug || "Stream", slug: streamSlug },
-        year: { name: yearSlug || "Year", slug: yearSlug },
-      };
-
-      return (
-        <main className="container mx-auto py-8 px-4 text-gray-100">
-          <Breadcrumb className="mb-6 text-sm">
-            <BreadcrumbList>
-              <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbLink asChild><Link href="/courses">Courses</Link></BreadcrumbLink></BreadcrumbItem>
-              {courseSlug && (<> <BreadcrumbSeparator /> <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}`}>{displayErrorParentData.course?.name || courseSlug}</Link></BreadcrumbLink></BreadcrumbItem> </>)}
-              {streamSlug && (<> <BreadcrumbSeparator /> <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}`}>{displayErrorParentData.stream?.name || streamSlug}</Link></BreadcrumbLink></BreadcrumbItem> </>)}
-              {yearSlug && (<> <BreadcrumbSeparator /> <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}/${yearSlug}`}>{displayErrorParentData.year?.name || yearSlug}</Link></BreadcrumbLink></BreadcrumbItem> </>)}
-              {subjectSlug && (<> <BreadcrumbSeparator /> <BreadcrumbItem><BreadcrumbLink asChild><Link href={`/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}`}>{subjectSlug.replace(/-/g, ' ')}</Link></BreadcrumbLink></BreadcrumbItem> </>)}
-              <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbPage>Error</BreadcrumbPage></BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 text-red-400 bg-red-900/20 p-6 rounded-lg">
-            <ExclamationTriangleIcon className="w-16 h-16 mx-auto mb-4 text-red-500" />
-            <h2 className="text-xl font-semibold mb-2">Resource Error</h2>
-            <p>{errorMessage || 'Resource not found or failed to load.'}</p>
-            <Link href={`/${courseSlug}/${streamSlug}/${yearSlug}/${subjectSlug}`} className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
-              Go Back to Subject
-            </Link>
-          </div>
-        </main>
-      );
+      console.warn('❌ [Nested Resource Page] Resource not found:', resourceSlug);
+      notFound();
     }
 
     const resource = resourceResponse.data;
@@ -287,19 +257,11 @@ export default async function NestedResourceDetailPage({ params }) {
       </main>
     );
   } catch (error) {
+    if (error?.digest?.startsWith('NEXT_')) {
+      throw error;
+    }
     console.error('❌ [Resource Page] Unexpected error:', error);
-    return (
-      <main className="container mx-auto py-8 px-4 text-gray-100">
-        <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 text-red-400 bg-red-900/20 p-6 rounded-lg">
-          <ExclamationTriangleIcon className="w-16 h-16 mx-auto mb-4 text-red-500" />
-          <h2 className="text-xl font-semibold mb-2">Unexpected Error</h2>
-          <p>An unexpected error occurred: {error.message}</p>
-          <Link href={`/${params.courseSlug}/${params.streamSlug}/${params.yearSlug}/${params.subjectSlug}`} className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
-            Go Back to Subject
-          </Link>
-        </div>
-      </main>
-    );
+    notFound();
   }
 }
 

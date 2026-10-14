@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getSpecialPageData } from '../../../../../services/apiService';
 import SubjectCard from '../../../../../components/SubjectCard';
 import SubscribeButton from '../../../../../components/SubscribeButton';
@@ -17,11 +18,20 @@ export async function generateMetadata({ params }) {
 
   const { courseSlug, streamSlug, yearSlug } = await params;
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
-  // console.log(response.data)
+
   if (response.error || !response.data) {
     return {
       title: 'Page Not Found - Gyan Aangan',
       description: 'The requested page could not be found.',
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+        },
+      },
     };
   }
 
@@ -51,25 +61,12 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function SpecialPage({ params }) {
-  // console.log('📄 [Year Page] Fetching data for:', params);
-
   const { courseSlug, streamSlug, yearSlug } = await params;
   const response = await getSpecialPageData(courseSlug, streamSlug, yearSlug);
-  // console.log(response.data)
-  // console.log('📄 [Year Page] Response status:', response.error ? 'Error' : 'Success');
 
   if (response.error || !response.data) {
-    const errorMessage = response.data?.detail || 'Unknown error';
-    // console.error('❌ [Year Page] Error fetching data:', errorMessage);
-
-    return (
-      <main className="container mx-auto py-8 px-4 text-center text-red-400">
-        <p>Failed to load page data: {errorMessage}</p>
-        <Link href={`/${courseSlug}/${streamSlug}`} className="text-primary-light hover:underline mt-4 inline-block">
-          Back to Stream
-        </Link>
-      </main>
-    );
+    console.warn('❌ [Year Page] Page not found:', { courseSlug, streamSlug, yearSlug });
+    notFound();
   }
 
   const pageData = response.data;

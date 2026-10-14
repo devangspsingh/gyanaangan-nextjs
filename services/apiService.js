@@ -175,6 +175,9 @@ export const getSpecialPageData = cache(async (courseSlug, streamSlug, yearSlug)
     if (typeof window === 'undefined') {
       // Server-side: use fetchFromServer with cookies for authentication
       const response = await fetchFromServer(`/special-pages/details/${courseSlug}/${streamSlug}/${yearSlug}/`);
+      if (response.error || !response.data || response.status === 404 || response.data?.detail) {
+        return { data: null, error: true, status: response.status || 404 };
+      }
       return { data: response.data, error: false };
     } else {
       // Client-side: use axios instance

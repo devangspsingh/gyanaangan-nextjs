@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getSubjectBySlug, getResources, getSpecialPageData } from '../../../../../../services/apiService';
 import SubjectResourcesClient from '../../../../../../components/SubjectResourcesClient';
 import {
@@ -27,6 +28,15 @@ export async function generateMetadata({ params }) {
       return {
         title: 'Subject Not Found - Gyan Aangan',
         description: 'The requested subject could not be found.',
+        robots: {
+          index: false,
+          follow: false,
+          nocache: true,
+          googleBot: {
+            index: false,
+            follow: false,
+          },
+        },
       };
     }
 
@@ -53,8 +63,17 @@ export async function generateMetadata({ params }) {
   } catch (error) {
     console.error('❌ [Subject Page] Error generating metadata:', error);
     return {
-      title: 'Subject Details - Gyan Aangan',
-      description: 'Subject details and resources on Gyan Aangan',
+      title: 'Subject Not Found - Gyan Aangan',
+      description: 'The requested subject could not be found.',
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+        },
+      },
     };
   }
 }
@@ -71,20 +90,10 @@ export default async function NestedSubjectDetailPage({ params }) {
       getSpecialPageData(courseSlug, streamSlug, yearSlug)
     ]);
 
-
-    // Handle subject error
+    // Handle subject error -> 404
     if (subjectResponse.error || !subjectResponse.data) {
-      const errorMessage = subjectResponse.data?.detail || 'Unknown error';
-      console.error('❌ [Subject Page] Failed to load subject:', errorMessage);
-
-      return (
-        <div className="container mx-auto py-8 px-4 text-gray-100">
-          <p className="text-red-500">Error: Failed to load subject: {errorMessage}</p>
-          <Link href={`/${courseSlug}/${streamSlug}/${yearSlug}`} className="text-primary-light hover:underline mt-4 inline-block">
-            Back to Year
-          </Link>
-        </div>
-      );
+      console.warn('❌ [Subject Page] Subject not found:', subjectSlug);
+      notFound();
     }
 
     const subject = subjectResponse.data;
@@ -178,15 +187,11 @@ export default async function NestedSubjectDetailPage({ params }) {
       </main>
     );
   } catch (error) {
+    if (error?.digest?.startsWith('NEXT_')) {
+      throw error;
+    }
     console.error('❌ [Subject Page] Unexpected error:', error);
-    return (
-      <div className="container mx-auto py-8 px-4 text-gray-100">
-        <p className="text-red-500">An unexpected error occurred: {error.message}</p>
-        <Link href={`/${courseSlug}/${streamSlug}/${yearSlug}`} className="text-primary-light hover:underline mt-4 inline-block">
-          Back to Year
-        </Link>
-      </div>
-    );
+    notFound();
   }
 }
 

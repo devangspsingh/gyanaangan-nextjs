@@ -1,5 +1,5 @@
-import React from 'react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getResourceBySlug, getResources } from '@/services/apiService';
 import Viewer from '@/components/Viewer';
 import ResourceCard from '@/components/ResourceCard';
@@ -63,6 +63,15 @@ export async function generateMetadata({ params }) {
   return {
     title: `Resource Not Found - ${SITE_NAME}`,
     description: `The requested resource could not be found on ${SITE_NAME}.`,
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
+    },
   };
 }
 
@@ -74,34 +83,10 @@ export default async function ResourceDetailPageServer({ params }) {
     // Fetch resource using public cached API
     const resourceResponse = await getResourceBySlug(slug);
 
-
-
-    // Handle resource error
+    // Handle resource error -> 404
     if (resourceResponse.error || !resourceResponse.data) {
-      const errorMessage = resourceResponse.data?.detail || 'Failed to load resource.';
-      console.error('❌ [Resource Page /resources/[slug]] Failed to load resource:', errorMessage);
-
-      return (
-        <main className="container mx-auto py-8 px-4 text-center text-red-400">
-          <Breadcrumb className="mb-6 text-sm justify-center">
-            <BreadcrumbList>
-              <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbLink asChild><Link href="/resources">Resources</Link></BreadcrumbLink></BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbPage>Error</BreadcrumbPage></BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 bg-red-900/20 p-6 rounded-lg">
-            <ExclamationTriangleIcon className="h-12 w-12 mx-auto mb-4 text-red-500" />
-            <h1 className="text-2xl font-semibold mb-2">Resource Error</h1>
-            <p>{errorMessage}</p>
-            <Link href="/resources" className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
-              Back to Resources
-            </Link>
-          </div>
-        </main>
-      );
+      console.warn('❌ [Resource Page /resources/[slug]] Resource not found:', slug);
+      notFound();
     }
 
     const resource = resourceResponse.data;
@@ -285,32 +270,16 @@ export default async function ResourceDetailPageServer({ params }) {
       </main>
     );
   } catch (error) {
+    if (error?.digest?.startsWith('NEXT_')) {
+      throw error;
+    }
     console.error('❌ [Resource Page /resources/[slug]] Unexpected error:', error);
-    return (
-      <main className="container mx-auto py-8 px-4 text-center text-red-400">
-        <Breadcrumb className="mb-6 text-sm justify-center">
-          <BreadcrumbList>
-            <BreadcrumbItem><BreadcrumbLink asChild><Link href="/">Home</Link></BreadcrumbLink></BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem><BreadcrumbLink asChild><Link href="/resources">Resources</Link></BreadcrumbLink></BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem><BreadcrumbPage>Error</BreadcrumbPage></BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <div className="min-h-[60vh] flex flex-col items-center justify-center text-center py-10 bg-red-900/20 p-6 rounded-lg">
-          <ExclamationTriangleIcon className="h-12 w-12 mx-auto mb-4 text-red-500" />
-          <h1 className="text-2xl font-semibold mb-2">Unexpected Error</h1>
-          <p>An unexpected error occurred: {error.message}</p>
-          <Link href="/resources" className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700">
-            Back to Resources
-          </Link>
-        </div>
-      </main>
-    );
+    notFound();
   }
 }
 
 export const dynamic = 'force-static';
 export const dynamicParams = true;
 export const revalidate = 432000; // 5 days (5 * 24 * 60 * 60)
+
 

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { getStreamBySlug } from '../../../../services/apiService'; // Adjust path
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import {
@@ -43,8 +43,17 @@ export async function generateMetadata({ params }) {
 
   // Fallback metadata
   return {
-    title: "Stream Details - Gyan Aangan",
-    description: "Explore academic streams.",
+    title: "Stream Not Found - Gyan Aangan",
+    description: "The requested stream could not be found.",
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+      },
+    },
   };
 }
 
@@ -53,7 +62,6 @@ export default async function StreamDetailPage({ params }) {
   const { courseSlug, streamSlug } = await params;
 
   let stream = null;
-  let error = null;
   let parentCourseName = '';
 
   // Fetch data directly on the server
@@ -66,32 +74,16 @@ export default async function StreamDetailPage({ params }) {
       // Attempt to find the current course's name
       const currentCourseInfo = stream.courses?.find(c => c.slug === courseSlug);
       parentCourseName = currentCourseInfo?.name || formatCourseName(courseSlug);
-
-      // Handle redirect logic on the server
-      // if (stream.years && stream.years.length === 1) {
-      //   const year = stream.years[0];
-      //   // The redirect function must be called before any JSX is returned
-      //   redirect(`/${courseSlug}/${streamSlug}/${year.slug}`);
-      // }
     } else {
-      error = `Failed to load stream: ${response.data?.detail || 'Unknown error'}`;
-      console.error("Error fetching stream:", response);
+      console.warn("Stream not found:", { courseSlug, streamSlug });
+      notFound();
     }
   } catch (e) {
+    if (e?.digest?.startsWith('NEXT_')) {
+      throw e;
+    }
     console.error("Server-side fetch error:", e);
-    error = "An unexpected error occurred while fetching stream details.";
-  }
-
-  // Handle error state
-  if (error) {
-    return (
-      <main className="container mx-auto py-8 px-4 text-center text-red-400">
-        <p>{error}</p>
-        <Link href={`/${courseSlug}`} className="text-primary-light hover:underline mt-4 inline-block">
-          Back to Course
-        </Link>
-      </main>
-    );
+    notFound();
   }
 
   // Handle not found state
