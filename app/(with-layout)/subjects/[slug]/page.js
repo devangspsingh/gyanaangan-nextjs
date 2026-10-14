@@ -8,6 +8,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gyanaangan.in';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/default-og-image.jpg`;
 const SITE_NAME = 'Gyan Aangan';
 
+export const dynamic = 'force-static';
+export const dynamicParams = true;
 export const revalidate = 86400; // 24 hours ISR
 
 export async function generateMetadata({ params }) {

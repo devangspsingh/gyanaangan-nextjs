@@ -171,11 +171,10 @@ export const searchSite = async (query, filters = {}, page = 1, pageSize = 10) =
 
 export const getSpecialPageData = cache(async (courseSlug, streamSlug, yearSlug) => {
   try {
-    // Check if we're on server-side
     if (typeof window === 'undefined') {
-      // Server-side: use fetchFromServer with cookies for authentication
-      const response = await fetchFromServer(`/special-pages/details/${courseSlug}/${streamSlug}/${yearSlug}/`);
-      if (response.error || !response.data || response.status === 404 || response.data?.detail) {
+      // Server-side context: Use direct axios call to avoid cookie-based dynamic deopt, allowing pure ISR & CDN caching
+      const response = await axios.get(`${API_BASE_URL}/special-pages/details/${courseSlug}/${streamSlug}/${yearSlug}/`);
+      if (!response.data || response.status === 404 || response.data?.detail) {
         return { data: null, error: true, status: response.status || 404 };
       }
       return { data: response.data, error: false };
@@ -185,8 +184,11 @@ export const getSpecialPageData = cache(async (courseSlug, streamSlug, yearSlug)
       return { data: response.data, error: false };
     }
   } catch (error) {
-    console.error(`Error fetching special page for ${courseSlug}/${streamSlug}/${yearSlug}:`, error);
-    return { data: null, error: true };
+    if (error.response?.status === 404) {
+      return { data: null, error: true, status: 404 };
+    }
+    console.error(`Error fetching special page for ${courseSlug}/${streamSlug}/${yearSlug}:`, error.message);
+    return { data: null, error: true, status: error.response?.status || 500 };
   }
 });
 
