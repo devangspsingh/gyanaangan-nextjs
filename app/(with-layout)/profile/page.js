@@ -51,7 +51,7 @@ export default function ProfilePage() {
   return (
     <>
       <Head>
-        <title>{user.name || user.username}&apos;s Profile - Gyan Aangan</title>
+        <title>{user.name || 'My'}&apos;s Profile - Gyan Aangan</title>
         <meta name="description" content={`Manage your profile and preferences on Gyan Aangan.`} />
       </Head>
       <main className="container mx-auto px-4 text-gray-100 py-8"> {/* Added py-8 for consistency */}
@@ -64,7 +64,7 @@ export default function ProfilePage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{user.name || user.username}&apos;s Profile</BreadcrumbPage>
+              <BreadcrumbPage>{user.name ? `${user.name}'s Profile` : 'My Profile'}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -74,11 +74,11 @@ export default function ProfilePage() {
             {user.picture && (
               <img
                 src={user.picture}
-                alt={user.name || user.username}
+                alt={user.name || 'Profile Picture'}
                 className="w-32 h-32 rounded-full mb-4 border-4 border-primary"
               />
             )}
-            <h2 className="text-3xl font-semibold text-white">{user.name || user.username}</h2>
+            <h2 className="text-3xl font-semibold text-white">{user.name || 'Student'}</h2>
             <p className="text-gray-400">{user.email}</p>
           </div>
 

@@ -35,9 +35,7 @@ export default function ResourceActionsClient({ resource }) {
       const isStaffOrAdmin = Boolean(user.is_staff || user.is_superuser || user.hasContentManagement);
       const isOwner = Boolean(
         resource?.uploaded_by_user &&
-        (String(user.id) === String(resource.uploaded_by_user.id) ||
-         (user.username && resource.uploaded_by_user.username && user.username === resource.uploaded_by_user.username) ||
-         (user.email && resource.uploaded_by_user.email && user.email === resource.uploaded_by_user.email))
+        String(user.id) === String(resource.uploaded_by_user.id)
       );
       if (isStaffOrAdmin || isOwner || resource?.can_edit) {
         setCanEdit(true);
