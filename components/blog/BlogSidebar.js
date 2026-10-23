@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, usePathname } from 'next/navigation';
@@ -13,7 +14,7 @@ import {
 import { formatDate } from './utils';
 import { getGradientForSlug } from './gradients';
 
-export default function BlogSidebar({ categories = [], featuredPosts = [], currentPost = null }) {
+function BlogSidebarInner({ categories = [], featuredPosts = [], currentPost = null }) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const currentCategory = searchParams.get('category');
@@ -140,5 +141,13 @@ export default function BlogSidebar({ categories = [], featuredPosts = [], curre
                 </Card>
             )}
         </div>
+    );
+}
+
+export default function BlogSidebar(props) {
+    return (
+        <Suspense fallback={null}>
+            <BlogSidebarInner {...props} />
+        </Suspense>
     );
 }

@@ -21,6 +21,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const barlow = Barlow({ weight: ['700'], subsets: ['latin'], variable: '--font-barlow', display: 'swap' });
 const roboto_mono = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto-mono', display: 'swap' });
+import { Suspense } from 'react';
 import AnalyticsTracker from '@/components/AnalyticsTracker'; // Import AnalyticsTracker
 import GoogleAdSenseLoader from '@/components/Ads/GoogleAdSenseLoader';
 import LoginNudge from '@/components/Auth/LoginNudge'; // Import LoginNudge
@@ -31,9 +32,13 @@ export default function WithLayout({ children }) {
   return (
     <>
       <DynamicBackground />
-      <AnalyticsTracker />
+      <Suspense fallback={null}>
+        <AnalyticsTracker />
+      </Suspense>
       <GoogleAdSenseLoader />
-      <LoginNudge />
+      <Suspense fallback={null}>
+        <LoginNudge />
+      </Suspense>
       <Header />
       <StickyNotification />
       <div className="relative container-app pt-16 pb-20 md:pb-0 md:pl-20 max-w-screen-xl mx-auto min-h-[calc(100vh-theme(space.16))]">

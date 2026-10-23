@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import EventListingClient from '@/components/event/EventListingClient';
 
 export const metadata = {
@@ -9,7 +9,9 @@ export const metadata = {
 const EventsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <EventListingClient />
+      <Suspense fallback={<div className="container mx-auto py-12 text-center text-gray-400">Loading events...</div>}>
+        <EventListingClient />
+      </Suspense>
     </div>
   );
 };
