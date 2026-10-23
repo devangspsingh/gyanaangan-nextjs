@@ -1,4 +1,5 @@
 import React from 'react';
+import { notFound } from 'next/navigation';
 import OrganizationDetailClient from '@/components/organization/OrganizationDetailClient';
 import { getOrganizationBySlug } from '@/services/organizationService';
 
@@ -7,10 +8,7 @@ export async function generateMetadata({ params }) {
   const { data, error } = await getOrganizationBySlug(slug);
 
   if (error || !data) {
-    return {
-      title: 'Organization Not Found | Gyan Aangan',
-      description: 'The requested organization could not be found.',
-    };
+    notFound();
   }
 
   return {
@@ -26,10 +24,15 @@ export async function generateMetadata({ params }) {
 
 const OrganizationDetailPage = async ({ params }) => {
   const { slug } = await params;
+  const { data, error } = await getOrganizationBySlug(slug);
+
+  if (error || !data) {
+    notFound();
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <OrganizationDetailClient slug={slug} />
+      <OrganizationDetailClient slug={slug} initialData={data} />
     </div>
   );
 };

@@ -23,20 +23,7 @@ export async function generateMetadata({ params }) {
   const post = response.data;
 
   if (!post) {
-    return {
-      metadataBase: new URL(SITE_URL),
-      title: 'Post Not Found - GyanAangan Blog',
-      description: 'The requested blog post could not be found.',
-      robots: {
-        index: false,
-        follow: false,
-        nocache: true,
-        googleBot: {
-          index: false,
-          follow: false,
-        },
-      },
-    };
+    notFound();
   }
 
   // Generate dynamic OG image URL

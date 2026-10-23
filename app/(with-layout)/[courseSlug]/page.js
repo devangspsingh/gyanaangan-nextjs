@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCourseBySlug } from '@/services/apiService';
+import { getCourseBySlug, getCourses } from '@/services/apiService';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import {
   Breadcrumb,
@@ -10,6 +10,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+
+export const dynamicParams = false;
+export const revalidate = 86400; // 24 hours ISR
+
+export async function generateStaticParams() {
+  try {
+    const response = await getCourses(1, 100);
+    const courses = response?.data?.results || response?.data || [];
+    return courses.filter(c => c && c.slug).map(c => ({ courseSlug: c.slug }));
+  } catch (error) {
+    console.error('Failed to generateStaticParams for courses:', error);
+    return [];
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { courseSlug } = await params;

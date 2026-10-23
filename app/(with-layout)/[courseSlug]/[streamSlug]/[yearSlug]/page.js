@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getSpecialPageData } from '../../../../../services/apiService';
+import { getSpecialPageData, getCourses } from '@/services/apiService';
 import SubjectCard from '../../../../../components/SubjectCard';
 import SubscribeButton from '../../../../../components/SubscribeButton';
 import {
@@ -169,6 +169,32 @@ export default async function SpecialPage({ params }) {
   );
 }
 
+export async function generateStaticParams() {
+  try {
+    const response = await getCourses(1, 100);
+    const courses = response?.data?.results || response?.data || [];
+    const params = [];
+    for (const course of courses) {
+      if (!course.slug || !Array.isArray(course.streams)) continue;
+      for (const stream of course.streams) {
+        if (!stream.slug || !Array.isArray(stream.years)) continue;
+        for (const year of stream.years) {
+          if (!year.slug) continue;
+          params.push({
+            courseSlug: course.slug,
+            streamSlug: stream.slug,
+            yearSlug: year.slug,
+          });
+        }
+      }
+    }
+    return params;
+  } catch (error) {
+    console.error('Failed to generateStaticParams for years:', error);
+    return [];
+  }
+}
+
 export const dynamic = 'force-static';
-export const dynamicParams = true;
+export const dynamicParams = false;
 export const revalidate = 86400; // 24 hours ISR
